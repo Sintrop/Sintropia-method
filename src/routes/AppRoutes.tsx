@@ -6,7 +6,9 @@ const Stack = createNativeStackNavigator()
 
 export function AppRoutes(): React.JSX.Element {
 	return (
-		<Stack.Navigator>
+		<Stack.Navigator
+      screenOptions={{ headerShown: false }}
+    >
 			<Stack.Screen name="HomeScreen" component={HomeScreen} />
 		</Stack.Navigator>
 	)
