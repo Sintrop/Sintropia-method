@@ -13,6 +13,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {PreInspectionStackParamsList} from '../../../routes/PreInspectionRoutes';
 import {getInspectionById} from '../../../services/inspection/getInspectionById';
 import {InspectionProps} from '../../../types/inspection';
+import { PreviewInspection } from '../../../components/PreviewInspection/PreviewInspection';
 
 type ScreenProps = NativeStackScreenProps<
   PreInspectionStackParamsList,
@@ -79,6 +80,11 @@ export function SearchInspectionScreen({navigation}: ScreenProps) {
           {t('accessListOfInspections')}
         </Text>
       </TouchableOpacity>
+
+      <PreviewInspection
+        inspection={inspection}
+        next={() => {}}
+      />
     </Screen>
   );
 }

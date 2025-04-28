@@ -1,4 +1,4 @@
-import Web3, { FMT_NUMBER } from 'web3'
+import Web3 from 'web3'
 import {
   SEQUOIA_INSPECTION_RULES_ADDRESS,
   INSPECTION_RULES_ADDRESS
