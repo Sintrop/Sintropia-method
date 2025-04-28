@@ -1,5 +1,6 @@
 {
   "translation": {
-    "helloWorld": "Hello World!!!"
+    "helloWorld": "Hello World!!!",
+    "whichAreaDoYouWantToInspect": "Which Area Do You Want To Inspect?"
   }
 }
