@@ -3,15 +3,15 @@ import { Text } from "react-native";
 import { Screen } from "../../../components/Screen/Screen";
 import { useTranslation } from "react-i18next";
 
-export function InspectionsScreen() {
+export function InspectionsListScreen() {
   const {t} = useTranslation()
 
   return (
-    <Screen
-      screenTitle={t('inspections')}
+    <Screen 
+      screenTitle={t('inspectionsList')}
       showBackButton
     >
-      <Text>Inspections</Text>
+      <Text>Inspections list</Text>
     </Screen>
   )
 }
