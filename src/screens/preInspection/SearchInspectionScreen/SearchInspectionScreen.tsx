@@ -1,9 +1,10 @@
 import React, {useState} from 'react';
-import {Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {ActivityIndicator, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {Screen} from '../../../components/Screen/Screen';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {PreInspectionStackParamsList} from '../../../routes/PreInspectionRoutes';
+import { getInspectionById } from '../../../services/inspection/getInspectionById';
 
 type ScreenProps = NativeStackScreenProps<
   PreInspectionStackParamsList,
@@ -12,9 +13,21 @@ type ScreenProps = NativeStackScreenProps<
 export function SearchInspectionScreen({navigation}: ScreenProps) {
   const {t} = useTranslation();
   const [id, setId] = useState('');
+  const [loadingSearch, setLoadingSearch] = useState(false)
 
   function handleGoToInspectionsList(){
     navigation.navigate('InspectionsListScreen')
+  }
+
+  async function handleSearchInspection(){
+    if (!id.trim()) return
+    setLoadingSearch(true)
+    const response = await getInspectionById({
+      id: parseInt(id),
+      rpcUrl: 'https://sequoiarpc.sintrop.com',
+      testnet: true
+    })
+    setLoadingSearch(false)
   }
 
   return (
@@ -30,8 +43,16 @@ export function SearchInspectionScreen({navigation}: ScreenProps) {
           keyboardType="numeric"
         />
 
-        <TouchableOpacity className="px-10 h-[48] bg-[#229B13] flex items-center justify-center rounded-2xl ml-5">
-          <Text className="font-semibold text-white">{t('search')}</Text>
+        <TouchableOpacity
+          className="w-20 h-[48] bg-[#229B13] flex items-center justify-center rounded-2xl ml-5"
+          onPress={handleSearchInspection}
+          disabled={loadingSearch}
+        >
+          {loadingSearch ? (
+            <ActivityIndicator color="white" size={30} />
+          ) : (
+            <Text className="font-semibold text-white">{t('search')}</Text>
+          )}
         </TouchableOpacity>
       </View>
 
