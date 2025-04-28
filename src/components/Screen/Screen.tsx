@@ -1,13 +1,12 @@
 import React from 'react'
 import { View } from 'react-native'
-import { Header } from '../Header/Header'
+import { Header, HeaderProps } from '../Header/Header'
 import { useSafeAreaApp } from '../../hooks/useSafeAreaApp'
 
-interface Props {
+interface Props extends HeaderProps {
 	children: React.ReactNode
-	screenTitle: string
 }
-export function Screen({ children, screenTitle }: Props): React.JSX.Element {
+export function Screen({ children, ...headerProps }: Props): React.JSX.Element {
 	const { top } = useSafeAreaApp()
 
 	return (
@@ -15,7 +14,7 @@ export function Screen({ children, screenTitle }: Props): React.JSX.Element {
 			className="flex-1"
 			style={{ paddingTop: top }}
 		>
-			<Header screenTitle={screenTitle} />
+			<Header {...headerProps} />
 
 			<View className="p-5">
 				{children}

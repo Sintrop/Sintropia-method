@@ -7,7 +7,10 @@ export function InspectionsScreen() {
   const {t} = useTranslation()
 
   return (
-    <Screen screenTitle={t('inspections')}>
+    <Screen
+      screenTitle={t('inspections')}
+      showBackButton
+    >
       <Text>Inspections</Text>
     </Screen>
   )
