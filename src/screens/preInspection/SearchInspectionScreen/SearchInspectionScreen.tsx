@@ -1,10 +1,18 @@
 import React, {useState} from 'react';
-import {ActivityIndicator, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {Screen} from '../../../components/Screen/Screen';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {PreInspectionStackParamsList} from '../../../routes/PreInspectionRoutes';
-import { getInspectionById } from '../../../services/inspection/getInspectionById';
+import {getInspectionById} from '../../../services/inspection/getInspectionById';
+import {InspectionProps} from '../../../types/inspection';
 
 type ScreenProps = NativeStackScreenProps<
   PreInspectionStackParamsList,
@@ -13,21 +21,28 @@ type ScreenProps = NativeStackScreenProps<
 export function SearchInspectionScreen({navigation}: ScreenProps) {
   const {t} = useTranslation();
   const [id, setId] = useState('');
-  const [loadingSearch, setLoadingSearch] = useState(false)
+  const [loadingSearch, setLoadingSearch] = useState(false);
+  const [inspection, setInspection] = useState({} as InspectionProps);
 
-  function handleGoToInspectionsList(){
-    navigation.navigate('InspectionsListScreen')
+  function handleGoToInspectionsList() {
+    navigation.navigate('InspectionsListScreen');
   }
 
-  async function handleSearchInspection(){
-    if (!id.trim()) return
-    setLoadingSearch(true)
+  async function handleSearchInspection() {
+    if (!id.trim()) return;
+    setLoadingSearch(true);
     const response = await getInspectionById({
       id: parseInt(id),
       rpcUrl: 'https://sequoiarpc.sintrop.com',
-      testnet: true
-    })
-    setLoadingSearch(false)
+      testnet: true,
+    });
+
+    if (response.success) {
+      if (response.inspection) setInspection(response.inspection);
+    } else {
+      Alert.alert('Error', response.message)
+    }
+    setLoadingSearch(false);
   }
 
   return (
@@ -46,8 +61,7 @@ export function SearchInspectionScreen({navigation}: ScreenProps) {
         <TouchableOpacity
           className="w-20 h-[48] bg-[#229B13] flex items-center justify-center rounded-2xl ml-5"
           onPress={handleSearchInspection}
-          disabled={loadingSearch}
-        >
+          disabled={loadingSearch}>
           {loadingSearch ? (
             <ActivityIndicator color="white" size={30} />
           ) : (
@@ -60,8 +74,7 @@ export function SearchInspectionScreen({navigation}: ScreenProps) {
 
       <TouchableOpacity
         className="px-10 h-[48] border border-[#229B13] flex items-center justify-center rounded-2xl"
-        onPress={handleGoToInspectionsList}
-      >
+        onPress={handleGoToInspectionsList}>
         <Text className="font-semibold text-[#229B13]">
           {t('accessListOfInspections')}
         </Text>
