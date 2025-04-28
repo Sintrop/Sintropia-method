@@ -17,3 +17,8 @@ export interface RegeneratorProps {
   }
   createdAt: number
 }
+
+export interface CoordinateProps {
+  latitude: string
+  longitude: string
+}

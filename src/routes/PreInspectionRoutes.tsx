@@ -3,12 +3,18 @@ import {HomeScreen} from '../screens/preInspection/HomeScreen/HomeScreen';
 import {SearchInspectionScreen} from '../screens/preInspection/SearchInspectionScreen/SearchInspectionScreen';
 import {InspectionsListScreen} from '../screens/preInspection/InspectionsListScreen/InspectionsListScreen';
 import {AreaPreviewScreen} from '../screens/preInspection/AreaPreviewScreen/AreaPreviewScreen';
+import {InspectionProps} from '../types/inspection';
+import {CoordinateProps, RegeneratorProps} from '../types/regenerator';
 
 export type PreInspectionStackParamsList = {
   HomeScreen: undefined;
   SearchInspectionScreen: undefined;
   InspectionsListScreen: undefined;
-  AreaPreviewScreen: undefined;
+  AreaPreviewScreen: {
+    inspection: InspectionProps;
+    regenerator: RegeneratorProps;
+    coords: CoordinateProps[];
+  };
 };
 
 const Stack = createNativeStackNavigator<PreInspectionStackParamsList>();
