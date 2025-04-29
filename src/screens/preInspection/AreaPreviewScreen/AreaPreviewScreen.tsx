@@ -1,9 +1,27 @@
-import React from 'react';
-import {ActivityIndicator, Text, TouchableOpacity, View} from 'react-native';
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import React, {useState} from 'react';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {Screen} from '../../../components/Screen/Screen';
 import {useTranslation} from 'react-i18next';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {PreInspectionStackParamsList} from '../../../routes/PreInspectionRoutes';
+import Mapbox, {
+  Camera,
+  MapView,
+  PointAnnotation,
+  StyleURL,
+} from '@rnmapbox/maps';
+//@ts-ignore
+import {MAPBOX_ACCESS_TOKEN} from '@env';
+import {Polyline} from '../../../components/Map/Polyline';
+
+Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN ? MAPBOX_ACCESS_TOKEN : '');
 
 type ScreenProps = NativeStackScreenProps<
   PreInspectionStackParamsList,
@@ -12,10 +30,43 @@ type ScreenProps = NativeStackScreenProps<
 export function AreaPreviewScreen({route}: ScreenProps) {
   const {coords} = route.params;
   const {t} = useTranslation();
+  const pathPolyline: [number, number][] = coords.map(coord => [
+    parseFloat(coord.longitude),
+    parseFloat(coord.latitude),
+  ]);
+  pathPolyline.push([...pathPolyline[0]]);
+
+  const [loading, setLoading] = useState(false);
+
+  function handleStartInspection() {
+    setLoading(true);
+  }
 
   return (
     <Screen screenTitle={t('areaPreview')} showBackButton>
-      <View className="w-full h-[250px] bg-red-500" />
+      <MapView style={styles.mapContainer} styleURL={StyleURL.SatelliteStreet}>
+        <Camera
+          centerCoordinate={[
+            parseFloat(coords[0].longitude),
+            parseFloat(coords[0].latitude),
+          ]}
+          zoomLevel={15}
+        />
+
+        {coords.map((coord, index) => (
+          <PointAnnotation
+            key={index.toString()}
+            coordinate={[
+              parseFloat(coord?.longitude),
+              parseFloat(coord.latitude),
+            ]}
+            id="marker">
+            <View />
+          </PointAnnotation>
+        ))}
+
+        <Polyline lineColor="red" lineWidth={4} coordinates={pathPolyline} />
+      </MapView>
 
       <View className="p-3 rounded-2xl border mt-5">
         <Text>{t('coordinates')}</Text>
@@ -26,8 +77,10 @@ export function AreaPreviewScreen({route}: ScreenProps) {
         ))}
       </View>
 
-      <TouchableOpacity className="w-full h-[48] bg-[#229B13] flex items-center justify-center rounded-2xl mt-10">
-        {false ? (
+      <TouchableOpacity
+        className="w-full h-[48] bg-[#229B13] flex items-center justify-center rounded-2xl mt-10"
+        onPress={handleStartInspection}>
+        {loading ? (
           <ActivityIndicator color="white" size={30} />
         ) : (
           <Text className="font-semibold text-white">
@@ -38,3 +91,10 @@ export function AreaPreviewScreen({route}: ScreenProps) {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  mapContainer: {
+    height: 300,
+    width: '100%',
+  },
+});
