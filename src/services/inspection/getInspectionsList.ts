@@ -5,22 +5,20 @@ import InspectionRules from '../../data/abis/mainnet/InspectionRules.json';
 import {InspectionProps} from '../../types/inspection';
 import {parseInspectionData} from './parseInspectionData';
 
-interface ReturnGetInspectionByIdProps {
+interface ReturnGetInspectionsListProps {
   success: boolean;
-  inspection?: InspectionProps;
+  inspections: InspectionProps[];
   message?: string;
 }
 
-interface GetInspectionByIdProps {
-  id: number;
+interface GetInspectionsListProps {
   rpcUrl: string;
   testnet: boolean;
 }
-export async function getInspectionById({
-  id,
+export async function getInspectionsList({
   rpcUrl,
   testnet,
-}: GetInspectionByIdProps): Promise<ReturnGetInspectionByIdProps> {
+}: GetInspectionsListProps): Promise<ReturnGetInspectionsListProps> {
   const abiToUse = testnet ? SequoiaInspectionRules.abi : InspectionRules.abi;
   const addressToUse = testnet
     ? SEQUOIA_INSPECTION_RULES_ADDRESS
@@ -30,27 +28,36 @@ export async function getInspectionById({
   const InspectionContract = new web3.eth.Contract(abiToUse, addressToUse);
 
   try {
-    const response = (await InspectionContract.methods
-      .getInspection(id)
-      .call()) as InspectionProps;
+    const response = await InspectionContract.methods
+      .inspectionsTotalCount()
+      .call();
+    const inspectionsCount = response
+      ? parseInt(String(response)?.replace('n', ''))
+      : 0;
+    const ids = Array.from(
+      {length: inspectionsCount},
+      (_, i) => i + 1,
+    ).reverse();
 
-    if (
-      response?.regenerator === '0x0000000000000000000000000000000000000000'
-    ) {
-      return {
-        success: false,
-        message: 'inspectionNotFound',
-      };
+    const inspectionsList: InspectionProps[] = [];
+
+    for (let i = 0; i < ids.length; i++) {
+      const responseInspection = (await InspectionContract.methods
+        .getInspection(ids[i])
+        .call()) as InspectionProps;
+
+      inspectionsList.push(parseInspectionData(responseInspection));
     }
 
     return {
       success: true,
-      inspection: parseInspectionData(response),
+      inspections: inspectionsList,
     };
   } catch (e) {
     console.log('Error: ' + e);
     return {
       success: false,
+      inspections: [],
     };
   }
 }
