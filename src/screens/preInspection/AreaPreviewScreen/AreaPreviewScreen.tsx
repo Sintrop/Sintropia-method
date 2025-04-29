@@ -26,13 +26,13 @@ export function AreaPreviewScreen({route}: ScreenProps) {
         ))}
       </View>
 
-      <TouchableOpacity
-        className="w-full h-[48] bg-[#229B13] flex items-center justify-center rounded-2xl mt-10"
-      >
+      <TouchableOpacity className="w-full h-[48] bg-[#229B13] flex items-center justify-center rounded-2xl mt-10">
         {false ? (
           <ActivityIndicator color="white" size={30} />
         ) : (
-          <Text className="font-semibold text-white">{t('startInspection')}</Text>
+          <Text className="font-semibold text-white">
+            {t('startInspection')}
+          </Text>
         )}
       </TouchableOpacity>
     </Screen>

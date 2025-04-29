@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -6,17 +6,17 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
-import {Modalize} from 'react-native-modalize';
-import {Portal} from 'react-native-portalize';
-import {InspectionProps} from '../../types/inspection';
-import {useTranslation} from 'react-i18next';
-import {StatusTagInspection} from '../StatusTagInspection/StatusTagInspection';
-import {CoordinateProps, RegeneratorProps} from '../../types/regenerator';
-import {getRegeneratorByAddress} from '../../services/regenerator/getRegeneratorByAddress';
-import {getCoordinates} from '../../services/regenerator/getCoordinates';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {PreInspectionStackParamsList} from '../../routes/PreInspectionRoutes';
+import { Modalize } from 'react-native-modalize';
+import { Portal } from 'react-native-portalize';
+import { InspectionProps } from '../../types/inspection';
+import { useTranslation } from 'react-i18next';
+import { StatusTagInspection } from '../StatusTagInspection/StatusTagInspection';
+import { CoordinateProps, RegeneratorProps } from '../../types/regenerator';
+import { getRegeneratorByAddress } from '../../services/regenerator/getRegeneratorByAddress';
+import { getCoordinates } from '../../services/regenerator/getCoordinates';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { PreInspectionStackParamsList } from '../../routes/PreInspectionRoutes';
 
 type NavigationProps = NativeStackNavigationProp<
   PreInspectionStackParamsList,
@@ -25,10 +25,10 @@ type NavigationProps = NativeStackNavigationProp<
 interface Props {
   inspection: InspectionProps;
 }
-export function PreviewInspection({inspection}: Props) {
+export function PreviewInspection({ inspection }: Props) {
   const navigation = useNavigation<NavigationProps>();
   const modalRef = useRef<Modalize>();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [loadingRegenerator, setLoadingRegenerator] = useState(false);
   const [regenerator, setRegenerator] = useState({} as RegeneratorProps);
   const [loadingCoordinates, setLoadingCoordinates] = useState(false);
@@ -120,7 +120,8 @@ export function PreviewInspection({inspection}: Props) {
                   <TouchableOpacity
                     className="w-full h-[48] rounded-2xl bg-[#229B13] flex items-center justify-center mt-5"
                     onPress={handleGetCoordinates}
-                    disabled={loadingCoordinates}>
+                    disabled={loadingCoordinates}
+                  >
                     {loadingCoordinates ? (
                       <ActivityIndicator color="white" size={30} />
                     ) : (

@@ -1,33 +1,33 @@
-import React from "react";
-import { ChevronLeft } from "../../assets/icons/ChevronLeft";
-import { Pressable } from "react-native";
+import React from 'react';
+import { ChevronLeft } from '../../assets/icons/ChevronLeft';
+import { Pressable } from 'react-native';
 
 export interface IconBaseProps {
-  size?: number
-  color?: string
+  size?: number;
+  color?: string;
 }
 
 interface Props {
-  name: IconName
-  size?: number
-  color?: string
-  onPress?: () => void
+  name: IconName;
+  size?: number;
+  color?: string;
+  onPress?: () => void;
 }
 export function Icon({ name, color, size, onPress }: Props) {
-  const IconComponent = icons[name]
+  const IconComponent = icons[name];
 
   if (onPress) {
     return (
       <Pressable onPress={onPress}>
         <IconComponent color={color} size={size} />
       </Pressable>
-    )
+    );
   }
-  return <IconComponent color={color} size={size} />
+  return <IconComponent color={color} size={size} />;
 }
 
 const icons = {
-  chevronLeft: ChevronLeft
-}
+  chevronLeft: ChevronLeft,
+};
 
-export type IconName = keyof typeof icons
+export type IconName = keyof typeof icons;

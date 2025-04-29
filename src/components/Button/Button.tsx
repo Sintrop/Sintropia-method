@@ -14,7 +14,7 @@ interface Props extends TouchableOpacityProps {
 }
 export function Button({title, isLoading, ...rest}: Props): React.JSX.Element {
   return (
-    <TouchableOpacity style={[$defaultContainerStyle]} {...rest}>
+    <TouchableOpacity style={$defaultContainerStyle} {...rest}>
       {isLoading ? (
         <ActivityIndicator color={'white'} size={30} />
       ) : (

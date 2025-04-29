@@ -1,11 +1,11 @@
-import React from 'react'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { Routes } from './src/routes'
-import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { MainContextProvider } from './src/contexts/MainContext'
-import './src/lang/i18n'
-import 'react-native-get-random-values'
-import 'text-encoding'
+import React from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Routes } from './src/routes';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { MainContextProvider } from './src/contexts/MainContext';
+import './src/lang/i18n';
+import 'react-native-get-random-values';
+import 'text-encoding';
 
 export default function App(): React.JSX.Element {
   return (
@@ -16,5 +16,5 @@ export default function App(): React.JSX.Element {
         </MainContextProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
-  )
+  );
 }
