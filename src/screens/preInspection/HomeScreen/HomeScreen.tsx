@@ -17,6 +17,10 @@ export function HomeScreen({navigation}: ScreenProps): React.JSX.Element {
     navigation.navigate('SearchInspectionScreen');
   }
 
+  function handleGoToInspectedAreasScreen() {
+    navigation.navigate('InspectedAreasScreen');
+  }
+
   return (
     <Screen screenTitle="Home Screen">
       <View className="items-end">
@@ -33,6 +37,15 @@ export function HomeScreen({navigation}: ScreenProps): React.JSX.Element {
           onPress={handleGoToInspectionsScreen}>
           <Text className="font-semibold text-white">
             {t('selectInspection')}
+          </Text>
+        </TouchableOpacity>
+
+        <Text className="mt-10">{t('seeYourAreasAlreadyInspected')}</Text>
+        <TouchableOpacity
+          className="w-[320] h-[48] rounded-2xl border border-[#229B13] flex items-center justify-center mt-1"
+          onPress={handleGoToInspectedAreasScreen}>
+          <Text className="font-semibold text-[#229B13]">
+            {t('inspectedAreas')}
           </Text>
         </TouchableOpacity>
       </View>
