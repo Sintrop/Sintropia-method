@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import SQLite, { SQLiteDatabase } from 'react-native-sqlite-storage';
-import { AreaDBProps, InspectionDBProps } from '../types/database';
+import { AreaDBProps, BiodiversityDBProps, InspectionDBProps } from '../types/database';
 
 export function useSQLite() {
   const [db, setDb] = useState<SQLiteDatabase | null>(null);
@@ -130,6 +130,44 @@ export function useSQLite() {
     });
   };
 
+  async function fetchBiodiversityByAreaId(id: number): Promise<BiodiversityDBProps[]> {
+    if (!db) return [];
+
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        tx.executeSql(
+          'SELECT * FROM biodiversity WHERE areaId = ?;',
+          [id],
+          (_, results) => {
+            const rows = results.rows;
+            const list: BiodiversityDBProps[] = [];
+            for (let i = 0; i < rows.length; i++) {
+              list.push(rows.item(i));
+            }
+            resolve(list);
+          },
+          (_, error) => {
+            console.error('Erro ao buscar biodiversidade:', error);
+            reject(error);
+            return true;
+          }
+        );
+      })
+    });
+  }
+
+  async function addBiodiversity(data: Omit<BiodiversityDBProps, 'id'>) {
+    if (!db) return;
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'INSERT INTO biodiversity (photo, areaId, specieData, coordinate) VALUES (?, ?, ?, ?);',
+        [data?.photo, data?.areaId, data.specieData, data.coordinate],
+        () => { }
+      );
+    });
+  };
+
   return { 
     fetchAreas,
     fetchOpenedAreas,
@@ -137,5 +175,7 @@ export function useSQLite() {
     addInspection,
     areas,
     areasOpened,
+    fetchBiodiversityByAreaId,
+    addBiodiversity
   };
 }

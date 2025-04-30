@@ -9,7 +9,7 @@ export function HeaderInspectionMode() {
   const {exitInspectionMode} = useInspectionContext();
   
   return (
-    <View className="flex-row items-center justify-between w-full mb-10">
+    <View className="flex-row items-center justify-between w-full mb-2">
       <View>
         <Text className="text-sm text-black">
           {t('youAreInInspectionMode')}
