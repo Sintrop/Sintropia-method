@@ -2,10 +2,14 @@ import { createContext, ReactNode, useEffect, useState } from 'react';
 import { StartInspectionProps } from '../types/inspectionContext';
 import { useSQLite } from '../hooks/useSQLite';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AreaDBProps } from '../types/database';
 
 export interface InspectionContextProps {
   inspectionMode: boolean;
   startInspection: (data: StartInspectionProps) => void;
+  exitInspectionMode: () => void;
+  enterInspectionMode: () => void;
+  areaOpened: AreaDBProps | undefined;
 }
 
 interface InspectionProviderProps {
@@ -17,12 +21,19 @@ export const InspectionContext = createContext({} as InspectionContextProps);
 export function InspectionContextProvider({
   children,
 }: InspectionProviderProps) {
-  const { addArea, addInspection } = useSQLite();
+  const { addArea, addInspection, areasOpened } = useSQLite();
   const [inspectionMode, setInspectionMode] = useState(false);
+  const [areaOpened, setAreaOpened] = useState<AreaDBProps>()
 
   useEffect(() => {
     handleCheckInspectionMode();
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    if (areasOpened.length > 0) {
+      setAreaOpened(areasOpened[0]);
+    }
+  }, [areasOpened])
 
   async function handleCheckInspectionMode() {
     const response = await AsyncStorage.getItem('inspection-mode')
@@ -60,11 +71,24 @@ export function InspectionContextProvider({
     await AsyncStorage.setItem('inspection-mode', 'true');
   }
 
+  function exitInspectionMode() {
+    AsyncStorage.removeItem('inspection-mode');
+    setInspectionMode(false)
+  }
+
+  function enterInspectionMode() {
+    AsyncStorage.setItem('inspection-mode', 'true');
+    setInspectionMode(true)
+  }
+
   return (
     <InspectionContext.Provider
       value={{
         inspectionMode,
-        startInspection
+        startInspection,
+        exitInspectionMode,
+        enterInspectionMode,
+        areaOpened
       }}
     >
       {children}

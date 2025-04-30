@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { Host } from 'react-native-portalize';
 import { PreInspectionRoutes } from './PreInspectionRoutes';
 import { useInspectionContext } from '../hooks/useInspectionContext';
-import { InspectionsRoutes } from './InspectionsRoutes';
+import { InspectionRoutes } from './InspectionRoutes';
 
 export function Routes(): React.JSX.Element {
   const { inspectionMode } = useInspectionContext();
@@ -11,7 +11,7 @@ export function Routes(): React.JSX.Element {
   return (
     <NavigationContainer>
       <Host>
-        {inspectionMode ? <InspectionsRoutes /> : <PreInspectionRoutes />}
+        {inspectionMode ? <InspectionRoutes /> : <PreInspectionRoutes />}
       </Host>
     </NavigationContainer>
   );

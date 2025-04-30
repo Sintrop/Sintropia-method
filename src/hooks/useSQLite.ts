@@ -4,7 +4,8 @@ import { AreaDBProps, InspectionDBProps } from '../types/database';
 
 export function useSQLite() {
   const [db, setDb] = useState<SQLiteDatabase | null>(null);
-  const [areas, setAreas] = useState<AreaDBProps[]>([])
+  const [areas, setAreas] = useState<AreaDBProps[]>([]);
+  const [areasOpened, setAreasOpened] = useState<AreaDBProps[]>([]);
 
   useEffect(() => {
     const initDB = async () => {
@@ -48,7 +49,8 @@ export function useSQLite() {
   }, []);
 
   useEffect(() => {
-    fetchAreas()
+    fetchAreas();
+    fetchOpenedAreas();
   }, [db])
 
   async function fetchAreas() {
@@ -68,6 +70,25 @@ export function useSQLite() {
     } catch (e) {
       console.log(e);
     }
+  }
+
+  async function fetchOpenedAreas() {
+    if (!db) return;
+
+    await db.transaction (tx => {
+      tx.executeSql(
+        'SELECT * from area WHERE status = 0;',
+        [],
+        (_, results) => {
+          const rows = results.rows;
+          const list: AreaDBProps[] = [];
+          for (let i = 0; i < rows.length; i++) {
+            list.push(rows.item(i));
+          }
+          setAreasOpened(list)
+        }
+      )
+    })
   }
 
   async function addArea(data: Omit<AreaDBProps, 'id'>) {
@@ -109,5 +130,12 @@ export function useSQLite() {
     });
   };
 
-  return { fetchAreas, addArea, addInspection, areas };
+  return { 
+    fetchAreas,
+    fetchOpenedAreas,
+    addArea,
+    addInspection,
+    areas,
+    areasOpened,
+  };
 }

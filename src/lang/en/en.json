@@ -1,6 +1,16 @@
 {
   "translation": {
     "helloWorld": "Hello World!!!",
-    "whichAreaDoYouWantToInspect": "Which Area Do You Want To Inspect?"
+    "whichAreaDoYouWantToInspect": "Which Area Do You Want To Inspect?",
+    "overview": "Overview",
+    "overviewDescription": "Your objective is to evaluate the number of trees larger than 5 cm in diameter in the selected area, as well as their species diversity.",
+    "treesResult": "Trees result",
+    "treesResultDescription": "The number of trees, palm trees and other plants larger than 5cm in diameter found in the regeneration area. Only plants managed or planted by the regenerator must be counted.",
+    "biodiversityResult": "Biodiversity result",
+    "biodiversityResultDescription": "The number of different species of trees, palm trees and other plants larger than 5 cm in diameter found in the regeneration area. Only plants managed or planted by the regenerator must be counted.",
+    "report": "Report",
+    "reportDescription": "As you fill in the data, an automated report with the justification for the result found will be created automatically and will be available for download.",
+    "howWouldYouLikeCollectData": "How would you like to collect the data?",
+    "descHowWouldYouLikeCollectData": "In the manual method, trees need to be inserted one by one, which is recommended for small areas. In the sampling method, samples are collected and the total result is estimated, which is recommended for large areas."
   }
 }

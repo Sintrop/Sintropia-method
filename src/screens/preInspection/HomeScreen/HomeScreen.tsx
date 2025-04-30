@@ -5,12 +5,14 @@ import {Screen} from '../../../components/Screen/Screen';
 import {LanguageSelector} from '../../../components/LanguageSelector/LanguageSelector';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {PreInspectionStackParamsList} from '../../../routes/PreInspectionRoutes';
+import { useInspectionContext } from '../../../hooks/useInspectionContext';
 
 type ScreenProps = NativeStackScreenProps<
   PreInspectionStackParamsList,
   'HomeScreen'
 >;
 export function HomeScreen({navigation}: ScreenProps): React.JSX.Element {
+  const { areaOpened, enterInspectionMode } = useInspectionContext();
   const {t} = useTranslation();
 
   function handleGoToInspectionsScreen() {
@@ -28,17 +30,35 @@ export function HomeScreen({navigation}: ScreenProps): React.JSX.Element {
       </View>
 
       <View className="items-center">
-        <Text className="text-black text-center mt-10">
-          {t('whichAreaDoYouWantToInspect')}
-        </Text>
+        {areaOpened ? (
+          <View className="">
+            <Text className="text-black text-center mt-10">
+              {t('youHaveAnOpenedInspection')}
+            </Text>
 
-        <TouchableOpacity
-          className="w-[320] h-[48] rounded-2xl bg-[#229B13] flex items-center justify-center mt-5"
-          onPress={handleGoToInspectionsScreen}>
-          <Text className="font-semibold text-white">
-            {t('selectInspection')}
-          </Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+              className="w-[320] h-[48] rounded-2xl bg-[#229B13] flex items-center justify-center mt-5"
+              onPress={enterInspectionMode}>
+              <Text className="font-semibold text-white">
+                {t('continue')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View>
+            <Text className="text-black text-center mt-10">
+              {t('whichAreaDoYouWantToInspect')}
+            </Text>
+
+            <TouchableOpacity
+              className="w-[320] h-[48] rounded-2xl bg-[#229B13] flex items-center justify-center mt-5"
+              onPress={handleGoToInspectionsScreen}>
+              <Text className="font-semibold text-white">
+                {t('selectInspection')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         <Text className="mt-10">{t('seeYourAreasAlreadyInspected')}</Text>
         <TouchableOpacity

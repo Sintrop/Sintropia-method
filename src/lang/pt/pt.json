@@ -1,6 +1,16 @@
 {
   "translation": {
     "helloWorld": "Olá Mundo!!!",
-    "whichAreaDoYouWantToInspect": "Qual área você quer inspecionar?"
+    "whichAreaDoYouWantToInspect": "Qual área você quer inspecionar?",
+    "overview": "Visão geral",
+    "overviewDescription": "O seu objetivo é avaliar a quantidade de árvores com mais de 5cm de diâmetro da área selecionada, bem como a diversidade de espécies das mesmas.",
+    "treesResult": "Resultado de árvores",
+    "treesResultDescription": "Número de árvores, palmeiras e outras plantas com mais de 5 cm de diâmetro encontradas na área de regeneração. Somente plantas manejadas ou plantadas pelo gerador devem ser contabilizadas.",
+    "biodiversityResult": "Resultado de biodiversidade",
+    "biodiversityResultDescription": "Número de árvores, palmeiras e outras plantas com mais de 5 cm de diâmetro encontradas na área de regeneração. Somente plantas manejadas ou plantadas pelo gerador devem ser contabilizadas.",
+    "report": "Relatório",
+    "reportDescription": "Conforme for preenchendo os dados, um relatório automatizado com a justificativa do resultado encontrado será criado automaticamente e estará disponível para download.",
+    "howWouldYouLikeCollectData": "Como gostaria de coletar os dados?",
+    "descHowWouldYouLikeCollectData": "No método manual, as árvores precisam ser inseridas uma a uma, indicado para áreas pequenas. Já no método por amostragem, são coletadas amostras e o resultado total é estimado, indicado para grandes áreas."
   }
 }
