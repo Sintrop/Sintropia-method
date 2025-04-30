@@ -19,6 +19,7 @@ import { CoordinateProps } from '../../../types/regenerator';
 import { Polyline } from '../../../components/Map/Polyline';
 import { useSQLite } from '../../../hooks/useSQLite';
 import { BiodiversityDBProps } from '../../../types/database';
+import { CameraComponent } from '../../../components/Camera/Camera';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -31,6 +32,7 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
   const {fetchBiodiversityByAreaId} = useSQLite();
   const [pathPolyline, setPathPolyline] = useState<[number, number][]>([]);
   const [biodiversity, setBiodiversity] = useState<BiodiversityDBProps[]>([]);
+  const [showCamera, setShowCamera] = useState(false);
 
   useEffect(() => {
     fetchAreaData();
@@ -81,13 +83,20 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
             <Text className="text-xs">{t('touchHereToRegister')}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="w-[48%] h-24 rounded-2xl bg-gray-300 items-center justify-center ml-4">
+          <TouchableOpacity
+            className="w-[48%] h-24 rounded-2xl bg-gray-300 items-center justify-center ml-4"
+            onPress={() => setShowCamera(true)}
+          >
             <Text>{t('biodiversity')}</Text>
             <Text className="font-bold text-black text-3xl">{biodiversity.length}</Text>
             <Text className="text-xs">{t('touchHereToRegister')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {showCamera && (
+        <CameraComponent close={() => setShowCamera(false)} photo={(e) => console.log(e)} />
+      )}
     </Screen>
   );
 }
