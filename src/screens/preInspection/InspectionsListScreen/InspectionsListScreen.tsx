@@ -11,11 +11,11 @@ import {useTranslation} from 'react-i18next';
 import {getInspectionsList} from '../../../services/inspection/getInspectionsList';
 import {InspectionProps} from '../../../types/inspection';
 import {InspectionItem} from './components/InspectionItem';
-import { PreviewInspection } from '../../../components/PreviewInspection/PreviewInspection';
+import {PreviewInspection} from '../../../components/PreviewInspection/PreviewInspection';
 
 export function InspectionsListScreen() {
   const {t} = useTranslation();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [inspections, setInspections] = useState<InspectionProps[]>([]);
   const [selectedInspection, setSelecetedInspection] = useState(
     {} as InspectionProps,

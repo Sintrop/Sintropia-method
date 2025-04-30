@@ -15,6 +15,7 @@ export type PreInspectionStackParamsList = {
     inspection: InspectionProps;
     regenerator: RegeneratorProps;
     coords: CoordinateProps[];
+    areaSize: number;
   };
   InspectedAreasScreen: undefined;
 };

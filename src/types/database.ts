@@ -6,6 +6,8 @@ export interface AreaDBProps {
   regeneratorAddress?: string;
   coordinates: string;
   size: number;
+  proofPhoto: string;
+  status: number;
 }
 
 export interface InspectionDBProps {

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   ActivityIndicator,
   StyleSheet,
@@ -7,10 +7,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {Screen} from '../../../components/Screen/Screen';
-import {useTranslation} from 'react-i18next';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {PreInspectionStackParamsList} from '../../../routes/PreInspectionRoutes';
+import { Screen } from '../../../components/Screen/Screen';
+import { useTranslation } from 'react-i18next';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { PreInspectionStackParamsList } from '../../../routes/PreInspectionRoutes';
 import Mapbox, {
   Camera,
   MapView,
@@ -18,8 +18,9 @@ import Mapbox, {
   StyleURL,
 } from '@rnmapbox/maps';
 //@ts-ignore
-import {MAPBOX_ACCESS_TOKEN} from '@env';
-import {Polyline} from '../../../components/Map/Polyline';
+import { MAPBOX_ACCESS_TOKEN } from '@env';
+import { Polyline } from '../../../components/Map/Polyline';
+import { useInspectionContext } from '../../../hooks/useInspectionContext';
 
 Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN ? MAPBOX_ACCESS_TOKEN : '');
 
@@ -27,9 +28,11 @@ type ScreenProps = NativeStackScreenProps<
   PreInspectionStackParamsList,
   'AreaPreviewScreen'
 >;
-export function AreaPreviewScreen({route}: ScreenProps) {
-  const {coords} = route.params;
-  const {t} = useTranslation();
+export function AreaPreviewScreen({ route }: ScreenProps) {
+  const { startInspection } = useInspectionContext()
+  const { coords, inspection, regenerator, areaSize } = route.params;
+
+  const { t } = useTranslation();
   const pathPolyline: [number, number][] = coords.map(coord => [
     parseFloat(coord.longitude),
     parseFloat(coord.latitude),
@@ -38,8 +41,17 @@ export function AreaPreviewScreen({route}: ScreenProps) {
 
   const [loading, setLoading] = useState(false);
 
-  function handleStartInspection() {
+  async function handleStartInspection() {
     setLoading(true);
+    await startInspection({
+      areaSize,
+      coordinates: coords,
+      inspection: {
+        inspectionId: inspection.id.toString(),
+        regeneratorAddress: inspection?.regenerator
+      }
+    })
+    setLoading(false);
   }
 
   return (
@@ -60,13 +72,18 @@ export function AreaPreviewScreen({route}: ScreenProps) {
               parseFloat(coord?.longitude),
               parseFloat(coord.latitude),
             ]}
-            id="marker">
+            id="marker"
+          >
             <View />
           </PointAnnotation>
         ))}
 
         <Polyline lineColor="red" lineWidth={4} coordinates={pathPolyline} />
       </MapView>
+
+      <Text>
+        {t('areaSize')}: {Intl.NumberFormat('pt-BR').format(areaSize)} m²
+      </Text>
 
       <View className="p-3 rounded-2xl border mt-5">
         <Text>{t('coordinates')}</Text>
@@ -79,7 +96,8 @@ export function AreaPreviewScreen({route}: ScreenProps) {
 
       <TouchableOpacity
         className="w-full h-[48] bg-[#229B13] flex items-center justify-center rounded-2xl mt-10"
-        onPress={handleStartInspection}>
+        onPress={handleStartInspection}
+      >
         {loading ? (
           <ActivityIndicator color="white" size={30} />
         ) : (

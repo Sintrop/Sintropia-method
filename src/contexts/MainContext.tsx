@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, {createContext, useEffect, useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import i18next from 'i18next';
 
@@ -39,8 +39,7 @@ export function MainContextProvider({
     <MainContext.Provider
       value={{
         language,
-      }}
-    >
+      }}>
       {children}
     </MainContext.Provider>
   );

@@ -78,6 +78,7 @@ export function PreviewInspection({inspection}: Props) {
       inspection,
       regenerator,
       coords,
+      areaSize: regenerator?.totalArea
     });
     modalRef.current?.close();
   }
