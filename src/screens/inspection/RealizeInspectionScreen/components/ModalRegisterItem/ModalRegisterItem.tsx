@@ -63,13 +63,14 @@ export function ModalRegisterItem({ count, registerItem, registerType }: Props) 
       registerType,
       specieData: JSON.stringify(mockSpecie)
     });
+    setPhoto(undefined);
     modalRef.current?.close();
   }
 
   return (
-    <View className="w-[48%] ml-4">
+    <View className="mb-4">
       <TouchableOpacity
-        className="w-full h-24 rounded-2xl bg-gray-300 items-center justify-center "
+        className="w-[150] h-24 rounded-2xl bg-gray-200 items-center justify-center "
         onPress={handleOpenModal}
       >
         <Text>{t('biodiversity')}</Text>

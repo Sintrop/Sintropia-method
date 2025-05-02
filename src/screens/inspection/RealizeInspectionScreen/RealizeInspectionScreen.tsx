@@ -4,6 +4,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import { Screen } from '../../../components/Screen/Screen';
@@ -24,13 +25,19 @@ import { CoordinateProps } from '../../../types/regenerator';
 import { Polyline } from '../../../components/Map/Polyline';
 import { useSQLite } from '../../../hooks/useSQLite';
 import { BiodiversityDBProps } from '../../../types/database';
-import { ModalRegisterItem, RegisterItemProps } from './components/ModalRegisterItem/ModalRegisterItem';
+import {
+  ModalRegisterItem,
+  RegisterItemProps,
+} from './components/ModalRegisterItem/ModalRegisterItem';
+import { BiodiversityList } from './components/BiodiversityList/BiodiversityList';
+import { Header } from '../../../components/Header/Header';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
   'RealizeInspectionScreen'
 >;
 export function RealizeInspectionScreen({ route }: ScreenProps) {
+  const { width, height } = useWindowDimensions();
   const { t } = useTranslation();
   const { areaOpened } = useInspectionContext();
   const { fetchBiodiversityByAreaId, addBiodiversity } = useSQLite();
@@ -51,12 +58,11 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
       ]),
     );
     setPathPolyline(value => [...value, value[0]]);
-
     handleFetchBiodiversity();
   }
 
   async function handleFetchBiodiversity() {
-    if (!areaOpened) return;
+    if (!areaOpened?.id) return;
     const bios = await fetchBiodiversityByAreaId(areaOpened.id);
     setBiodiversity(bios);
   }
@@ -69,31 +75,44 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
         areaId: areaOpened?.id,
         coordinate: JSON.stringify(data?.coordinate),
         photo: data.photo,
-        specieData: data.specieData
-      })
+        specieData: data.specieData,
+      });
 
       handleFetchBiodiversity();
     }
   }
 
   return (
-    <Screen screenTitle={t('realizeInspection')} showBackButton>
-      <HeaderInspectionMode />
+    <View>
+      <Header screenTitle={t('realizeInspection')} showBackButton />
+      <View style={{ position: 'relative' }}>
+        <MapView
+          style={[styles.mapContainer, { width, height }]}
+          styleURL={StyleURL.SatelliteStreet}
+        >
+          <Camera
+            followUserLocation={true}
+            followUserMode={UserTrackingMode.Follow}
+            followZoomLevel={16}
+          />
 
-      <MapView style={styles.mapContainer} styleURL={StyleURL.SatelliteStreet}>
-        <Camera
-          followUserLocation={true}
-          followUserMode={UserTrackingMode.Follow}
-          followZoomLevel={16}
-        />
+          <UserLocation showsUserHeadingIndicator minDisplacement={1} />
 
-        <UserLocation showsUserHeadingIndicator minDisplacement={1} />
+          <Polyline lineColor="red" lineWidth={4} coordinates={pathPolyline} />
+        </MapView>
 
-        <Polyline lineColor="red" lineWidth={4} coordinates={pathPolyline} />
-      </MapView>
+        <View style={{ position: 'absolute', top: height - 230, right: 20 }}>
+          <ModalRegisterItem
+            registerType="biodiversity"
+            count={biodiversity.length}
+            registerItem={handleRegisterItem}
+          />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View className="flex-row items-center w-full mt-5">
+          <BiodiversityList list={biodiversity} />
+        </View>
+      </View>
+
+      {/* <View className="flex-row items-center w-full mt-5 mb-5">
           <TouchableOpacity className="w-[48%] h-24 rounded-2xl bg-gray-300 items-center justify-center">
             <Text>{t('trees')}</Text>
             <Text className="font-bold text-black text-3xl">0</Text>
@@ -101,20 +120,20 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
           </TouchableOpacity>
 
           <ModalRegisterItem
-            registerType='biodiversity'
+            registerType="biodiversity"
             count={biodiversity.length}
             registerItem={handleRegisterItem}
           />
         </View>
-      </ScrollView>
-    </Screen>
+
+        <BiodiversityList list={biodiversity} /> */}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   mapContainer: {
-    height: 300,
-    width: '100%',
-    marginTop: 10,
+    position: 'absolute',
+    flex: 1,
   },
 });
