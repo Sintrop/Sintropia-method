@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Screen } from '../../../components/Screen/Screen';
 import { HeaderInspectionMode } from '../components/HeaderInspectionMode';
 import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { InspectionStackParamsList } from '../../../routes/InspectionRoutes';
-import { useLocation } from '../../../hooks/useLocation';
 import {
   Camera,
   MapView,
@@ -19,7 +24,7 @@ import { CoordinateProps } from '../../../types/regenerator';
 import { Polyline } from '../../../components/Map/Polyline';
 import { useSQLite } from '../../../hooks/useSQLite';
 import { BiodiversityDBProps } from '../../../types/database';
-import { CameraComponent } from '../../../components/Camera/Camera';
+import { ModalRegisterItem, RegisterItemProps } from './components/ModalRegisterItem/ModalRegisterItem';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -28,32 +33,47 @@ type ScreenProps = NativeStackScreenProps<
 export function RealizeInspectionScreen({ route }: ScreenProps) {
   const { t } = useTranslation();
   const { areaOpened } = useInspectionContext();
-  const { location } = useLocation();
-  const {fetchBiodiversityByAreaId} = useSQLite();
+  const { fetchBiodiversityByAreaId, addBiodiversity } = useSQLite();
   const [pathPolyline, setPathPolyline] = useState<[number, number][]>([]);
   const [biodiversity, setBiodiversity] = useState<BiodiversityDBProps[]>([]);
-  const [showCamera, setShowCamera] = useState(false);
 
   useEffect(() => {
     fetchAreaData();
-  }, [areaOpened])
+  }, [areaOpened]);
 
   async function fetchAreaData() {
-    if (!areaOpened) return
+    if (!areaOpened) return;
     const coords = JSON.parse(areaOpened.coordinates) as CoordinateProps[];
-    setPathPolyline(coords.map(coord => [
-      parseFloat(coord.longitude),
-      parseFloat(coord.latitude),
-    ]));
-    setPathPolyline((value) => [...value, value[0]])
-    
+    setPathPolyline(
+      coords.map(coord => [
+        parseFloat(coord.longitude),
+        parseFloat(coord.latitude),
+      ]),
+    );
+    setPathPolyline(value => [...value, value[0]]);
+
     handleFetchBiodiversity();
   }
 
   async function handleFetchBiodiversity() {
-    if (!areaOpened) return
+    if (!areaOpened) return;
     const bios = await fetchBiodiversityByAreaId(areaOpened.id);
-    setBiodiversity(bios)
+    setBiodiversity(bios);
+  }
+
+  async function handleRegisterItem(data: RegisterItemProps): Promise<void> {
+    if (!areaOpened) return;
+
+    if (data?.registerType === 'biodiversity') {
+      await addBiodiversity({
+        areaId: areaOpened?.id,
+        coordinate: JSON.stringify(data?.coordinate),
+        photo: data.photo,
+        specieData: data.specieData
+      })
+
+      handleFetchBiodiversity();
+    }
   }
 
   return (
@@ -67,10 +87,7 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
           followZoomLevel={16}
         />
 
-        <UserLocation
-          showsUserHeadingIndicator
-          minDisplacement={1}
-        />
+        <UserLocation showsUserHeadingIndicator minDisplacement={1} />
 
         <Polyline lineColor="red" lineWidth={4} coordinates={pathPolyline} />
       </MapView>
@@ -83,20 +100,13 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
             <Text className="text-xs">{t('touchHereToRegister')}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            className="w-[48%] h-24 rounded-2xl bg-gray-300 items-center justify-center ml-4"
-            onPress={() => setShowCamera(true)}
-          >
-            <Text>{t('biodiversity')}</Text>
-            <Text className="font-bold text-black text-3xl">{biodiversity.length}</Text>
-            <Text className="text-xs">{t('touchHereToRegister')}</Text>
-          </TouchableOpacity>
+          <ModalRegisterItem
+            registerType='biodiversity'
+            count={biodiversity.length}
+            registerItem={handleRegisterItem}
+          />
         </View>
       </ScrollView>
-
-      {showCamera && (
-        <CameraComponent close={() => setShowCamera(false)} photo={(e) => console.log(e)} />
-      )}
     </Screen>
   );
 }
@@ -105,6 +115,6 @@ const styles = StyleSheet.create({
   mapContainer: {
     height: 300,
     width: '100%',
-    marginTop: 10
+    marginTop: 10,
   },
 });
