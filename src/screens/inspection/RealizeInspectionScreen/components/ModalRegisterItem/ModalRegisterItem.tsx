@@ -73,7 +73,7 @@ export function ModalRegisterItem({ count, registerItem, registerType }: Props) 
         className="w-[150] h-24 rounded-2xl bg-gray-200 items-center justify-center "
         onPress={handleOpenModal}
       >
-        <Text>{t('biodiversity')}</Text>
+        <Text>{registerType === 'biodiversity' ? t('biodiversity') : t('trees')}</Text>
         <Text className="font-bold text-black text-3xl">{count}</Text>
         <Text className="text-xs">{t('touchHereToRegister')}</Text>
       </TouchableOpacity>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -7,8 +8,6 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { Screen } from '../../../components/Screen/Screen';
-import { HeaderInspectionMode } from '../components/HeaderInspectionMode';
 import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { InspectionStackParamsList } from '../../../routes/InspectionRoutes';
@@ -24,29 +23,53 @@ import { useInspectionContext } from '../../../hooks/useInspectionContext';
 import { CoordinateProps } from '../../../types/regenerator';
 import { Polyline } from '../../../components/Map/Polyline';
 import { useSQLite } from '../../../hooks/useSQLite';
-import { BiodiversityDBProps } from '../../../types/database';
+import {
+  BiodiversityDBProps,
+  SamplingDBProps,
+  TreeDBProps,
+} from '../../../types/database';
 import {
   ModalRegisterItem,
   RegisterItemProps,
 } from './components/ModalRegisterItem/ModalRegisterItem';
 import { BiodiversityList } from './components/BiodiversityList/BiodiversityList';
 import { Header } from '../../../components/Header/Header';
+import { TreesList } from './components/TreesList/TreesList';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
   'RealizeInspectionScreen'
 >;
 export function RealizeInspectionScreen({ route }: ScreenProps) {
+  const { collectionMethod } = route.params;
+  const {
+    fetchBiodiversityByAreaId,
+    addBiodiversity,
+    db,
+    fetchSampligsArea,
+    addSampling,
+    fetchTreesSampling,
+    addTree,
+  } = useSQLite();
   const { width, height } = useWindowDimensions();
   const { t } = useTranslation();
   const { areaOpened } = useInspectionContext();
-  const { fetchBiodiversityByAreaId, addBiodiversity } = useSQLite();
   const [pathPolyline, setPathPolyline] = useState<[number, number][]>([]);
   const [biodiversity, setBiodiversity] = useState<BiodiversityDBProps[]>([]);
+  const [samplings, setSamplings] = useState<SamplingDBProps[]>([]);
+  const [trees, setTrees] = useState<TreeDBProps[]>([]);
 
   useEffect(() => {
-    fetchAreaData();
-  }, [areaOpened]);
+    if (db) {
+      fetchAreaData();
+      handleFetchBiodiversity();
+      handleFetchSamplings();
+    }
+  }, [areaOpened, db]);
+
+  useEffect(() => {
+    handleFetchTrees();
+  }, [samplings]);
 
   async function fetchAreaData() {
     if (!areaOpened) return;
@@ -58,27 +81,78 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
       ]),
     );
     setPathPolyline(value => [...value, value[0]]);
-    handleFetchBiodiversity();
   }
 
   async function handleFetchBiodiversity() {
-    if (!areaOpened?.id) return;
-    const bios = await fetchBiodiversityByAreaId(areaOpened.id);
+    if (!areaOpened) return;
+    const bios = await fetchBiodiversityByAreaId(areaOpened?.id);
     setBiodiversity(bios);
+  }
+
+  async function handleFetchSamplings() {
+    if (!areaOpened) return;
+
+    const responseSamplings = await fetchSampligsArea(areaOpened?.id);
+    setSamplings(responseSamplings);
+
+    if (collectionMethod === 'manual') {
+      startManualMode(responseSamplings);
+    }
+  }
+
+  async function startManualMode(samps: SamplingDBProps[]): Promise<void> {
+    if (!areaOpened) return;
+    if (samps.length > 0) return;
+
+    await addSampling({
+      areaId: areaOpened?.id,
+      number: 1,
+      size: areaOpened?.size,
+    });
+
+    handleFetchSamplings();
+  }
+
+  async function handleFetchTrees() {
+    if (samplings.length === 0) return;
+
+    if (collectionMethod === 'manual') {
+      const responseTrees = await fetchTreesSampling(samplings[0].id);
+      setTrees(responseTrees);
+    }
   }
 
   async function handleRegisterItem(data: RegisterItemProps): Promise<void> {
     if (!areaOpened) return;
+    const areaId = areaOpened?.id;
+    const coordinate = JSON.stringify(data?.coordinate);
+    const photo = data?.photo;
+    const specieData = data?.specieData;
 
     if (data?.registerType === 'biodiversity') {
       await addBiodiversity({
-        areaId: areaOpened?.id,
-        coordinate: JSON.stringify(data?.coordinate),
-        photo: data.photo,
-        specieData: data.specieData,
+        areaId,
+        coordinate,
+        photo,
+        specieData,
       });
 
       handleFetchBiodiversity();
+    }
+
+    if (data?.registerType === 'tree') {
+      if (collectionMethod === 'manual') {
+        await addTree({
+          areaId,
+          coordinate,
+          photo,
+          specieData,
+          samplingNumber: 1,
+          samplingId: samplings[0].id,
+        });
+
+        handleFetchTrees();
+      }
     }
   }
 
@@ -99,34 +173,61 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
           <UserLocation showsUserHeadingIndicator minDisplacement={1} />
 
           <Polyline lineColor="red" lineWidth={4} coordinates={pathPolyline} />
+
+          {biodiversity.map((item, index) => (
+            <PointAnnotation
+              id="bio-marker"
+              key={index.toString()}
+              coordinate={[
+                JSON.parse(item.coordinate).longitude,
+                JSON.parse(item.coordinate).latitude,
+              ]}
+              children={<View />}
+            />
+          ))}
+
+          {trees.map((item, index) => (
+            <PointAnnotation
+              id="tree-marker"
+              key={index.toString()}
+              coordinate={[
+                JSON.parse(item.coordinate).longitude,
+                JSON.parse(item.coordinate).latitude,
+              ]}
+              children={<View className="w-2 h-2 bg-white rounded-full border-[1]"/>}
+            />
+          ))}
         </MapView>
 
-        <View style={{ position: 'absolute', top: height - 230, right: 20 }}>
-          <ModalRegisterItem
-            registerType="biodiversity"
-            count={biodiversity.length}
-            registerItem={handleRegisterItem}
-          />
+        <View
+          style={{
+            position: 'absolute',
+            top: height - 230,
+            right: 20,
+            flexDirection: 'row',
+          }}
+        >
+          <View className="mr-5">
+            <ModalRegisterItem
+              registerType="tree"
+              count={trees.length}
+              registerItem={handleRegisterItem}
+            />
 
-          <BiodiversityList list={biodiversity} />
+            <TreesList list={trees} />
+          </View>
+
+          <View>
+            <ModalRegisterItem
+              registerType="biodiversity"
+              count={biodiversity.length}
+              registerItem={handleRegisterItem}
+            />
+
+            <BiodiversityList list={biodiversity} />
+          </View>
         </View>
       </View>
-
-      {/* <View className="flex-row items-center w-full mt-5 mb-5">
-          <TouchableOpacity className="w-[48%] h-24 rounded-2xl bg-gray-300 items-center justify-center">
-            <Text>{t('trees')}</Text>
-            <Text className="font-bold text-black text-3xl">0</Text>
-            <Text className="text-xs">{t('touchHereToRegister')}</Text>
-          </TouchableOpacity>
-
-          <ModalRegisterItem
-            registerType="biodiversity"
-            count={biodiversity.length}
-            registerItem={handleRegisterItem}
-          />
-        </View>
-
-        <BiodiversityList list={biodiversity} /> */}
     </View>
   );
 }

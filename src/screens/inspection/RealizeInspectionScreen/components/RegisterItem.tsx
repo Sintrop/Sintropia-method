@@ -1,25 +1,26 @@
 import React from "react";
 import { View, Image, Text } from "react-native";
-import { BiodiversityDBProps } from "../../../../types/database";
+import { BiodiversityDBProps, TreeDBProps } from "../../../../types/database";
 import { useTranslation } from "react-i18next";
 import { CoordinateProps } from "../../../../types/regenerator";
 
 interface Props {
   biodiversity?: BiodiversityDBProps;
+  tree?: TreeDBProps
 }
-export function RegisterItem({ biodiversity }: Props) {
+export function RegisterItem({ biodiversity, tree }: Props) {
   const {t} = useTranslation();
 
   const coordinate: CoordinateProps = {
-    latitude: biodiversity ? JSON.parse(biodiversity.coordinate).latitude : '0', 
-    longitude: biodiversity ? JSON.parse(biodiversity.coordinate).longitude : '0'
+    latitude: biodiversity ? JSON.parse(biodiversity.coordinate).latitude : JSON.parse(tree?.coordinate as string).latitude, 
+    longitude: biodiversity ? JSON.parse(biodiversity.coordinate).longitude : JSON.parse(tree?.coordinate as string).longitude
   }
 
   return (
     <View className="w-full rounded-2xl p-3 flex-row bg-gray-200">
       <View className="w-20 h-20 border rounded-2xl overflow-hidden ">
         <Image
-          source={{ uri: biodiversity?.photo }}
+          source={{ uri: biodiversity ? biodiversity?.photo : tree?.photo}}
           className="w-full h-full"
           resizeMode="cover"
         />

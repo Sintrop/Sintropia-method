@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import SQLite, { SQLiteDatabase } from 'react-native-sqlite-storage';
-import { AreaDBProps, BiodiversityDBProps, InspectionDBProps } from '../types/database';
+import { AreaDBProps, BiodiversityDBProps, InspectionDBProps, SamplingDBProps, TreeDBProps } from '../types/database';
 
 export function useSQLite() {
   const [db, setDb] = useState<SQLiteDatabase | null>(null);
@@ -8,50 +8,50 @@ export function useSQLite() {
   const [areasOpened, setAreasOpened] = useState<AreaDBProps[]>([]);
 
   useEffect(() => {
-    const initDB = async () => {
-      const database = await SQLite.openDatabase({
-        name: 'mydb.db',
-        location: 'default',
-      });
-      setDb(database);
-
-      // await database.transaction(tx => {
-      //   tx.executeSql('DROP TABLE inspection;');
-      // })
-      await database.transaction(tx => {
-        tx.executeSql(
-          'CREATE TABLE IF NOT EXISTS area (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT, inspectionId TEXT, regeneratorAddress TEXT, coordinates TEXT, size INTEGER, proofPhoto TEXT, status INTEGER);',
-        );
-      });
-      await database.transaction(tx => {
-        tx.executeSql(
-          'CREATE TABLE IF NOT EXISTS inspection (id INTEGER PRIMARY KEY AUTOINCREMENT, inspectionId TEXT UNIQUE, regeneratorAddress TEXT);',
-        );
-      });
-      await database.transaction(tx => {
-        tx.executeSql(
-          'CREATE TABLE IF NOT EXISTS sampling (id INTEGER PRIMARY KEY AUTOINCREMENT, areaId TEXT, number INTEGER, size INTEGER);',
-        );
-      });
-      await database.transaction(tx => {
-        tx.executeSql(
-          'CREATE TABLE IF NOT EXISTS biodiversity (id INTEGER PRIMARY KEY AUTOINCREMENT, photo TEXT, areaId INTEGER, specieData TEXT, coordinate TEXT);',
-        );
-      });
-      await database.transaction(tx => {
-        tx.executeSql(
-          'CREATE TABLE IF NOT EXISTS tree (id INTEGER PRIMARY KEY AUTOINCREMENT, photo TEXT, areaId INTEGER, specieData TEXT, coordinate TEXT, samplingNumber INTEGER);',
-        );
-      });
-    };
-
     initDB();
   }, []);
 
   useEffect(() => {
     fetchAreas();
     fetchOpenedAreas();
-  }, [db])
+  }, [db]);
+
+  const initDB = async () => {
+    const database = await SQLite.openDatabase({
+      name: 'mydb.db',
+      location: 'default',
+    });
+    setDb(database);
+
+    // await database.transaction(tx => {
+    //   tx.executeSql('DROP TABLE tree;');
+    // })
+    await database.transaction(tx => {
+      tx.executeSql(
+        'CREATE TABLE IF NOT EXISTS area (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT, inspectionId TEXT, regeneratorAddress TEXT, coordinates TEXT, size INTEGER, proofPhoto TEXT, status INTEGER);',
+      );
+    });
+    await database.transaction(tx => {
+      tx.executeSql(
+        'CREATE TABLE IF NOT EXISTS inspection (id INTEGER PRIMARY KEY AUTOINCREMENT, inspectionId TEXT UNIQUE, regeneratorAddress TEXT);',
+      );
+    });
+    await database.transaction(tx => {
+      tx.executeSql(
+        'CREATE TABLE IF NOT EXISTS sampling (id INTEGER PRIMARY KEY AUTOINCREMENT, areaId TEXT, number INTEGER, size INTEGER);',
+      );
+    });
+    await database.transaction(tx => {
+      tx.executeSql(
+        'CREATE TABLE IF NOT EXISTS biodiversity (id INTEGER PRIMARY KEY AUTOINCREMENT, photo TEXT, areaId INTEGER, specieData TEXT, coordinate TEXT);',
+      );
+    });
+    await database.transaction(tx => {
+      tx.executeSql(
+        'CREATE TABLE IF NOT EXISTS tree (id INTEGER PRIMARY KEY AUTOINCREMENT, photo TEXT, areaId INTEGER, specieData TEXT, coordinate TEXT, samplingNumber INTEGER, samplingId INTEGER);',
+      );
+    });
+  };
 
   async function fetchAreas() {
     if (!db) return [];
@@ -168,7 +168,97 @@ export function useSQLite() {
     });
   };
 
+  async function fetchSampligsArea(areaId: number): Promise<SamplingDBProps[]> {
+    if (!db) return [];
+
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        tx.executeSql(
+          'SELECT * FROM sampling WHERE areaId = ?;',
+          [areaId],
+          (_, results) => {
+            const rows = results.rows;
+            const list: SamplingDBProps[] = [];
+            for (let i = 0; i < rows.length; i++) {
+              list.push(rows.item(i));
+            }
+            resolve(list);
+          },
+          (_, error) => {
+            console.error('Erro ao buscar amostragens:', error);
+            reject(error);
+            return true;
+          }
+        );
+      })
+    });
+  };
+
+  async function addSampling(data: Omit<SamplingDBProps, 'id'>) {
+    if (!db) return;
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'INSERT INTO sampling (areaId, number, size) VALUES (?, ?, ?);',
+        [data?.areaId, data.number, data.size],
+        (_, result) => {
+          console.log('Amostra inserida com sucesso:', result);
+        },
+        (_, error) => {
+          console.error('Erro ao inserir a amostra:', error);
+          return true; // impede continuar a transação
+        }
+      );
+    });
+  };
+
+  async function fetchTreesSampling(samplingId: number): Promise<TreeDBProps[]> {
+    if (!db) return [];
+
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        tx.executeSql(
+          'SELECT * FROM tree WHERE samplingId = ?;',
+          [samplingId],
+          (_, results) => {
+            const rows = results.rows;
+            const list: TreeDBProps[] = [];
+            for (let i = 0; i < rows.length; i++) {
+              list.push(rows.item(i));
+            }
+            resolve(list);
+          },
+          (_, error) => {
+            console.error('Erro ao buscar arvores:', error);
+            reject(error);
+            return true;
+          }
+        );
+      })
+    });
+  };
+
+  async function addTree(data: Omit<TreeDBProps, 'id'>) {
+    if (!db) return;
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'INSERT INTO tree (photo, areaId, specieData, coordinate, samplingNumber, samplingId) VALUES (?, ?, ?, ?, ?, ?);',
+        [data?.photo, data.areaId, data.specieData, data?.coordinate, data?.samplingNumber, data?.samplingId],
+        (_, result) => {
+          console.log('Árvore inserida com sucesso:', result);
+        },
+        (_, error) => {
+          console.error('Erro ao inserir a arvore:', error);
+          return true; // impede continuar a transação
+        }
+      );
+    });
+  };
+
   return { 
+    initDB,
+    db,
     fetchAreas,
     fetchOpenedAreas,
     addArea,
@@ -176,6 +266,10 @@ export function useSQLite() {
     areas,
     areasOpened,
     fetchBiodiversityByAreaId,
-    addBiodiversity
+    addBiodiversity,
+    fetchSampligsArea,
+    addSampling,
+    fetchTreesSampling,
+    addTree
   };
 }

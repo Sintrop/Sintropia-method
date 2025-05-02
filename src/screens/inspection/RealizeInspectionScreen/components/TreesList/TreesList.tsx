@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { View, Text, ListRenderItemInfo } from "react-native";
-import { BiodiversityDBProps } from "../../../../../types/database";
+import { TreeDBProps } from "../../../../../types/database";
 import { RegisterItem } from "../RegisterItem";
 import { Portal } from "react-native-portalize";
 import { Modalize } from "react-native-modalize";
@@ -8,14 +8,14 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { useTranslation } from "react-i18next";
 
 interface Props {
-  list: BiodiversityDBProps[]
+  list: TreeDBProps[]
 }
 
-export function BiodiversityList({ list }: Props) {
+export function TreesList({ list }: Props) {
   const {t} = useTranslation();
   const modalRef = useRef<Modalize>();
 
-  function renderBiodiversityItem({ item }: ListRenderItemInfo<BiodiversityDBProps>) {
+  function renderBiodiversityItem({ item }: ListRenderItemInfo<TreeDBProps>) {
     return (
       <RegisterItem biodiversity={item} />
     );
@@ -41,7 +41,7 @@ export function BiodiversityList({ list }: Props) {
         className="w-[150px] h-10 rounded-2xl bg-gray-200 flex-row items-center justify-center"
         onPress={handleOpenModal}
       >
-        <Text className="font-bold text-black">{t('biodiversityList')}</Text>
+        <Text className="font-bold text-black">{t('treesList')}</Text>
       </TouchableOpacity>
 
       <Portal>
