@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import { Screen } from '../../../components/Screen/Screen';
 import { useTranslation } from 'react-i18next';
 import { Camera, MapView, PointAnnotation, StyleURL } from '@rnmapbox/maps';
@@ -16,6 +21,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { InspectionStackParamsList } from '../../../routes/InspectionRoutes';
 import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
 import { RegisterItem } from '../RealizeInspectionScreen/components/RegisterItem';
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import Share from 'react-native-share';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -54,6 +61,10 @@ export function ReportScreen({ route }: ScreenProps) {
   async function fetchAreaData() {
     if (!areaOpened) return;
     const coords = JSON.parse(areaOpened.coordinates) as CoordinateProps[];
+    setCoordinateMapCenter([
+      parseFloat(coords[0].longitude),
+      parseFloat(coords[0].latitude),
+    ]);
     setPathPolyline(
       coords.map(coord => [
         parseFloat(coord.longitude),
@@ -85,14 +96,59 @@ export function ReportScreen({ route }: ScreenProps) {
     }
   }
 
+  const htmlContent = `
+    <html>
+      <head>
+        <style>
+          body { font-family: Arial; padding: 20px; }
+          h1 { color: #1eb76f; }
+          img { border-radius: 5px; }
+          .cardcount {display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px, background-color: gray;}
+        </style>
+      </head>
+      <body>
+        <h1>Final Result</h1>
+        <p>${areaOpened?.name}</p>
+
+        <div style={{display: 'flex'; gap: 20px}}>
+          <div class="cardcount">
+            <p style={{font-weight: bold; color: black; font-size: 20px}}>
+              ${trees.length}
+            </p>
+            <p>Trees</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+
+  async function handleGeneratePDF() {
+    const options = {
+      html: htmlContent,
+      fileName: `relatorio-123`,
+      directory: 'Documents',
+    };
+  
+    const file = await RNHTMLtoPDF.convert(options);
+    console.log('PDF gerado em:', file.filePath);
+
+    Share.open({
+      url: `file://${file.filePath}`,
+      title: 'report',
+      type: 'application/pdf'
+    })
+  }
+
   return (
-    <Screen
-      screenTitle={t('report')}
-      showBackButton
-      scrollable
-    >
-      <Text className="font-bold text-black text-lg mt-5">{t('finalResult')}</Text>
+    <Screen screenTitle={t('report')} showBackButton scrollable>
+      <Text className="font-bold text-black text-lg mt-5">
+        {t('finalResult')}
+      </Text>
       <Text>{areaOpened?.name}</Text>
+
+      <TouchableOpacity onPress={handleGeneratePDF}>
+        <Text>Gerar pdf</Text>
+      </TouchableOpacity>
 
       <MapView style={styles.mapContainer} styleURL={StyleURL.SatelliteStreet}>
         <Camera centerCoordinate={coordinateMapCenter} zoomLevel={16} />
