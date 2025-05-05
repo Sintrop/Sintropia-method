@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import ViewShot from 'react-native-view-shot';
+import Share from 'react-native-share';
 import { Screen } from '../../../components/Screen/Screen';
 import { useTranslation } from 'react-i18next';
 import { Camera, MapView, PointAnnotation, StyleURL } from '@rnmapbox/maps';
@@ -21,8 +18,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { InspectionStackParamsList } from '../../../routes/InspectionRoutes';
 import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
 import { RegisterItem } from '../RealizeInspectionScreen/components/RegisterItem';
-import RNHTMLtoPDF from 'react-native-html-to-pdf';
-import Share from 'react-native-share';
 import { generateReportPDF } from '../../../services/inspection/generateReportPDF';
 import { convertImageToBase64 } from '../../../services/inspection/convertImageToBase64';
 
@@ -40,6 +35,8 @@ export function ReportScreen({ route }: ScreenProps) {
   } = useSQLite();
   const { areaOpened } = useInspectionContext();
   const { t } = useTranslation();
+  const [coordinatesArea, setCoordinatesArea] = useState<CoordinateProps[]>([]);
+  const [areaSize, setAreaSize] = useState<number>(0);
   const [pathPolyline, setPathPolyline] = useState<[number, number][]>([]);
   const [biodiversity, setBiodiversity] = useState<BiodiversityDBProps[]>([]);
   const [samplings, setSamplings] = useState<SamplingDBProps[]>([]);
@@ -47,6 +44,8 @@ export function ReportScreen({ route }: ScreenProps) {
   const [coordinateMapCenter, setCoordinateMapCenter] = useState<Position>([
     -46.62714425279819, -23.576845138073693,
   ]);
+  const viewMapRef = useRef<ViewShot>(null);
+  const [loadingShare, setLoadingShare] = useState(false);
 
   useEffect(() => {
     if (db) {
@@ -62,7 +61,10 @@ export function ReportScreen({ route }: ScreenProps) {
 
   async function fetchAreaData() {
     if (!areaOpened) return;
+    setAreaSize(areaOpened?.size);
+
     const coords = JSON.parse(areaOpened.coordinates) as CoordinateProps[];
+    setCoordinatesArea(coords);
     setCoordinateMapCenter([
       parseFloat(coords[0].longitude),
       parseFloat(coords[0].latitude),
@@ -98,35 +100,9 @@ export function ReportScreen({ route }: ScreenProps) {
     }
   }
 
-  const htmlContent = `
-    <html>
-      <head>
-        <style>
-          body { font-family: Arial; padding: 20px; }
-          h1 { color: #1eb76f; }
-          img { border-radius: 5px; }
-          .cardcount {display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; background-color: #eee}
-        </style>
-      </head>
-      <body>
-        <h1>Final Result</h1>
-        <p>${areaOpened?.name}</p>
-
-        <div style={{display: 'flex'; gap: 20px}}>
-          <div class="cardcount">
-            <p style={{font-weight: bold; color: black; font-size: 20px}}>
-              ${trees.length}
-            </p>
-            <p>Trees</p>
-          </div>
-        </div>
-      </body>
-    </html>
-  `;
-
-  async function handleGeneratePDF() {
+  async function generatePDF(): Promise<string> {
     const newListBio: BiodiversityDBProps[] = [];
-    const newListTrees: TreeDBProps[] = []
+    const newListTrees: TreeDBProps[] = [];
 
     for (let b = 0; b < biodiversity.length; b++) {
       const bio = biodiversity[b];
@@ -135,7 +111,7 @@ export function ReportScreen({ route }: ScreenProps) {
       newListBio.push({
         ...bio,
         photo: base64,
-      })
+      });
     }
 
     for (let t = 0; t < trees.length; t++) {
@@ -145,16 +121,45 @@ export function ReportScreen({ route }: ScreenProps) {
       newListTrees.push({
         ...tree,
         photo: base64,
-      })
+      });
     }
 
-    await generateReportPDF({
+    const mapPhoto = await getMapScreenshot();
+
+    const pdfUri = await generateReportPDF({
       areaName: areaOpened?.name as string,
       biodiversityCount: biodiversity.length,
       treesCount: trees.length,
       biodiversity: newListBio,
-      trees: newListTrees
+      trees: newListTrees,
+      mapPhoto,
+      coordinates: coordinatesArea,
+      areaSize: `${Intl.NumberFormat('pt-BR').format(areaSize)} m²`,
     });
+
+    return pdfUri;
+  }
+
+  async function getMapScreenshot() {
+    if (!viewMapRef) return '';
+
+    //@ts-ignore
+    const shotMapUri = await viewMapRef?.current?.capture();
+    const shotMapBase64 = await convertImageToBase64(shotMapUri as string);
+    return shotMapBase64;
+  }
+
+  async function handleSharePDF() {
+    setLoadingShare(true);
+
+    const pdf = await generatePDF();
+    Share.open({
+      url: pdf,
+      title: `Inspection Area: ${areaOpened?.name}`,
+      type: 'application/pdf',
+    });
+    
+    setLoadingShare(false);
   }
 
   return (
@@ -164,41 +169,60 @@ export function ReportScreen({ route }: ScreenProps) {
       </Text>
       <Text>{areaOpened?.name}</Text>
 
-      <TouchableOpacity onPress={handleGeneratePDF}>
-        <Text>Gerar pdf</Text>
-      </TouchableOpacity>
+      <View className="items-end w-full">
+        <TouchableOpacity
+          onPress={handleSharePDF}
+          className="h-10 w-32 rounded-2xl bg-green-600 flex-row items-center justify-center"
+          disabled={loadingShare}
+          style={{ opacity: loadingShare ? 0.5 : 1 }}
+        >
+          <Text className="font-semibold text-white">{t('sharePDF')}</Text>
+        </TouchableOpacity>
+      </View>
 
-      <MapView style={styles.mapContainer} styleURL={StyleURL.SatelliteStreet}>
-        <Camera centerCoordinate={coordinateMapCenter} zoomLevel={16} />
+      <ViewShot
+        ref={viewMapRef}
+        options={{
+          fileName: `mapshot-${areaOpened?.name}`,
+          format: 'png',
+          quality: 0.8,
+        }}
+      >
+        <MapView
+          style={styles.mapContainer}
+          styleURL={StyleURL.SatelliteStreet}
+        >
+          <Camera centerCoordinate={coordinateMapCenter} zoomLevel={16} />
 
-        <Polyline lineColor="red" lineWidth={4} coordinates={pathPolyline} />
+          <Polyline lineColor="red" lineWidth={4} coordinates={pathPolyline} />
 
-        {biodiversity.map((item, index) => (
-          <PointAnnotation
-            id="bio-marker"
-            key={index.toString()}
-            coordinate={[
-              JSON.parse(item.coordinate).longitude,
-              JSON.parse(item.coordinate).latitude,
-            ]}
-            children={<View />}
-          />
-        ))}
+          {biodiversity.map((item, index) => (
+            <PointAnnotation
+              id="bio-marker"
+              key={index.toString()}
+              coordinate={[
+                JSON.parse(item.coordinate).longitude,
+                JSON.parse(item.coordinate).latitude,
+              ]}
+              children={<View />}
+            />
+          ))}
 
-        {trees.map((item, index) => (
-          <PointAnnotation
-            id="tree-marker"
-            key={index.toString()}
-            coordinate={[
-              JSON.parse(item.coordinate).longitude,
-              JSON.parse(item.coordinate).latitude,
-            ]}
-            children={
-              <View className="w-2 h-2 bg-white rounded-full border-[1]" />
-            }
-          />
-        ))}
-      </MapView>
+          {trees.map((item, index) => (
+            <PointAnnotation
+              id="tree-marker"
+              key={index.toString()}
+              coordinate={[
+                JSON.parse(item.coordinate).longitude,
+                JSON.parse(item.coordinate).latitude,
+              ]}
+              children={
+                <View className="w-2 h-2 bg-white rounded-full border-[1]" />
+              }
+            />
+          ))}
+        </MapView>
+      </ViewShot>
 
       <View className="flex-row items-center justify-center mt-5">
         <View className="w-[48%] h-20 rounded-2xl items-center justify-center bg-gray-200">

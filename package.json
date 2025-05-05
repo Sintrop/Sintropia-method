@@ -38,6 +38,7 @@
     "react-native-sqlite-storage": "^6.0.1",
     "react-native-svg": "^15.11.2",
     "react-native-toast-message": "^2.3.0",
+    "react-native-view-shot": "^4.0.3",
     "react-native-vision-camera": "^4.6.4",
     "text-encoding": "^0.7.0",
     "web3": "^4.16.0"

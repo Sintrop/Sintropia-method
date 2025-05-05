@@ -1,6 +1,6 @@
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
-import Share from 'react-native-share';
 import { BiodiversityDBProps, TreeDBProps } from '../../types/database';
+import { CoordinateProps } from '../../types/regenerator';
 
 interface GenerateReportPDFProps {
   areaName: string;
@@ -8,6 +8,9 @@ interface GenerateReportPDFProps {
   biodiversityCount: number;
   biodiversity: BiodiversityDBProps[];
   trees: TreeDBProps[];
+  areaSize: string;
+  coordinates: CoordinateProps[];
+  mapPhoto: string;
 }
 
 const styleHTML = `
@@ -15,13 +18,15 @@ const styleHTML = `
     body { font-family: Arial; padding: 20px; }
     h1 { color: #1eb76f; }
     h3 { color: #1eb76f; margin-top: 50px; }
-    p { line-height: 0 }
+    p { margin: 0px }
     img { border-radius: 5px; }
-    .div-flex-row { display: flex; flex-direction: row; gap: 20px}
-    .card-count { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; background-color: #eee; width: 200px}
-    .card_p { font-weight: bold; color: black; font-size: 30px; line-height: 0 }
+    .map-img { width: 200px; height: 200px; border-radius: 16px; object-fit: cover; }
+    .map-coordinates-box { display: flex; flex-direction: column; }
+    .div-flex-row { display: flex; flex-direction: row; gap: 20px; margin-top: 20px; }
+    .card-count { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; background-color: #eee; width: 200px; padding-vertical: 10px;}
+    .card_p { font-weight: bold; color: black; font-size: 30px; } 
     .register-item { background-color: #eee; display: flex; gap: 30px; padding: 10px; border-radius: 16px; margin-bottom: 10px; }
-    .register-item_img { width: 120px; height: 120px; border-radius: 16px; object-fit: cover; }
+    .register-item_img { width: 100px; height: 100px; border-radius: 16px; object-fit: cover; }
     .register-item_box { display: flex; flex-direction: column;}
   </style>
 `
@@ -72,13 +77,21 @@ function listTrees(trees: TreeDBProps[]) {
     `;
 }
 
-export async function generateReportPDF(props: GenerateReportPDFProps) {
+function listCoordinates(coords: CoordinateProps[]) {
+  const coordsHTML = coords.map(item => `<p>Lat: ${item?.latitude}, Lng: ${item?.longitude}</p>`)
+  return `${coordsHTML}`;
+}
+
+export async function generateReportPDF(props: GenerateReportPDFProps): Promise<string> {
   const {
     areaName,
     biodiversityCount,
     treesCount,
     biodiversity,
-    trees
+    trees,
+    areaSize,
+    coordinates,
+    mapPhoto
   } = props;
 
   const htmlContent = `
@@ -89,6 +102,18 @@ export async function generateReportPDF(props: GenerateReportPDFProps) {
       <body>
         <h1>Final Result</h1>
         <p>${areaName}</p>
+
+        <div class="div-flex-row">
+          <img
+            src="${mapPhoto}"
+            class="map-img"
+          />
+
+          <div class="map-coordinates-box">
+            <p>Area size: ${areaSize}</p>
+            ${listCoordinates(coordinates)}
+          </div>
+        </div>
 
         <div class="div-flex-row">
           <div class="card-count">
@@ -114,16 +139,11 @@ export async function generateReportPDF(props: GenerateReportPDFProps) {
 
   const options = {
     html: htmlContent,
-    fileName: `relatorio-123`,
+    fileName: `inspection-area`,
     directory: 'Documents',
   };
 
   const file = await RNHTMLtoPDF.convert(options);
-  console.log('PDF gerado em:', file.filePath);
 
-  Share.open({
-    url: `file://${file.filePath}`,
-    title: 'report',
-    type: 'application/pdf'
-  })
+  return `file://${file.filePath}`
 }
