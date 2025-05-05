@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ViewShot from 'react-native-view-shot';
 import Share from 'react-native-share';
 import { Screen } from '../../../components/Screen/Screen';
@@ -46,6 +46,10 @@ export function ReportScreen({ route }: ScreenProps) {
   ]);
   const viewMapRef = useRef<ViewShot>(null);
   const [loadingShare, setLoadingShare] = useState(false);
+  const [loadingAreaData, setLoadingAreaData] = useState(true);
+  const [loadingBio, setLoadingBio] = useState(true);
+  const [loadingTrees, setLoadingTrees] = useState(true);
+  const [loadingSamplings, setLoadingSamplings] = useState(true);
 
   useEffect(() => {
     if (db) {
@@ -61,6 +65,7 @@ export function ReportScreen({ route }: ScreenProps) {
 
   async function fetchAreaData() {
     if (!areaOpened) return;
+    setLoadingAreaData(true);
     setAreaSize(areaOpened?.size);
 
     const coords = JSON.parse(areaOpened.coordinates) as CoordinateProps[];
@@ -76,28 +81,33 @@ export function ReportScreen({ route }: ScreenProps) {
       ]),
     );
     setPathPolyline(value => [...value, value[0]]);
+    setLoadingAreaData(false);
   }
 
   async function handleFetchBiodiversity() {
     if (!areaOpened) return;
+    setLoadingBio(true);
     const bios = await fetchBiodiversityByAreaId(areaOpened?.id);
     setBiodiversity(bios);
+    setLoadingBio(false);
   }
 
   async function handleFetchSamplings() {
     if (!areaOpened) return;
-
+    setLoadingSamplings(true);
     const responseSamplings = await fetchSampligsArea(areaOpened?.id);
     setSamplings(responseSamplings);
+    setLoadingSamplings(false);
   }
 
   async function handleFetchTrees() {
     if (samplings.length === 0) return;
-
+    setLoadingTrees(true);
     if (collectionMethod === 'manual') {
       const responseTrees = await fetchTreesSampling(samplings[0].id);
       setTrees(responseTrees);
     }
+    setLoadingTrees(false);
   }
 
   async function generatePDF(): Promise<string> {
@@ -160,6 +170,16 @@ export function ReportScreen({ route }: ScreenProps) {
     });
     
     setLoadingShare(false);
+  }
+
+  if (loadingAreaData || loadingBio || loadingSamplings || loadingTrees) {
+    return (
+      <Screen screenTitle={t('report')} showBackButton>
+        <View className="absolute w-screen h-screen items-center justify-center">
+          <ActivityIndicator size={50} />
+        </View>
+      </Screen>
+    )
   }
 
   return (
