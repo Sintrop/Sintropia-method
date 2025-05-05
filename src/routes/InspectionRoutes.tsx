@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { TutorialScreen } from "../screens/inspection/TutorialScreen/TutorialScreen";
 import { ChooseColectScreen } from "../screens/inspection/ChooseColectScreen/ChooseColectScreen";
 import { RealizeInspectionScreen } from "../screens/inspection/RealizeInspectionScreen/RealizeInspectionScreen";
+import { ReportScreen } from "../screens/inspection/ReportScreen/ReportScreen";
 
 export type InspectionStackParamsList = {
   TutorialScreen: undefined;
@@ -9,6 +10,7 @@ export type InspectionStackParamsList = {
   RealizeInspectionScreen: {
     collectionMethod: string;
   }
+  ReportScreen: undefined;
 }
 const Stack = createNativeStackNavigator<InspectionStackParamsList>();
 
@@ -20,6 +22,7 @@ export function InspectionRoutes() {
       <Stack.Screen name="TutorialScreen" component={TutorialScreen} />
       <Stack.Screen name="ChooseColectScreen" component={ChooseColectScreen} />
       <Stack.Screen name="RealizeInspectionScreen" component={RealizeInspectionScreen} />
+      <Stack.Screen name="ReportScreen" component={ReportScreen} />
     </Stack.Navigator>
   )
 }

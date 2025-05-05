@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Alert,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -35,12 +33,13 @@ import {
 import { BiodiversityList } from './components/BiodiversityList/BiodiversityList';
 import { Header } from '../../../components/Header/Header';
 import { TreesList } from './components/TreesList/TreesList';
+import { Icon } from '../../../components/Icon/Icon';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
   'RealizeInspectionScreen'
 >;
-export function RealizeInspectionScreen({ route }: ScreenProps) {
+export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
   const { collectionMethod } = route.params;
   const {
     fetchBiodiversityByAreaId,
@@ -108,6 +107,7 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
       areaId: areaOpened?.id,
       number: 1,
       size: areaOpened?.size,
+      coordinate: ''
     });
 
     handleFetchSamplings();
@@ -156,10 +156,30 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
     }
   }
 
+  function handleGoToReport(): void {
+    navigation.navigate("ReportScreen");
+  }
+
   return (
     <View>
       <Header screenTitle={t('realizeInspection')} showBackButton />
       <View style={{ position: 'relative' }}>
+        <View
+          style={{
+            position: 'absolute',
+            top: 25,
+            right: 25,
+            zIndex: 20
+          }}
+        >
+          <TouchableOpacity
+            className="bg-gray-200 rounded-2xl h-10 pl-5 pr-2 flex-row items-center justify-center"
+            onPress={handleGoToReport}
+          >
+            <Text className="text-black mr-2">{t('report')}</Text>
+            <Icon name="chevronRight" size={25}/>
+          </TouchableOpacity>
+        </View>
         <MapView
           style={[styles.mapContainer, { width, height }]}
           styleURL={StyleURL.SatelliteStreet}

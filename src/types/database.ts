@@ -21,6 +21,7 @@ export interface SamplingDBProps {
   areaId: number;
   size: number;
   number: number;
+  coordinate: string;
 }
 
 export interface BiodiversityDBProps {

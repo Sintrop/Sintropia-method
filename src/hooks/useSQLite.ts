@@ -38,7 +38,7 @@ export function useSQLite() {
     });
     await database.transaction(tx => {
       tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS sampling (id INTEGER PRIMARY KEY AUTOINCREMENT, areaId TEXT, number INTEGER, size INTEGER);',
+        'CREATE TABLE IF NOT EXISTS sampling (id INTEGER PRIMARY KEY AUTOINCREMENT, areaId TEXT, number INTEGER, size INTEGER, coordinate TEXT);',
       );
     });
     await database.transaction(tx => {
@@ -199,8 +199,8 @@ export function useSQLite() {
 
     await db.transaction(tx => {
       tx.executeSql(
-        'INSERT INTO sampling (areaId, number, size) VALUES (?, ?, ?);',
-        [data?.areaId, data.number, data.size],
+        'INSERT INTO sampling (areaId, number, size, coordinate) VALUES (?, ?, ?, ?);',
+        [data?.areaId, data.number, data.size, data?.coordinate],
         (_, result) => {
           console.log('Amostra inserida com sucesso:', result);
         },
