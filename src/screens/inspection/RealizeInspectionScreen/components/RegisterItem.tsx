@@ -17,7 +17,7 @@ export function RegisterItem({ biodiversity, tree }: Props) {
   }
 
   return (
-    <View className="w-full rounded-2xl p-3 flex-row bg-gray-200">
+    <View className="w-full rounded-2xl p-3 flex-row bg-gray-200 mb-3">
       <View className="w-20 h-20 border rounded-2xl overflow-hidden ">
         <Image
           source={{ uri: biodiversity ? biodiversity?.photo : tree?.photo}}

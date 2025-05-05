@@ -10,7 +10,9 @@ export type InspectionStackParamsList = {
   RealizeInspectionScreen: {
     collectionMethod: string;
   }
-  ReportScreen: undefined;
+  ReportScreen: {
+    collectionMethod: string;
+  }
 }
 const Stack = createNativeStackNavigator<InspectionStackParamsList>();
 

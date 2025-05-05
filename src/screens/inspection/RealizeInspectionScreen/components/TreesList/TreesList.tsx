@@ -21,10 +21,6 @@ export function TreesList({ list }: Props) {
     );
   }
 
-  function Separator() {
-    return <View className="mb-3"/>
-  }
-
   function EmptyList() {
     return <View className="mb-3">
       <Text>not list</Text>
@@ -53,7 +49,6 @@ export function TreesList({ list }: Props) {
             keyExtractor: (item, index) => index.toString(),
             renderItem: renderBiodiversityItem,
             showsVerticalScrollIndicator: false,
-            ItemSeparatorComponent: Separator,
             ListEmptyComponent: EmptyList,
             contentContainerStyle: {padding: 10}
           }}

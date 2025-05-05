@@ -157,7 +157,9 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
   }
 
   function handleGoToReport(): void {
-    navigation.navigate("ReportScreen");
+    navigation.navigate("ReportScreen", {
+      collectionMethod
+    });
   }
 
   return (
