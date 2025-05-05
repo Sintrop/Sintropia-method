@@ -23,6 +23,8 @@ import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
 import { RegisterItem } from '../RealizeInspectionScreen/components/RegisterItem';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import Share from 'react-native-share';
+import { generateReportPDF } from '../../../services/inspection/generateReportPDF';
+import { convertImageToBase64 } from '../../../services/inspection/convertImageToBase64';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -103,7 +105,7 @@ export function ReportScreen({ route }: ScreenProps) {
           body { font-family: Arial; padding: 20px; }
           h1 { color: #1eb76f; }
           img { border-radius: 5px; }
-          .cardcount {display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px, background-color: gray;}
+          .cardcount {display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; background-color: #eee}
         </style>
       </head>
       <body>
@@ -123,20 +125,36 @@ export function ReportScreen({ route }: ScreenProps) {
   `;
 
   async function handleGeneratePDF() {
-    const options = {
-      html: htmlContent,
-      fileName: `relatorio-123`,
-      directory: 'Documents',
-    };
-  
-    const file = await RNHTMLtoPDF.convert(options);
-    console.log('PDF gerado em:', file.filePath);
+    const newListBio: BiodiversityDBProps[] = [];
+    const newListTrees: TreeDBProps[] = []
 
-    Share.open({
-      url: `file://${file.filePath}`,
-      title: 'report',
-      type: 'application/pdf'
-    })
+    for (let b = 0; b < biodiversity.length; b++) {
+      const bio = biodiversity[b];
+      const photo = bio.photo;
+      const base64 = await convertImageToBase64(photo);
+      newListBio.push({
+        ...bio,
+        photo: base64,
+      })
+    }
+
+    for (let t = 0; t < trees.length; t++) {
+      const tree = trees[t];
+      const photo = tree.photo;
+      const base64 = await convertImageToBase64(photo);
+      newListTrees.push({
+        ...tree,
+        photo: base64,
+      })
+    }
+
+    await generateReportPDF({
+      areaName: areaOpened?.name as string,
+      biodiversityCount: biodiversity.length,
+      treesCount: trees.length,
+      biodiversity: newListBio,
+      trees: newListTrees
+    });
   }
 
   return (
