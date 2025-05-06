@@ -2,7 +2,7 @@ import React from 'react';
 import { ChevronLeft } from '../../assets/icons/ChevronLeft';
 import { Pressable } from 'react-native';
 import { ChevronRightIcon } from '../../assets/icons/ChevronRight';
-import { CloseIcon } from '../../assets/icons/close';
+import { CloseIcon } from '../../assets/icons/Close';
 
 export interface IconBaseProps {
   size?: number;

@@ -16,6 +16,7 @@
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.11.0",
     "@rnmapbox/maps": "10.1.36",
+    "@turf/turf": "^7.2.0",
     "axios": "^1.8.4",
     "i18next": "^25.0.1",
     "nativewind": "^2.0.11",

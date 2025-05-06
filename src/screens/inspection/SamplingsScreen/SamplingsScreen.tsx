@@ -7,6 +7,7 @@ import { InspectionStackParamsList } from '../../../routes/InspectionRoutes';
 import { SamplingDBProps } from '../../../types/database';
 import { useSQLite } from '../../../hooks/useSQLite';
 import { ModalCreateSampling } from './components/ModalCreateSampling/ModalCreateSampling';
+import { SamplingListItem } from './components/SamplingListItem/SamplingListItem';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -63,8 +64,15 @@ export function SamplingsScreen({ route }: ScreenProps) {
           <ButtonCreateSampling onPress={handleShowCreateSampling} />
         </View>
       ) : (
-        <View>
-
+        <View className="pt-5">
+          {samplings.map((sampling, index) => (
+            <SamplingListItem
+              key={index.toString()}
+              sampling={sampling}
+            />
+          ))}
+          
+          <ButtonCreateSampling onPress={handleShowCreateSampling} />
         </View> 
       )}
 
@@ -73,6 +81,8 @@ export function SamplingsScreen({ route }: ScreenProps) {
           close={() => setShowCreateSampling(false)}
           areaId={areaId}
           areaCoordinates={areaCoordinates}
+          samplingsCount={samplings.length}
+          samplingCreated={handleGetSamplings}
         />
       )}
     </Screen>
