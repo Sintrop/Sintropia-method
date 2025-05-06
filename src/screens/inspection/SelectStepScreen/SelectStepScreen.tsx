@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
-import { useTranslation } from "react-i18next";
-import { Screen } from "../../../components/Screen/Screen";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { InspectionStackParamsList } from "../../../routes/InspectionRoutes";
-import { CameraComponent } from "../../../components/Camera/Camera";
-import { useInspectionContext } from "../../../hooks/useInspectionContext";
-import { useSQLite } from "../../../hooks/useSQLite";
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Screen } from '../../../components/Screen/Screen';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { InspectionStackParamsList } from '../../../routes/InspectionRoutes';
+import { CameraComponent } from '../../../components/Camera/Camera';
+import { useInspectionContext } from '../../../hooks/useInspectionContext';
+import { useSQLite } from '../../../hooks/useSQLite';
 
-type ScreenProps = NativeStackScreenProps<InspectionStackParamsList, 'SelectStepScreen'>
+type ScreenProps = NativeStackScreenProps<
+  InspectionStackParamsList,
+  'SelectStepScreen'
+>;
 export function SelectStepScreen({ route, navigation }: ScreenProps) {
   const { collectionMethod } = route.params;
   const { t } = useTranslation();
@@ -17,6 +20,7 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
   const [showCamera, setShowCamera] = useState(false);
   const [proofPhoto, setProofPhoto] = useState('');
 
+  //TODO: Get permission location and disable btn inpsection when not location available
   useEffect(() => {
     getProofPhoto();
   }, [areaOpened]);
@@ -34,7 +38,14 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
 
   function handleGoToInspection() {
     navigation.navigate('RealizeInspectionScreen', {
-      collectionMethod
+      collectionMethod,
+    });
+  }
+
+  function handleGoToSamplings() {
+    if (!areaOpened) return;
+    navigation.navigate('SamplingsScreen', {
+      areaId: areaOpened?.id
     })
   }
 
@@ -64,6 +75,15 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
         </TouchableOpacity>
       )}
 
+      {collectionMethod === 'sampling' && (
+        <TouchableOpacity
+          className="w-full px-5 min-h-10 rounded-2xl border py-3 mt-5"
+          onPress={handleGoToSamplings}
+        >
+          <Text className="font-semibold text-black">{t('samplings')}</Text>
+        </TouchableOpacity>
+      )}
+
       {showCamera && (
         <CameraComponent
           close={() => setShowCamera(false)}
@@ -71,5 +91,5 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
         />
       )}
     </Screen>
-  )
+  );
 }

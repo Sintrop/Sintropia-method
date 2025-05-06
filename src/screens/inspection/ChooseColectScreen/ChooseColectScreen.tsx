@@ -76,9 +76,7 @@ export function ChooseColectScreen({ navigation }: ScreenProps) {
 
         <TouchableOpacity
           className="w-[48%] h-12 rounded-2xl items-center justify-center ml-3 bg-gray-300"
-          style={{ opacity: 0.5 }}
           onPress={() => handleGoToRealizeInspection('sampling')}
-          disabled={true}
         >
           <Text className="text-black font-semibold">{t('sampling')}</Text>
         </TouchableOpacity>

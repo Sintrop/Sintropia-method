@@ -128,6 +128,7 @@ export function useSQLite() {
         [collectionMethod, areaId],
         (_, result) => {
           console.log('Área atualizada com sucesso:', result);
+          fetchOpenedAreas();
         },
         (_, error) => {
           console.error('Erro ao atualizar área:', error);
@@ -146,6 +147,7 @@ export function useSQLite() {
         [proofPhoto, areaId],
         (_, result) => {
           console.log('Área atualizada com sucesso:', result);
+          fetchOpenedAreas();
         },
         (_, error) => {
           console.error('Erro ao atualizar área:', error);

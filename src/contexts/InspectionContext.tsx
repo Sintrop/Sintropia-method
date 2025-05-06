@@ -21,7 +21,7 @@ export const InspectionContext = createContext({} as InspectionContextProps);
 export function InspectionContextProvider({
   children,
 }: InspectionProviderProps) {
-  const { addArea, addInspection, areasOpened } = useSQLite();
+  const { addArea, addInspection, areasOpened, fetchOpenedAreas } = useSQLite();
   const [inspectionMode, setInspectionMode] = useState(false);
   const [areaOpened, setAreaOpened] = useState<AreaDBProps>()
 
@@ -67,7 +67,7 @@ export function InspectionContextProvider({
     if (inspection) {
       await addInspection(inspection);
     }
-
+    fetchOpenedAreas();
     setInspectionMode(true);
     await AsyncStorage.setItem('inspection-mode', 'true');
   }
