@@ -20,7 +20,7 @@ export function Header({
           <Icon
             name="chevronLeft"
             size={25}
-            color="white"
+            color="black"
             onPress={navigation.goBack}
           />
         )}

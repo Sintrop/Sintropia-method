@@ -7,7 +7,7 @@ export function ChevronRightIcon({ color = 'black', size = 20 }: IconBaseProps) 
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
         d="M9 6L15 12L9 18"
-        stroke="#000000"
+        stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"

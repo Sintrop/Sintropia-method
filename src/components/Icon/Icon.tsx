@@ -2,6 +2,7 @@ import React from 'react';
 import { ChevronLeft } from '../../assets/icons/ChevronLeft';
 import { Pressable } from 'react-native';
 import { ChevronRightIcon } from '../../assets/icons/ChevronRight';
+import { CloseIcon } from '../../assets/icons/close';
 
 export interface IconBaseProps {
   size?: number;
@@ -29,7 +30,8 @@ export function Icon({ name, color, size, onPress }: Props) {
 
 const icons = {
   chevronLeft: ChevronLeft,
-  chevronRight: ChevronRightIcon
+  chevronRight: ChevronRightIcon,
+  close: CloseIcon,
 };
 
 export type IconName = keyof typeof icons;
