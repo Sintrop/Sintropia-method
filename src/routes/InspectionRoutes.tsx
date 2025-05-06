@@ -5,6 +5,7 @@ import { RealizeInspectionScreen } from "../screens/inspection/RealizeInspection
 import { ReportScreen } from "../screens/inspection/ReportScreen/ReportScreen";
 import { SelectStepScreen } from "../screens/inspection/SelectStepScreen/SelectStepScreen";
 import { SamplingsScreen } from "../screens/inspection/SamplingsScreen/SamplingsScreen";
+import { CoordinateProps } from "../types/regenerator";
 
 export type InspectionStackParamsList = {
   TutorialScreen: undefined;
@@ -20,6 +21,7 @@ export type InspectionStackParamsList = {
   }
   SamplingsScreen: {
     areaId: number;
+    areaCoordinates: CoordinateProps[];
   }
 }
 

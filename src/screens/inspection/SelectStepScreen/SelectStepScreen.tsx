@@ -45,7 +45,8 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
   function handleGoToSamplings() {
     if (!areaOpened) return;
     navigation.navigate('SamplingsScreen', {
-      areaId: areaOpened?.id
+      areaId: areaOpened?.id,
+      areaCoordinates: JSON.parse(areaOpened?.coordinates)
     })
   }
 

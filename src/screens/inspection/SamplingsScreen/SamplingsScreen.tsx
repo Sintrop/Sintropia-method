@@ -13,7 +13,7 @@ type ScreenProps = NativeStackScreenProps<
   'SamplingsScreen'
 >;
 export function SamplingsScreen({ route }: ScreenProps) {
-  const { areaId } = route.params;
+  const { areaId, areaCoordinates } = route.params;
   const { t } = useTranslation();
   const { db, fetchSampligsArea } = useSQLite();
   const [samplings, setSamplings] = useState<SamplingDBProps[]>([]);
@@ -72,6 +72,7 @@ export function SamplingsScreen({ route }: ScreenProps) {
         <ModalCreateSampling
           close={() => setShowCreateSampling(false)}
           areaId={areaId}
+          areaCoordinates={areaCoordinates}
         />
       )}
     </Screen>
