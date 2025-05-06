@@ -124,6 +124,7 @@ export function CameraComponent({ close, photo }: Props) {
         isActive={true}
         ref={camera}
         photo={true}
+        photoQualityBalance='speed'
       />
       <TouchableOpacity 
         onPress={handleTakePhoto} 

@@ -28,7 +28,7 @@ export function useSQLite() {
     // })
     await database.transaction(tx => {
       tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS area (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT, inspectionId TEXT, regeneratorAddress TEXT, coordinates TEXT, size INTEGER, proofPhoto TEXT, status INTEGER);',
+        'CREATE TABLE IF NOT EXISTS area (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT, inspectionId TEXT, regeneratorAddress TEXT, coordinates TEXT, size INTEGER, proofPhoto TEXT, status INTEGER, collectionMethod TEXT);',
       );
     });
     await database.transaction(tx => {
@@ -96,7 +96,7 @@ export function useSQLite() {
 
     await db.transaction(tx => {
       tx.executeSql(
-        'INSERT INTO area (name, description, inspectionId, regeneratorAddress, coordinates, size, proofPhoto, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?);',
+        'INSERT INTO area (name, description, inspectionId, regeneratorAddress, coordinates, size, proofPhoto, status, collectionMethod) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);',
         [
           data?.name,
           data?.description,
@@ -105,13 +105,50 @@ export function useSQLite() {
           data?.coordinates,
           data?.size,
           data?.proofPhoto,
-          data?.status
+          data?.status,
+          data?.collectionMethod
         ],
         (_, result) => {
           console.log('Área inserida com sucesso:', result);
         },
         (_, error) => {
           console.error('Erro ao inserir área:', error);
+          return true; // impede continuar a transação
+        }
+      )
+    })
+  }
+
+  async function updateCollectionMethod(collectionMethod: string, areaId: number) {
+    if (!db) return;
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'UPDATE area SET collectionMethod = ? WHERE id = ?;',
+        [collectionMethod, areaId],
+        (_, result) => {
+          console.log('Área atualizada com sucesso:', result);
+        },
+        (_, error) => {
+          console.error('Erro ao atualizar área:', error);
+          return true; // impede continuar a transação
+        }
+      )
+    })
+  }
+
+  async function updateProofPhoto(proofPhoto: string, areaId: number) {
+    if (!db) return;
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'UPDATE area SET proofPhoto = ? WHERE id = ?;',
+        [proofPhoto, areaId],
+        (_, result) => {
+          console.log('Área atualizada com sucesso:', result);
+        },
+        (_, error) => {
+          console.error('Erro ao atualizar área:', error);
           return true; // impede continuar a transação
         }
       )
@@ -270,6 +307,8 @@ export function useSQLite() {
     fetchSampligsArea,
     addSampling,
     fetchTreesSampling,
-    addTree
+    addTree,
+    updateCollectionMethod,
+    updateProofPhoto
   };
 }

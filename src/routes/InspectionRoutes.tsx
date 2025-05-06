@@ -3,6 +3,7 @@ import { TutorialScreen } from "../screens/inspection/TutorialScreen/TutorialScr
 import { ChooseColectScreen } from "../screens/inspection/ChooseColectScreen/ChooseColectScreen";
 import { RealizeInspectionScreen } from "../screens/inspection/RealizeInspectionScreen/RealizeInspectionScreen";
 import { ReportScreen } from "../screens/inspection/ReportScreen/ReportScreen";
+import { SelectStepScreen } from "../screens/inspection/SelectStepScreen/SelectStepScreen";
 
 export type InspectionStackParamsList = {
   TutorialScreen: undefined;
@@ -11,6 +12,9 @@ export type InspectionStackParamsList = {
     collectionMethod: string;
   }
   ReportScreen: {
+    collectionMethod: string;
+  }
+  SelectStepScreen: {
     collectionMethod: string;
   }
 }
@@ -25,6 +29,7 @@ export function InspectionRoutes() {
       <Stack.Screen name="ChooseColectScreen" component={ChooseColectScreen} />
       <Stack.Screen name="RealizeInspectionScreen" component={RealizeInspectionScreen} />
       <Stack.Screen name="ReportScreen" component={ReportScreen} />
+      <Stack.Screen name="SelectStepScreen" component={SelectStepScreen} />
     </Stack.Navigator>
   )
 }

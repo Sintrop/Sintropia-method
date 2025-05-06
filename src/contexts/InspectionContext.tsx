@@ -60,7 +60,8 @@ export function InspectionContextProvider({
       regeneratorAddress: inspection
         ? inspection?.regeneratorAddress
         : '0x0000000000000000000000000000000000000',
-      status: 0
+      status: 0,
+      collectionMethod: ''
     });
 
     if (inspection) {

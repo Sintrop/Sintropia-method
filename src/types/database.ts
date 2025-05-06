@@ -8,6 +8,7 @@ export interface AreaDBProps {
   size: number;
   proofPhoto: string;
   status: number;
+  collectionMethod: string;
 }
 
 export interface InspectionDBProps {
