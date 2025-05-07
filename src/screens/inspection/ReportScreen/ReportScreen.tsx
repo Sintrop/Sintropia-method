@@ -23,6 +23,7 @@ import { convertImageToBase64 } from '../../../services/inspection/convertImageT
 import { BiodiversityList } from './components/BiodiversityList/BiodiversityList';
 import { SamplingList } from './components/SamplingList/SamplingList';
 import { generateReportPDFSamplingMode, SamplingPDFProps } from '../../../services/inspection/generateReportPDFSamplingMode';
+import { extrapolateTreesToArea } from '../../../services/inspection/extrapolateTreesToArea';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -104,11 +105,29 @@ export function ReportScreen({ route }: ScreenProps) {
 
   async function handleFetchTrees() {
     if (samplings.length === 0) return;
+
     setLoadingTrees(true);
     if (collectionMethod === 'manual') {
       const responseTrees = await fetchTreesSampling(samplings[0].id);
       setTrees(responseTrees);
       setTotalTrees(responseTrees.length);
+    }
+
+    if (collectionMethod === 'sampling') {
+      let treesCountPerSampling: number[] = []
+      for (let s = 0; s < samplings.length; s++) {
+        const sampling = samplings[s];
+        const responseTrees = await fetchTreesSampling(sampling.id);
+        treesCountPerSampling.push(responseTrees.length);
+      }
+
+      const treesTotalEstimated = extrapolateTreesToArea({
+        samplingSize: samplings[0].size,
+        samplingTrees: treesCountPerSampling,
+        totalArea: area.size,
+      });
+
+      setTotalTrees(treesTotalEstimated);
     }
     setLoadingTrees(false);
   }
@@ -303,6 +322,10 @@ export function ReportScreen({ route }: ScreenProps) {
           ))}
         </MapView>
       </ViewShot>
+
+      <Text>
+        {t('areaSize')}: {Intl.NumberFormat('pt-BR').format(area.size)} m²
+      </Text>
 
       <View className="flex-row items-center justify-center mt-5">
         <View className="w-[48%] h-20 rounded-2xl items-center justify-center bg-gray-200">
