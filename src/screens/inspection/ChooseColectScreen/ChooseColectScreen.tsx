@@ -54,8 +54,6 @@ export function ChooseColectScreen({}: ScreenProps) {
   if (loading) {
     return (
       <Screen screenTitle={t('collectionMethod')} showBackButton>
-        <HeaderInspectionMode />
-
         <View className="absolute w-screen h-screen items-center justify-center">
           <ActivityIndicator size={40} />
         </View>
