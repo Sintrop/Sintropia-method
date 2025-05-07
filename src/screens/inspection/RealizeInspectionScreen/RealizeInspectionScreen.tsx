@@ -35,6 +35,7 @@ import { Icon } from '../../../components/Icon/Icon';
 import { circle } from '@turf/turf';
 import { useLocation } from '../../../hooks/useLocation';
 import { isPointInPolygon } from '../../../services/inspection/isPointInPolygon';
+import { isPointInCircle } from '../../../services/inspection/isPointInCircle';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -57,6 +58,7 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
   const [biodiversity, setBiodiversity] = useState<BiodiversityDBProps[]>([]);
   const [trees, setTrees] = useState<TreeDBProps[]>([]);
   const [disableRegisterBio, setDisableRegisterBio] = useState(false);
+  const [disableRegisterTree, setDisableRegisterTree] = useState(false);
 
   const centerSampling =
     sampling.coordinate !== ''
@@ -97,6 +99,16 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
     });
 
     setDisableRegisterBio(!pointInPolygon);
+
+    if (collectionMethod === 'sampling') {
+      const isPointInSampling = isPointInCircle({
+        center: { latitude: centerSampling[1], longitude: centerSampling[0]},
+        point: { latitude: atualPosition.latitude, longitude: atualPosition.longitude},
+        radiusInMeters: sampling.size
+      });
+
+      setDisableRegisterTree(!isPointInSampling);
+    }
   }
 
   async function fetchAreaData() {
@@ -157,7 +169,7 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
           photo,
           specieData,
         });
-        
+
         handleFetchBiodiversity();
       }
 
@@ -240,6 +252,7 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
           <ModalRegisterItem
             registerType="tree"
             registerItem={handleRegisterItem}
+            disabled={disableRegisterTree}
           />
 
           <View className="flex-row">
