@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '../../../components/Screen/Screen';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -54,6 +54,10 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
     if (collectionMethod !== 'sampling') return;
 
     const response = await fetchSampligsArea(areaOpened.id);
+    if (response.length === 0) {
+      Alert.alert(t('atention'), t('createOneSamplingFirst'))
+      return
+    }
 
     navigation.navigate('RealizeInspectionScreen', {
       collectionMethod,

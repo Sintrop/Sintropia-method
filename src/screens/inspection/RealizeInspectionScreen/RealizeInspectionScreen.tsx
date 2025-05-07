@@ -36,6 +36,7 @@ import { circle } from '@turf/turf';
 import { useLocation } from '../../../hooks/useLocation';
 import { isPointInPolygon } from '../../../services/inspection/isPointInPolygon';
 import { isPointInCircle } from '../../../services/inspection/isPointInCircle';
+import { SamplingIndicator } from './components/SamplingIndicator/SamplingIndicator';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -99,6 +100,10 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
     });
 
     setDisableRegisterBio(!pointInPolygon);
+
+    if (collectionMethod === 'manual') {
+      setDisableRegisterTree(!pointInPolygon);
+    }
 
     if (collectionMethod === 'sampling') {
       const isPointInSampling = isPointInCircle({
@@ -183,14 +188,15 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
   return (
     <View>
       <Header
-        screenTitle={
-          collectionMethod === 'sampling'
-            ? `${t('sampling')} #${sampling.number}`
-            : t('realizeInspection')
-        }
+        screenTitle={t('realizeInspection') }
         showBackButton
       />
       <View style={{ position: 'relative' }}>
+        {collectionMethod === 'sampling' && !collectOnlyBio && (
+          <SamplingIndicator
+            samplingNumber={sampling.number}
+          />
+        )}
         <MapView
           style={[styles.mapContainer, { width, height }]}
           styleURL={StyleURL.SatelliteStreet}

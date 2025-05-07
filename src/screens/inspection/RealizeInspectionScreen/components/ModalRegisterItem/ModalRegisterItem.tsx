@@ -130,7 +130,7 @@ export function ModalRegisterItem({ registerItem, registerType, disabled }: Prop
 
                 </TouchableOpacity>
 
-                <Text className="text-sm text-black ml-3">{t('addHowNewBiodiversity')}</Text>
+                <Text className="text-sm text-black ml-3">{t('addNewBiodiversity')}</Text>
               </View>
             )}
 
