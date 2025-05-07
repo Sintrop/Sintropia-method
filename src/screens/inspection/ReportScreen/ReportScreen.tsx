@@ -20,20 +20,20 @@ import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
 import { RegisterItem } from '../RealizeInspectionScreen/components/RegisterItem';
 import { generateReportPDF } from '../../../services/inspection/generateReportPDF';
 import { convertImageToBase64 } from '../../../services/inspection/convertImageToBase64';
+import { BiodiversityList } from './components/BiodiversityList/BiodiversityList';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
   'ReportScreen'
 >;
 export function ReportScreen({ route }: ScreenProps) {
-  const { collectionMethod } = route.params;
+  const { collectionMethod, area } = route.params;
   const {
     fetchBiodiversityByAreaId,
     db,
     fetchSampligsArea,
     fetchTreesSampling,
   } = useSQLite();
-  const { areaOpened } = useInspectionContext();
   const { t } = useTranslation();
   const [coordinatesArea, setCoordinatesArea] = useState<CoordinateProps[]>([]);
   const [areaSize, setAreaSize] = useState<number>(0);
@@ -41,6 +41,8 @@ export function ReportScreen({ route }: ScreenProps) {
   const [biodiversity, setBiodiversity] = useState<BiodiversityDBProps[]>([]);
   const [samplings, setSamplings] = useState<SamplingDBProps[]>([]);
   const [trees, setTrees] = useState<TreeDBProps[]>([]);
+  const [totalTrees, setTotalTrees] = useState<number>(0);
+  const [totalBiodiversity, setTotalBiodiversity] = useState<number>(0)
   const [coordinateMapCenter, setCoordinateMapCenter] = useState<Position>([
     -46.62714425279819, -23.576845138073693,
   ]);
@@ -53,22 +55,21 @@ export function ReportScreen({ route }: ScreenProps) {
 
   useEffect(() => {
     if (db) {
-      fetchAreaData();
+      setAreaData();
       handleFetchBiodiversity();
       handleFetchSamplings();
     }
-  }, [areaOpened, db]);
+  }, [db]);
 
   useEffect(() => {
     handleFetchTrees();
   }, [samplings]);
 
-  async function fetchAreaData() {
-    if (!areaOpened) return;
+  async function setAreaData() {
     setLoadingAreaData(true);
-    setAreaSize(areaOpened?.size);
+    setAreaSize(area?.size);
 
-    const coords = JSON.parse(areaOpened.coordinates) as CoordinateProps[];
+    const coords = JSON.parse(area.coordinates) as CoordinateProps[];
     setCoordinatesArea(coords);
     setCoordinateMapCenter([
       parseFloat(coords[0].longitude),
@@ -85,17 +86,16 @@ export function ReportScreen({ route }: ScreenProps) {
   }
 
   async function handleFetchBiodiversity() {
-    if (!areaOpened) return;
     setLoadingBio(true);
-    const bios = await fetchBiodiversityByAreaId(areaOpened?.id);
+    const bios = await fetchBiodiversityByAreaId(area?.id);
+    setTotalBiodiversity(bios.length);
     setBiodiversity(bios);
     setLoadingBio(false);
   }
 
   async function handleFetchSamplings() {
-    if (!areaOpened) return;
     setLoadingSamplings(true);
-    const responseSamplings = await fetchSampligsArea(areaOpened?.id);
+    const responseSamplings = await fetchSampligsArea(area?.id);
     setSamplings(responseSamplings);
     setLoadingSamplings(false);
   }
@@ -106,6 +106,7 @@ export function ReportScreen({ route }: ScreenProps) {
     if (collectionMethod === 'manual') {
       const responseTrees = await fetchTreesSampling(samplings[0].id);
       setTrees(responseTrees);
+      setTotalTrees(responseTrees.length);
     }
     setLoadingTrees(false);
   }
@@ -137,7 +138,7 @@ export function ReportScreen({ route }: ScreenProps) {
     const mapPhoto = await getMapScreenshot();
 
     const pdfUri = await generateReportPDF({
-      areaName: areaOpened?.name as string,
+      areaName: area?.name,
       biodiversityCount: biodiversity.length,
       treesCount: trees.length,
       biodiversity: newListBio,
@@ -165,7 +166,7 @@ export function ReportScreen({ route }: ScreenProps) {
     const pdf = await generatePDF();
     Share.open({
       url: pdf,
-      title: `Inspection Area: ${areaOpened?.name}`,
+      title: `Inspection Area: ${area?.name}`,
       type: 'application/pdf',
     });
     
@@ -187,7 +188,7 @@ export function ReportScreen({ route }: ScreenProps) {
       <Text className="font-bold text-black text-lg mt-5">
         {t('finalResult')}
       </Text>
-      <Text>{areaOpened?.name}</Text>
+      <Text>{area?.name}</Text>
 
       <View className="items-end w-full">
         <TouchableOpacity
@@ -203,7 +204,7 @@ export function ReportScreen({ route }: ScreenProps) {
       <ViewShot
         ref={viewMapRef}
         options={{
-          fileName: `mapshot-${areaOpened?.name}`,
+          fileName: `mapshot-${area?.name}`,
           format: 'png',
           quality: 0.8,
         }}
@@ -246,24 +247,19 @@ export function ReportScreen({ route }: ScreenProps) {
 
       <View className="flex-row items-center justify-center mt-5">
         <View className="w-[48%] h-20 rounded-2xl items-center justify-center bg-gray-200">
-          <Text className="font-bold text-black text-4xl">{trees.length}</Text>
+          <Text className="font-bold text-black text-4xl">{totalTrees}</Text>
           <Text>{t('trees')}</Text>
         </View>
 
         <View className="w-[48%] h-20 rounded-2xl items-center justify-center bg-gray-200 ml-3">
           <Text className="font-bold text-black text-4xl">
-            {biodiversity.length}
+            {totalBiodiversity}
           </Text>
-          <Text>{t('species')}</Text>
+          <Text>{t('biodiversity')}</Text>
         </View>
       </View>
 
-      <Text className="text-green-500 font-bold text-lg mt-10">
-        {t('biodiversity')}
-      </Text>
-      {biodiversity.map((item, index) => (
-        <RegisterItem key={index} biodiversity={item} />
-      ))}
+      <BiodiversityList list={biodiversity} />
 
       <Text className="text-green-500 font-bold text-lg mt-10">
         {t('trees')}

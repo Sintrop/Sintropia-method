@@ -55,14 +55,14 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
 
     const response = await fetchSampligsArea(areaOpened.id);
     if (response.length === 0) {
-      Alert.alert(t('atention'), t('createOneSamplingFirst'))
-      return
+      Alert.alert(t('atention'), t('createOneSamplingFirst'));
+      return;
     }
 
     navigation.navigate('RealizeInspectionScreen', {
       collectionMethod,
       sampling: response[0],
-      collectOnlyBio: true
+      collectOnlyBio: true,
     });
   }
 
@@ -72,6 +72,15 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
       areaId: areaOpened?.id,
       areaCoordinates: JSON.parse(areaOpened?.coordinates),
     });
+  }
+
+  function handleGoToReport(): void {
+    if (!areaOpened) return;
+
+    navigation.navigate('ReportScreen', {
+      collectionMethod,
+      area: areaOpened
+    })
   }
 
   return (
@@ -115,10 +124,19 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
             className="w-full px-5 min-h-10 rounded-2xl border py-3 mt-5"
             onPress={handleGoToCollectBio}
           >
-            <Text className="font-semibold text-black">{t('biodiversity')}</Text>
+            <Text className="font-semibold text-black">
+              {t('biodiversity')}
+            </Text>
           </TouchableOpacity>
         </>
       )}
+
+      <TouchableOpacity
+        className="w-full px-5 min-h-10 rounded-2xl border py-3 mt-5"
+        onPress={handleGoToReport}
+      >
+        <Text className="font-semibold text-black">{t('report')}</Text>
+      </TouchableOpacity>
 
       {showCamera && (
         <CameraComponent
