@@ -22,6 +22,7 @@ import { generateReportPDF } from '../../../services/inspection/generateReportPD
 import { convertImageToBase64 } from '../../../services/inspection/convertImageToBase64';
 import { BiodiversityList } from './components/BiodiversityList/BiodiversityList';
 import { SamplingList } from './components/SamplingList/SamplingList';
+import { generateReportPDFSamplingMode, SamplingPDFProps } from '../../../services/inspection/generateReportPDFSamplingMode';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -112,7 +113,7 @@ export function ReportScreen({ route }: ScreenProps) {
     setLoadingTrees(false);
   }
 
-  async function generatePDF(): Promise<string> {
+  async function generatePDFManualMode(): Promise<string> {
     const newListBio: BiodiversityDBProps[] = [];
     const newListTrees: TreeDBProps[] = [];
 
@@ -140,8 +141,8 @@ export function ReportScreen({ route }: ScreenProps) {
 
     const pdfUri = await generateReportPDF({
       areaName: area?.name,
-      biodiversityCount: biodiversity.length,
-      treesCount: trees.length,
+      biodiversityCount: totalBiodiversity,
+      treesCount: totalTrees,
       biodiversity: newListBio,
       trees: newListTrees,
       proofPhoto,
@@ -152,24 +153,81 @@ export function ReportScreen({ route }: ScreenProps) {
     return pdfUri;
   }
 
-  async function getMapScreenshot() {
-    if (!viewMapRef) return '';
+  async function generatePDFSamplingMode(): Promise<string> {
+    const newListBio: BiodiversityDBProps[] = [];
+    const newListSamplings: SamplingPDFProps[] = [];
 
-    //@ts-ignore
-    const shotMapUri = await viewMapRef?.current?.capture();
-    const shotMapBase64 = await convertImageToBase64(shotMapUri as string);
-    return shotMapBase64;
+    for (let b = 0; b < biodiversity.length; b++) {
+      const bio = biodiversity[b];
+      const photo = bio.photo;
+      const base64 = await convertImageToBase64(photo);
+      newListBio.push({
+        ...bio,
+        photo: base64,
+      });
+    }
+
+    for (let s = 0; s < samplings.length; s++) {
+      const sampling = samplings[s];
+      const trees = await fetchTreesSampling(sampling.id)
+
+      let newTreesList: TreeDBProps[] = [];
+      
+      for(let t = 0; t < trees.length; t++) {
+        const tree = trees[t];
+        const photoBase64 = await convertImageToBase64(tree.photo);
+        const newDataTree: TreeDBProps = {
+          ...tree,
+          photo: photoBase64
+        }
+        newTreesList.push(newDataTree) 
+      }
+
+      const newDataSampling: SamplingPDFProps = {
+        samplingNumber: sampling.number,
+        size: sampling.size,
+        trees: newTreesList,
+      }
+
+      newListSamplings.push(newDataSampling);
+    }
+
+    const proofPhoto = await convertImageToBase64(area.proofPhoto)
+
+    const pdfUri = await generateReportPDFSamplingMode({
+      areaName: area?.name,
+      biodiversityCount: totalBiodiversity,
+      treesCount: totalTrees,
+      biodiversity: newListBio,
+      samplings: newListSamplings,
+      proofPhoto,
+      coordinates: coordinatesArea,
+      areaSize: `${Intl.NumberFormat('pt-BR').format(areaSize)} m²`,
+    });
+
+    return pdfUri;
   }
 
   async function handleSharePDF() {
     setLoadingShare(true);
 
-    const pdf = await generatePDF();
-    Share.open({
-      url: pdf,
-      title: `Inspection Area: ${area?.name}`,
-      type: 'application/pdf',
-    });
+    if (collectionMethod === 'manual') {
+      const pdf = await generatePDFManualMode();
+      Share.open({
+        url: pdf,
+        title: `Inspection Area: ${area?.name}`,
+        type: 'application/pdf',
+      });
+    }
+
+    if (collectionMethod === 'sampling') {
+      const pdf = await generatePDFSamplingMode();
+      Share.open({
+        url: pdf,
+        title: `Inspection Area: ${area?.name}`,
+        type: 'application/pdf'
+      });
+    }
     
     setLoadingShare(false);
   }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Screen } from '../../../components/Screen/Screen';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +18,7 @@ export function ChooseColectScreen({}: ScreenProps) {
   const { updateCollectionMethod, addSampling } = useSQLite();
   const { resetToSelectStepScreen } = useResetNavigation();
   const { t } = useTranslation();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     checkCollectionMethod();
@@ -29,6 +30,8 @@ export function ChooseColectScreen({}: ScreenProps) {
     if (areaOpened?.collectionMethod !== '') {
       resetToSelectStepScreen(areaOpened?.collectionMethod)
     }
+
+    setLoading(false);
   }
 
   async function handleGoToRealizeInspection(method: 'manual' | 'sampling') {
@@ -48,7 +51,7 @@ export function ChooseColectScreen({}: ScreenProps) {
     resetToSelectStepScreen(method)
   }
 
-  if (!areaOpened) {
+  if (loading) {
     return (
       <Screen screenTitle={t('collectionMethod')} showBackButton>
         <HeaderInspectionMode />
