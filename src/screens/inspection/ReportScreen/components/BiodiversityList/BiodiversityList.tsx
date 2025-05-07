@@ -11,7 +11,7 @@ export function BiodiversityList({ list }: Props) {
   const { t } = useTranslation();
 
   return (
-    <View className="mt-10 pt-2">
+    <View className="mt-8 pt-2">
       <Text className="text-green-500 font-bold text-lg">
         {t('biodiversity')}
       </Text>

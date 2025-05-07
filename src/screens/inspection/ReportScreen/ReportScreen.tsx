@@ -21,6 +21,7 @@ import { RegisterItem } from '../RealizeInspectionScreen/components/RegisterItem
 import { generateReportPDF } from '../../../services/inspection/generateReportPDF';
 import { convertImageToBase64 } from '../../../services/inspection/convertImageToBase64';
 import { BiodiversityList } from './components/BiodiversityList/BiodiversityList';
+import { SamplingList } from './components/SamplingList/SamplingList';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -135,7 +136,7 @@ export function ReportScreen({ route }: ScreenProps) {
       });
     }
 
-    const mapPhoto = await getMapScreenshot();
+    const proofPhoto = await convertImageToBase64(area.proofPhoto)
 
     const pdfUri = await generateReportPDF({
       areaName: area?.name,
@@ -143,7 +144,7 @@ export function ReportScreen({ route }: ScreenProps) {
       treesCount: trees.length,
       biodiversity: newListBio,
       trees: newListTrees,
-      mapPhoto,
+      proofPhoto,
       coordinates: coordinatesArea,
       areaSize: `${Intl.NumberFormat('pt-BR').format(areaSize)} m²`,
     });
@@ -260,13 +261,11 @@ export function ReportScreen({ route }: ScreenProps) {
       </View>
 
       <BiodiversityList list={biodiversity} />
-
-      <Text className="text-green-500 font-bold text-lg mt-10">
-        {t('trees')}
-      </Text>
-      {trees.map((item, index) => (
-        <RegisterItem key={index} tree={item} />
-      ))}
+      
+      <SamplingList
+        samplings={samplings}
+        collectionMethod={collectionMethod}
+      />
 
       <View className="mb-20" />
     </Screen>

@@ -52,7 +52,7 @@ export function InspectionContextProvider({
 
     await addArea({
       coordinates: JSON.stringify(coordinates),
-      name: inspection ? `#${inspection?.inspectionId}` : '',
+      name: inspection ? `Inspection #${inspection?.inspectionId}` : '',
       description: '',
       proofPhoto: '',
       size: areaSize,

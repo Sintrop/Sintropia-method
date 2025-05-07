@@ -10,7 +10,7 @@ interface GenerateReportPDFProps {
   trees: TreeDBProps[];
   areaSize: string;
   coordinates: CoordinateProps[];
-  mapPhoto: string;
+  proofPhoto: string;
 }
 
 const styleHTML = `
@@ -91,7 +91,7 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
     trees,
     areaSize,
     coordinates,
-    mapPhoto
+    proofPhoto
   } = props;
 
   const htmlContent = `
@@ -105,7 +105,7 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
 
         <div class="div-flex-row">
           <img
-            src="${mapPhoto}"
+            src="${proofPhoto}"
             class="map-img"
           />
 
