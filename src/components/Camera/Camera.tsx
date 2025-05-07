@@ -16,6 +16,7 @@ import {
   PhotoFile,
 } from 'react-native-vision-camera';
 import type { CameraDevice } from 'react-native-vision-camera';
+import { Icon } from '../Icon/Icon';
 
 interface Props {
   close: () => void;
@@ -49,19 +50,19 @@ export function CameraComponent({ close, photo }: Props) {
       }
     } catch (e) {
       console.log(e);
-      Alert.alert('Error', 'Erro ao tentar tirar a foto')
+      Alert.alert('Error', 'Erro ao tentar tirar a foto');
     } finally {
-      setLoadingTake(false)
+      setLoadingTake(false);
     }
   }
 
-  function handleConfirmPhoto(){
+  function handleConfirmPhoto() {
     if (!imagePreview) return;
     photo(imagePreview);
     close();
   }
-  
-  if (!backCamera) {
+
+  if (!backCamera || !hasPermission) {
     return (
       <ModalContainer close={close}>
         <View className="w-screen h-screen items-center justify-center">
@@ -71,24 +72,13 @@ export function CameraComponent({ close, photo }: Props) {
     );
   }
 
-  if (!hasPermission) {
-    return (
-      <ModalContainer close={close}>
-        <View className="w-screen h-screen items-center justify-center">
-          <Text>{t('weNeedYourPermissionToUseYourCamera')}</Text>
-        </View>
-      </ModalContainer>
-    );
-  }
-
-
   if (imagePreview) {
     return (
       <ModalContainer close={close}>
         <Image
-          source={{uri: imagePreview}}
-          style={{width: '100%', height: '100%'}}
-          resizeMode='cover'
+          source={{ uri: imagePreview }}
+          style={{ width: '100%', height: '100%' }}
+          resizeMode="cover"
         />
 
         <View className="flex-row items-center justify-center absolute bottom-5 w-full h-20">
@@ -107,32 +97,26 @@ export function CameraComponent({ close, photo }: Props) {
           </TouchableOpacity>
         </View>
       </ModalContainer>
-    )
+    );
   }
 
   return (
     <ModalContainer close={close}>
-      <TouchableOpacity 
-        onPress={close} 
-        className="absolute w-12 h-12 bg-white rounded-full top-5 left-5"
-      >
-        <Text>close</Text>
-      </TouchableOpacity>
       <Camera
         style={[StyleSheet.absoluteFill, { width: '100%', height: '100%' }]}
         device={backCamera}
         isActive={true}
         ref={camera}
         photo={true}
-        photoQualityBalance='speed'
+        photoQualityBalance="speed"
       />
-      <TouchableOpacity 
-        onPress={handleTakePhoto} 
+      <TouchableOpacity
+        onPress={handleTakePhoto}
         style={styles.captureButton}
         disabled={loadingTake}
       >
         {loadingTake ? (
-          <ActivityIndicator size={30}/>
+          <ActivityIndicator size={30} />
         ) : (
           <Text style={styles.buttonText}>📸</Text>
         )}
@@ -153,7 +137,15 @@ function ModalContainer({ children, close }: ModalContainerProps) {
       transparent
       onRequestClose={close}
     >
-      <View className="flex-1 bg-white">{children}</View>
+      <View className="flex-1 bg-white relative">
+        <TouchableOpacity
+          onPress={close}
+          className="absolute top-5 right-5 z-20"
+        >
+          <Icon name="close" size={30} color="white" />
+        </TouchableOpacity>
+        {children}
+      </View>
     </Modal>
   );
 }

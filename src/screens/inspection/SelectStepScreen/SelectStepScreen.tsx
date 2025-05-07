@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Image, Alert, Platform, PermissionsAndroid } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '../../../components/Screen/Screen';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -21,10 +21,23 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
   const [showCamera, setShowCamera] = useState(false);
   const [proofPhoto, setProofPhoto] = useState('');
 
-  //TODO: Get permission location and disable btn inpsection when not location available
+  //TODO: Get permission location and disable btn inpsection when not location available]
+  useEffect(() => {
+    requestLocationPermissions()
+  }, []);
+  
   useEffect(() => {
     getProofPhoto();
   }, [areaOpened]);
+
+  async function requestLocationPermissions() {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+  }
 
   function getProofPhoto() {
     if (!areaOpened) return;
@@ -76,11 +89,15 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
 
   function handleGoToReport(): void {
     if (!areaOpened) return;
+    if (proofPhoto === '') {
+      Alert.alert(t('atention', t('youNeedToTakeTheProofPhoto')));
+      return;
+    }
 
     navigation.navigate('ReportScreen', {
       collectionMethod,
-      area: areaOpened
-    })
+      area: areaOpened,
+    });
   }
 
   return (
