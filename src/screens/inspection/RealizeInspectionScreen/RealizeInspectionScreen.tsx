@@ -33,6 +33,8 @@ import { Header } from '../../../components/Header/Header';
 import { TreesList } from './components/TreesList/TreesList';
 import { Icon } from '../../../components/Icon/Icon';
 import { circle } from '@turf/turf';
+import { useLocation } from '../../../hooks/useLocation';
+import { isPointInPolygon } from '../../../services/inspection/isPointInPolygon';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -47,12 +49,14 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
     fetchTreesSampling,
     addTree,
   } = useSQLite();
+  const { location } = useLocation();
   const { width, height } = useWindowDimensions();
   const { t } = useTranslation();
   const { areaOpened } = useInspectionContext();
   const [pathPolyline, setPathPolyline] = useState<[number, number][]>([]);
   const [biodiversity, setBiodiversity] = useState<BiodiversityDBProps[]>([]);
   const [trees, setTrees] = useState<TreeDBProps[]>([]);
+  const [disableRegisterBio, setDisableRegisterBio] = useState(false);
 
   const centerSampling =
     sampling.coordinate !== ''
@@ -74,6 +78,26 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
       handleFetchTrees();
     }
   }, [areaOpened, db]);
+
+  useEffect(() => {
+    handleCheckAvailableCollect();
+  }, [location]);
+
+  function handleCheckAvailableCollect() {
+    if (!location) return;
+
+    const atualPosition = location.coords;
+
+    const pointInPolygon = isPointInPolygon({
+      coord: {
+        latitude: atualPosition.latitude,
+        longitude: atualPosition.longitude,
+      },
+      polygonCoords: pathPolyline,
+    });
+
+    setDisableRegisterBio(!pointInPolygon);
+  }
 
   async function fetchAreaData() {
     if (!areaOpened) return;
@@ -126,36 +150,32 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
         samplingId: sampling.id,
       });
 
+      if (data.addNewBio) {
+        await addBiodiversity({
+          areaId,
+          coordinate,
+          photo,
+          specieData,
+        });
+        
+        handleFetchBiodiversity();
+      }
+
       handleFetchTrees();
     }
   }
 
-  function handleGoToReport(): void {
-    navigation.navigate('ReportScreen', {
-      collectionMethod,
-    });
-  }
-
   return (
     <View>
-      <Header screenTitle={t('realizeInspection')} showBackButton />
+      <Header
+        screenTitle={
+          collectionMethod === 'sampling'
+            ? `${t('sampling')} #${sampling.number}`
+            : t('realizeInspection')
+        }
+        showBackButton
+      />
       <View style={{ position: 'relative' }}>
-        <View
-          style={{
-            position: 'absolute',
-            top: 25,
-            right: 25,
-            zIndex: 20,
-          }}
-        >
-          <TouchableOpacity
-            className="bg-gray-200 rounded-2xl h-10 pl-5 pr-2 flex-row items-center justify-center"
-            onPress={handleGoToReport}
-          >
-            <Text className="text-black mr-2">{t('report')}</Text>
-            <Icon name="chevronRight" size={25} />
-          </TouchableOpacity>
-        </View>
         <MapView
           style={[styles.mapContainer, { width, height }]}
           styleURL={StyleURL.SatelliteStreet}
@@ -212,28 +232,18 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
         <View
           style={{
             position: 'absolute',
-            top: height - 230,
+            top: height - 220,
             right: 20,
-            flexDirection: 'row',
+            alignItems: 'flex-end',
           }}
         >
-          <View className="mr-5">
-            <ModalRegisterItem
-              registerType="tree"
-              count={trees.length}
-              registerItem={handleRegisterItem}
-            />
+          <ModalRegisterItem
+            registerType="tree"
+            registerItem={handleRegisterItem}
+          />
 
+          <View className="flex-row">
             <TreesList list={trees} />
-          </View>
-
-          <View>
-            <ModalRegisterItem
-              registerType="biodiversity"
-              count={biodiversity.length}
-              registerItem={handleRegisterItem}
-            />
-
             <BiodiversityList list={biodiversity} />
           </View>
         </View>

@@ -14,20 +14,22 @@ export interface RegisterItemProps {
   photo: string;
   specieData: string;
   registerType: RegisterType;
+  addNewBio?: boolean;
 }
 
 interface Props {
   registerType: RegisterType;
-  count: number;
   registerItem: (data: RegisterItemProps) => void;
+  disabled?: boolean;
 }
 
-export function ModalRegisterItem({ count, registerItem, registerType }: Props) {
+export function ModalRegisterItem({ registerItem, registerType, disabled }: Props) {
   const modalRef = useRef<Modalize>(null);
   const { t } = useTranslation();
   const { location } = useLocation();
   const [showCamera, setShowCamera] = useState<boolean>(false);
   const [photo, setPhoto] = useState<string>();
+  const [addNewBio, setAddNewBio] = useState(false);
 
   function handleOpenModal() {
     modalRef.current?.open();
@@ -61,21 +63,27 @@ export function ModalRegisterItem({ count, registerItem, registerType }: Props) 
       coordinate,
       photo,
       registerType,
-      specieData: JSON.stringify(mockSpecie)
+      specieData: JSON.stringify(mockSpecie),
+      addNewBio,
     });
     setPhoto(undefined);
+    setAddNewBio(false);
     modalRef.current?.close();
+  }
+
+  function toggleAddNewBio() {
+    setAddNewBio((value) => !value);
   }
 
   return (
     <View className="mb-4">
       <TouchableOpacity
-        className="w-[150] h-24 rounded-2xl bg-gray-200 items-center justify-center "
+        className="w-[150] h-10 rounded-2xl bg-gray-200 items-center justify-center "
         onPress={handleOpenModal}
+        style={{ opacity: disabled ? 0.8 : 1 }}
+        disabled={disabled}
       >
-        <Text>{registerType === 'biodiversity' ? t('biodiversity') : t('trees')}</Text>
-        <Text className="font-bold text-black text-3xl">{count}</Text>
-        <Text className="text-xs">{t('touchHereToRegister')}</Text>
+        <Text className="text-xs text-black">{t('registerNewTree')}</Text>
       </TouchableOpacity>
 
       <Portal>
@@ -110,6 +118,19 @@ export function ModalRegisterItem({ count, registerItem, registerType }: Props) 
             <Text className="text-black">
               ID= 0 - Indefinido
             </Text>
+
+            {registerType === 'tree' && (
+              <View className="my-5 flex-row items-center">
+                <TouchableOpacity
+                  onPress={toggleAddNewBio}
+                  className={`w-5 h-5 rounded-md border-2 items-center justify-center ${addNewBio ? 'bg-green-500 border-green-500' : 'bg-transparent'}`}
+                >
+
+                </TouchableOpacity>
+
+                <Text className="text-sm text-black ml-3">{t('addHowNewBiodiversity')}</Text>
+              </View>
+            )}
 
             <TouchableOpacity
               className="w-full h-12 rounded-2xl items-center justify-center bg-green-600 mt-5"

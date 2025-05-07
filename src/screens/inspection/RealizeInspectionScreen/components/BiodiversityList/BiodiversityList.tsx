@@ -1,30 +1,32 @@
-import React, { useRef } from "react";
-import { View, Text, ListRenderItemInfo } from "react-native";
-import { BiodiversityDBProps } from "../../../../../types/database";
-import { RegisterItem } from "../RegisterItem";
-import { Portal } from "react-native-portalize";
-import { Modalize } from "react-native-modalize";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { useTranslation } from "react-i18next";
+import React, { useRef } from 'react';
+import { View, Text, ListRenderItemInfo } from 'react-native';
+import { BiodiversityDBProps } from '../../../../../types/database';
+import { RegisterItem } from '../RegisterItem';
+import { Portal } from 'react-native-portalize';
+import { Modalize } from 'react-native-modalize';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
-  list: BiodiversityDBProps[]
+  list: BiodiversityDBProps[];
 }
 
 export function BiodiversityList({ list }: Props) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const modalRef = useRef<Modalize>();
 
-  function renderBiodiversityItem({ item }: ListRenderItemInfo<BiodiversityDBProps>) {
-    return (
-      <RegisterItem biodiversity={item} />
-    );
+  function renderBiodiversityItem({
+    item,
+  }: ListRenderItemInfo<BiodiversityDBProps>) {
+    return <RegisterItem biodiversity={item} />;
   }
 
   function EmptyList() {
-    return <View className="mb-3">
-      <Text>not list</Text>
-    </View>
+    return (
+      <View className="mb-3">
+        <Text>not list</Text>
+      </View>
+    );
   }
 
   function handleOpenModal(): void {
@@ -34,10 +36,11 @@ export function BiodiversityList({ list }: Props) {
   return (
     <View>
       <TouchableOpacity
-        className="w-[150px] h-10 rounded-2xl bg-gray-200 flex-row items-center justify-center"
+        className="w-[150] h-20 rounded-2xl bg-gray-200 items-center justify-center "
         onPress={handleOpenModal}
       >
-        <Text className="font-bold text-black">{t('biodiversityList')}</Text>
+        <Text>{t('biodiversity')}</Text>
+        <Text className="font-bold text-black text-3xl">{list.length}</Text>
       </TouchableOpacity>
 
       <Portal>
@@ -50,10 +53,10 @@ export function BiodiversityList({ list }: Props) {
             renderItem: renderBiodiversityItem,
             showsVerticalScrollIndicator: false,
             ListEmptyComponent: EmptyList,
-            contentContainerStyle: {padding: 10}
+            contentContainerStyle: { padding: 10 },
           }}
         />
       </Portal>
     </View>
-  )
+  );
 }
