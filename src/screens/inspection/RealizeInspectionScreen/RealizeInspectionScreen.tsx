@@ -41,8 +41,8 @@ type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
   'RealizeInspectionScreen'
 >;
-export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
-  const { collectionMethod, sampling } = route.params;
+export function RealizeInspectionScreen({ route }: ScreenProps) {
+  const { collectionMethod, sampling, collectOnlyBio } = route.params;
   const {
     fetchBiodiversityByAreaId,
     addBiodiversity,
@@ -102,9 +102,12 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
 
     if (collectionMethod === 'sampling') {
       const isPointInSampling = isPointInCircle({
-        center: { latitude: centerSampling[1], longitude: centerSampling[0]},
-        point: { latitude: atualPosition.latitude, longitude: atualPosition.longitude},
-        radiusInMeters: sampling.size
+        center: { latitude: centerSampling[1], longitude: centerSampling[0] },
+        point: {
+          latitude: atualPosition.latitude,
+          longitude: atualPosition.longitude,
+        },
+        radiusInMeters: sampling.size,
       });
 
       setDisableRegisterTree(!isPointInSampling);
@@ -214,30 +217,34 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
             />
           ))}
 
-          {trees.map((item, index) => (
-            <PointAnnotation
-              id="tree-marker"
-              key={index.toString()}
-              coordinate={[
-                JSON.parse(item.coordinate).longitude,
-                JSON.parse(item.coordinate).latitude,
-              ]}
-              children={
-                <View className="w-2 h-2 bg-white rounded-full border-[1]" />
-              }
-            />
-          ))}
+          {!collectOnlyBio && (
+            <>
+              {trees.map((item, index) => (
+                <PointAnnotation
+                  id="tree-marker"
+                  key={index.toString()}
+                  coordinate={[
+                    JSON.parse(item.coordinate).longitude,
+                    JSON.parse(item.coordinate).latitude,
+                  ]}
+                  children={
+                    <View className="w-2 h-2 bg-white rounded-full border-[1]" />
+                  }
+                />
+              ))}
 
-          {collectionMethod === 'sampling' && (
-            <ShapeSource id="circlesource" shape={circleGeoJSON}>
-              <FillLayer
-                id="circlelayer"
-                style={{
-                  fillColor: 'rgba(0, 150, 255, 0.3)',
-                  fillOutlineColor: 'rgba(0, 150, 255, 1)',
-                }}
-              />
-            </ShapeSource>
+              {collectionMethod === 'sampling' && (
+                <ShapeSource id="circlesource" shape={circleGeoJSON}>
+                  <FillLayer
+                    id="circlelayer"
+                    style={{
+                      fillColor: 'rgba(0, 150, 255, 0.3)',
+                      fillOutlineColor: 'rgba(0, 150, 255, 1)',
+                    }}
+                  />
+                </ShapeSource>
+              )}
+            </>
           )}
         </MapView>
 
@@ -249,14 +256,22 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
             alignItems: 'flex-end',
           }}
         >
-          <ModalRegisterItem
-            registerType="tree"
-            registerItem={handleRegisterItem}
-            disabled={disableRegisterTree}
-          />
+          {collectOnlyBio ? (
+            <ModalRegisterItem
+              registerType="biodiversity"
+              registerItem={handleRegisterItem}
+              disabled={disableRegisterBio}
+            />
+          ) : (
+            <ModalRegisterItem
+              registerType="tree"
+              registerItem={handleRegisterItem}
+              disabled={disableRegisterTree}
+            />
+          )}
 
           <View className="flex-row">
-            <TreesList list={trees} />
+            {!collectOnlyBio && <TreesList list={trees} />}
             <BiodiversityList list={biodiversity} />
           </View>
         </View>

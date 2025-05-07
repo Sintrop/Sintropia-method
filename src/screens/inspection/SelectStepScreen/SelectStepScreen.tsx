@@ -37,7 +37,7 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
     updateProofPhoto(uri, areaOpened?.id);
   }
 
-  async function handleGoToInspection() {
+  async function handleGoToInspectionManual() {
     if (!areaOpened) return;
     if (collectionMethod !== 'manual') return;
 
@@ -45,7 +45,20 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
 
     navigation.navigate('RealizeInspectionScreen', {
       collectionMethod,
-      sampling: response[0]
+      sampling: response[0],
+    });
+  }
+
+  async function handleGoToCollectBio() {
+    if (!areaOpened) return;
+    if (collectionMethod !== 'sampling') return;
+
+    const response = await fetchSampligsArea(areaOpened.id);
+
+    navigation.navigate('RealizeInspectionScreen', {
+      collectionMethod,
+      sampling: response[0],
+      collectOnlyBio: true
     });
   }
 
@@ -53,8 +66,8 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
     if (!areaOpened) return;
     navigation.navigate('SamplingsScreen', {
       areaId: areaOpened?.id,
-      areaCoordinates: JSON.parse(areaOpened?.coordinates)
-    })
+      areaCoordinates: JSON.parse(areaOpened?.coordinates),
+    });
   }
 
   return (
@@ -79,19 +92,28 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
       {collectionMethod === 'manual' && (
         <TouchableOpacity
           className="w-full px-5 min-h-10 rounded-2xl border py-3 mt-5"
-          onPress={handleGoToInspection}
+          onPress={handleGoToInspectionManual}
         >
           <Text className="font-semibold text-black">{t('inspection')}</Text>
         </TouchableOpacity>
       )}
 
       {collectionMethod === 'sampling' && (
-        <TouchableOpacity
-          className="w-full px-5 min-h-10 rounded-2xl border py-3 mt-5"
-          onPress={handleGoToSamplings}
-        >
-          <Text className="font-semibold text-black">{t('samplings')}</Text>
-        </TouchableOpacity>
+        <>
+          <TouchableOpacity
+            className="w-full px-5 min-h-10 rounded-2xl border py-3 mt-5"
+            onPress={handleGoToSamplings}
+          >
+            <Text className="font-semibold text-black">{t('samplings')}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            className="w-full px-5 min-h-10 rounded-2xl border py-3 mt-5"
+            onPress={handleGoToCollectBio}
+          >
+            <Text className="font-semibold text-black">{t('biodiversity')}</Text>
+          </TouchableOpacity>
+        </>
       )}
 
       {showCamera && (

@@ -13,7 +13,8 @@ export type InspectionStackParamsList = {
   ChooseColectScreen: undefined;
   RealizeInspectionScreen: {
     collectionMethod: string;
-    sampling: SamplingDBProps
+    sampling: SamplingDBProps;
+    collectOnlyBio?: boolean;
   }
   ReportScreen: {
     collectionMethod: string;

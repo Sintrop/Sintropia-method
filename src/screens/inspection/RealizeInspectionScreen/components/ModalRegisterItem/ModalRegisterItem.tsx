@@ -83,7 +83,9 @@ export function ModalRegisterItem({ registerItem, registerType, disabled }: Prop
         style={{ opacity: disabled ? 0.8 : 1 }}
         disabled={disabled}
       >
-        <Text className="text-xs text-black">{t('registerNewTree')}</Text>
+        <Text className="text-xs text-black">
+          {registerType === 'tree' ? t('registerNewTree') : t('registerNewBio')}
+        </Text>
       </TouchableOpacity>
 
       <Portal>
