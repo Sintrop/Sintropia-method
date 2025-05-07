@@ -6,12 +6,14 @@ import { ReportScreen } from "../screens/inspection/ReportScreen/ReportScreen";
 import { SelectStepScreen } from "../screens/inspection/SelectStepScreen/SelectStepScreen";
 import { SamplingsScreen } from "../screens/inspection/SamplingsScreen/SamplingsScreen";
 import { CoordinateProps } from "../types/regenerator";
+import { SamplingDBProps } from "../types/database";
 
 export type InspectionStackParamsList = {
   TutorialScreen: undefined;
   ChooseColectScreen: undefined;
   RealizeInspectionScreen: {
     collectionMethod: string;
+    sampling: SamplingDBProps
   }
   ReportScreen: {
     collectionMethod: string;

@@ -7,14 +7,16 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { InspectionStackParamsList } from '../../../routes/InspectionRoutes';
 import { useInspectionContext } from '../../../hooks/useInspectionContext';
 import { useSQLite } from '../../../hooks/useSQLite';
+import { useResetNavigation } from '../../../hooks/useResetNavigation';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
   'ChooseColectScreen'
 >;
-export function ChooseColectScreen({ navigation }: ScreenProps) {
+export function ChooseColectScreen({}: ScreenProps) {
   const { areaOpened } = useInspectionContext();
-  const { updateCollectionMethod } = useSQLite();
+  const { updateCollectionMethod, addSampling } = useSQLite();
+  const { resetToSelectStepScreen } = useResetNavigation();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -25,20 +27,25 @@ export function ChooseColectScreen({ navigation }: ScreenProps) {
     if (!areaOpened) return;
 
     if (areaOpened?.collectionMethod !== '') {
-      navigation.navigate ('SelectStepScreen', {
-        collectionMethod: areaOpened?.collectionMethod
-      });
+      resetToSelectStepScreen(areaOpened?.collectionMethod)
     }
   }
 
-  function handleGoToRealizeInspection(method: 'manual' | 'sampling') {
+  async function handleGoToRealizeInspection(method: 'manual' | 'sampling') {
     if (!areaOpened) return;
 
     updateCollectionMethod(method, areaOpened?.id);
 
-    navigation.navigate('SelectStepScreen', {
-      collectionMethod: method,
-    });
+    if (method === 'manual') {
+      await addSampling({
+        areaId: areaOpened?.id,
+        number: 1,
+        size: areaOpened?.size,
+        coordinate: '',
+      });
+    }
+
+    resetToSelectStepScreen(method)
   }
 
   if (!areaOpened) {

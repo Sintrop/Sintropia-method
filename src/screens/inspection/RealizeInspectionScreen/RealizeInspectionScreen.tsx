@@ -11,8 +11,10 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { InspectionStackParamsList } from '../../../routes/InspectionRoutes';
 import {
   Camera,
+  FillLayer,
   MapView,
   PointAnnotation,
+  ShapeSource,
   StyleURL,
   UserLocation,
   UserTrackingMode,
@@ -21,11 +23,7 @@ import { useInspectionContext } from '../../../hooks/useInspectionContext';
 import { CoordinateProps } from '../../../types/regenerator';
 import { Polyline } from '../../../components/Map/Polyline';
 import { useSQLite } from '../../../hooks/useSQLite';
-import {
-  BiodiversityDBProps,
-  SamplingDBProps,
-  TreeDBProps,
-} from '../../../types/database';
+import { BiodiversityDBProps, TreeDBProps } from '../../../types/database';
 import {
   ModalRegisterItem,
   RegisterItemProps,
@@ -34,19 +32,18 @@ import { BiodiversityList } from './components/BiodiversityList/BiodiversityList
 import { Header } from '../../../components/Header/Header';
 import { TreesList } from './components/TreesList/TreesList';
 import { Icon } from '../../../components/Icon/Icon';
+import { circle } from '@turf/turf';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
   'RealizeInspectionScreen'
 >;
 export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
-  const { collectionMethod } = route.params;
+  const { collectionMethod, sampling } = route.params;
   const {
     fetchBiodiversityByAreaId,
     addBiodiversity,
     db,
-    fetchSampligsArea,
-    addSampling,
     fetchTreesSampling,
     addTree,
   } = useSQLite();
@@ -55,20 +52,28 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
   const { areaOpened } = useInspectionContext();
   const [pathPolyline, setPathPolyline] = useState<[number, number][]>([]);
   const [biodiversity, setBiodiversity] = useState<BiodiversityDBProps[]>([]);
-  const [samplings, setSamplings] = useState<SamplingDBProps[]>([]);
   const [trees, setTrees] = useState<TreeDBProps[]>([]);
+
+  const centerSampling =
+    sampling.coordinate !== ''
+      ? [
+          JSON.parse(sampling.coordinate).longitude,
+          JSON.parse(sampling.coordinate).latitude,
+        ]
+      : [0, 0];
+
+  const circleGeoJSON = circle(centerSampling, sampling.size, {
+    steps: 64,
+    units: 'meters',
+  });
 
   useEffect(() => {
     if (db) {
       fetchAreaData();
       handleFetchBiodiversity();
-      handleFetchSamplings();
+      handleFetchTrees();
     }
   }, [areaOpened, db]);
-
-  useEffect(() => {
-    handleFetchTrees();
-  }, [samplings]);
 
   async function fetchAreaData() {
     if (!areaOpened) return;
@@ -88,38 +93,9 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
     setBiodiversity(bios);
   }
 
-  async function handleFetchSamplings() {
-    if (!areaOpened) return;
-
-    const responseSamplings = await fetchSampligsArea(areaOpened?.id);
-    setSamplings(responseSamplings);
-
-    if (collectionMethod === 'manual') {
-      startManualMode(responseSamplings);
-    }
-  }
-
-  async function startManualMode(samps: SamplingDBProps[]): Promise<void> {
-    if (!areaOpened) return;
-    if (samps.length > 0) return;
-
-    await addSampling({
-      areaId: areaOpened?.id,
-      number: 1,
-      size: areaOpened?.size,
-      coordinate: ''
-    });
-
-    handleFetchSamplings();
-  }
-
   async function handleFetchTrees() {
-    if (samplings.length === 0) return;
-
-    if (collectionMethod === 'manual') {
-      const responseTrees = await fetchTreesSampling(samplings[0].id);
-      setTrees(responseTrees);
-    }
+    const responseTrees = await fetchTreesSampling(sampling.id);
+    setTrees(responseTrees);
   }
 
   async function handleRegisterItem(data: RegisterItemProps): Promise<void> {
@@ -141,24 +117,22 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
     }
 
     if (data?.registerType === 'tree') {
-      if (collectionMethod === 'manual') {
-        await addTree({
-          areaId,
-          coordinate,
-          photo,
-          specieData,
-          samplingNumber: 1,
-          samplingId: samplings[0].id,
-        });
+      await addTree({
+        areaId,
+        coordinate,
+        photo,
+        specieData,
+        samplingNumber: sampling.number,
+        samplingId: sampling.id,
+      });
 
-        handleFetchTrees();
-      }
+      handleFetchTrees();
     }
   }
 
   function handleGoToReport(): void {
-    navigation.navigate("ReportScreen", {
-      collectionMethod
+    navigation.navigate('ReportScreen', {
+      collectionMethod,
     });
   }
 
@@ -171,7 +145,7 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
             position: 'absolute',
             top: 25,
             right: 25,
-            zIndex: 20
+            zIndex: 20,
           }}
         >
           <TouchableOpacity
@@ -179,7 +153,7 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
             onPress={handleGoToReport}
           >
             <Text className="text-black mr-2">{t('report')}</Text>
-            <Icon name="chevronRight" size={25}/>
+            <Icon name="chevronRight" size={25} />
           </TouchableOpacity>
         </View>
         <MapView
@@ -216,9 +190,23 @@ export function RealizeInspectionScreen({ route, navigation }: ScreenProps) {
                 JSON.parse(item.coordinate).longitude,
                 JSON.parse(item.coordinate).latitude,
               ]}
-              children={<View className="w-2 h-2 bg-white rounded-full border-[1]"/>}
+              children={
+                <View className="w-2 h-2 bg-white rounded-full border-[1]" />
+              }
             />
           ))}
+
+          {collectionMethod === 'sampling' && (
+            <ShapeSource id="circlesource" shape={circleGeoJSON}>
+              <FillLayer
+                id="circlelayer"
+                style={{
+                  fillColor: 'rgba(0, 150, 255, 0.3)',
+                  fillOutlineColor: 'rgba(0, 150, 255, 1)',
+                }}
+              />
+            </ShapeSource>
+          )}
         </MapView>
 
         <View

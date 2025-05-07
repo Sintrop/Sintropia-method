@@ -12,7 +12,7 @@ import {
   FillLayer,
 } from '@rnmapbox/maps';
 import { Polyline } from '../../../../../components/Map/Polyline';
-import { center, circle } from '@turf/turf';
+import { circle } from '@turf/turf';
 import { getRandomPointInPolygon } from '../../../../../services/inspection/getRandomPointInPolygon';
 import { useSQLite } from '../../../../../hooks/useSQLite';
 

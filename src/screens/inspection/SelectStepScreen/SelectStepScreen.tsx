@@ -7,6 +7,7 @@ import { InspectionStackParamsList } from '../../../routes/InspectionRoutes';
 import { CameraComponent } from '../../../components/Camera/Camera';
 import { useInspectionContext } from '../../../hooks/useInspectionContext';
 import { useSQLite } from '../../../hooks/useSQLite';
+import { HeaderInspectionMode } from '../components/HeaderInspectionMode';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -16,7 +17,7 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
   const { collectionMethod } = route.params;
   const { t } = useTranslation();
   const { areaOpened } = useInspectionContext();
-  const { updateProofPhoto } = useSQLite();
+  const { updateProofPhoto, fetchSampligsArea } = useSQLite();
   const [showCamera, setShowCamera] = useState(false);
   const [proofPhoto, setProofPhoto] = useState('');
 
@@ -36,9 +37,15 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
     updateProofPhoto(uri, areaOpened?.id);
   }
 
-  function handleGoToInspection() {
+  async function handleGoToInspection() {
+    if (!areaOpened) return;
+    if (collectionMethod !== 'manual') return;
+
+    const response = await fetchSampligsArea(areaOpened.id);
+
     navigation.navigate('RealizeInspectionScreen', {
       collectionMethod,
+      sampling: response[0]
     });
   }
 
@@ -52,8 +59,10 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
 
   return (
     <Screen screenTitle={t('selectStep')}>
+      <HeaderInspectionMode />
+
       <TouchableOpacity
-        className="w-full px-5 min-h-10 rounded-2xl border py-3"
+        className="w-full px-5 min-h-10 rounded-2xl border py-3 mt-5"
         onPress={() => setShowCamera(true)}
       >
         <Text className="font-semibold text-black">{t('proofPhoto')}</Text>
