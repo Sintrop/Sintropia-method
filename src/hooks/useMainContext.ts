@@ -1,7 +1,7 @@
-import { useContext } from 'react'
-import { MainContext, MainContextProps } from '../contexts/MainContext'
+import { useContext } from 'react';
+import { MainContext, MainContextProps } from '../contexts/MainContext';
 
 export function useMainContext(): MainContextProps {
-  const context = useContext(MainContext)
-  return context
+  const context = useContext(MainContext);
+  return context;
 }
