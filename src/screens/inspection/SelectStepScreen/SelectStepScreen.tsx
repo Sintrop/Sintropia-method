@@ -8,6 +8,7 @@ import { CameraComponent } from '../../../components/Camera/Camera';
 import { useInspectionContext } from '../../../hooks/useInspectionContext';
 import { useSQLite } from '../../../hooks/useSQLite';
 import { HeaderInspectionMode } from '../components/HeaderInspectionMode';
+import { FinishInspection } from './components/FinishInspection/FinishInspection';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -154,6 +155,11 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
       >
         <Text className="font-semibold text-black">{t('report')}</Text>
       </TouchableOpacity>
+
+      <FinishInspection
+        areaId={areaOpened?.id as number}
+        disabled={proofPhoto === ''}  
+      />
 
       {showCamera && (
         <CameraComponent

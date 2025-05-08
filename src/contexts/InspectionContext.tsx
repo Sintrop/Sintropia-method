@@ -10,6 +10,7 @@ export interface InspectionContextProps {
   exitInspectionMode: () => void;
   enterInspectionMode: () => void;
   areaOpened: AreaDBProps | undefined;
+  finishInspection: (areaId: number) => void;
 }
 
 interface InspectionProviderProps {
@@ -21,9 +22,15 @@ export const InspectionContext = createContext({} as InspectionContextProps);
 export function InspectionContextProvider({
   children,
 }: InspectionProviderProps) {
-  const { addArea, addInspection, areasOpened, fetchOpenedAreas } = useSQLite();
+  const {
+    addArea,
+    addInspection,
+    areasOpened,
+    fetchOpenedAreas,
+    updateAreaStatus,
+  } = useSQLite();
   const [inspectionMode, setInspectionMode] = useState(false);
-  const [areaOpened, setAreaOpened] = useState<AreaDBProps>()
+  const [areaOpened, setAreaOpened] = useState<AreaDBProps>();
 
   useEffect(() => {
     handleCheckInspectionMode();
@@ -33,10 +40,10 @@ export function InspectionContextProvider({
     if (areasOpened.length > 0) {
       setAreaOpened(areasOpened[0]);
     }
-  }, [areasOpened])
+  }, [areasOpened]);
 
   async function handleCheckInspectionMode() {
-    const response = await AsyncStorage.getItem('inspection-mode')
+    const response = await AsyncStorage.getItem('inspection-mode');
 
     if (response) {
       if (response === 'true') {
@@ -61,7 +68,7 @@ export function InspectionContextProvider({
         ? inspection?.regeneratorAddress
         : '0x0000000000000000000000000000000000000',
       status: 0,
-      collectionMethod: ''
+      collectionMethod: '',
     });
 
     if (inspection) {
@@ -72,14 +79,20 @@ export function InspectionContextProvider({
     await AsyncStorage.setItem('inspection-mode', 'true');
   }
 
+  async function finishInspection(areaId: number) {
+    await updateAreaStatus(1, areaId);
+    exitInspectionMode();
+    fetchOpenedAreas();
+  }
+
   function exitInspectionMode() {
     AsyncStorage.removeItem('inspection-mode');
-    setInspectionMode(false)
+    setInspectionMode(false);
   }
 
   function enterInspectionMode() {
     AsyncStorage.setItem('inspection-mode', 'true');
-    setInspectionMode(true)
+    setInspectionMode(true);
   }
 
   return (
@@ -89,7 +102,8 @@ export function InspectionContextProvider({
         startInspection,
         exitInspectionMode,
         enterInspectionMode,
-        areaOpened
+        finishInspection,
+        areaOpened,
       }}
     >
       {children}
