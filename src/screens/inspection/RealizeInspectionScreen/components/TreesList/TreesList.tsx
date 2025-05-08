@@ -18,18 +18,14 @@ export function TreesList({ list, updateList }: Props) {
 
   function renderTreeItem({ item }: ListRenderItemInfo<TreeDBProps>) {
     return (
-      <RegisterItem
-        tree={item}
-        updateList={updateList}
-        registerType="tree"
-      />
+      <RegisterItem tree={item} updateList={updateList} registerType="tree" />
     );
   }
 
   function EmptyList() {
     return (
-      <View className="mb-3">
-        <Text>not list</Text>
+      <View className="p-5">
+        <Text className="text-center">{t('noTreeRegistered')}</Text>
       </View>
     );
   }
@@ -58,7 +54,7 @@ export function TreesList({ list, updateList }: Props) {
             renderItem: renderTreeItem,
             showsVerticalScrollIndicator: false,
             ListEmptyComponent: EmptyList,
-            contentContainerStyle: { padding: 10 },
+            contentContainerStyle: { padding: 10, paddingTop: 20 },
           }}
         />
       </Portal>

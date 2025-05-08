@@ -30,8 +30,10 @@ export function BiodiversityList({ list, updateList }: Props) {
 
   function EmptyList() {
     return (
-      <View className="mb-3">
-        <Text>not list</Text>
+      <View className="p-5">
+        <Text className="text-center">
+          {t('noBiodiversityRegistered')}
+        </Text>
       </View>
     );
   }
@@ -60,7 +62,7 @@ export function BiodiversityList({ list, updateList }: Props) {
             renderItem: renderBiodiversityItem,
             showsVerticalScrollIndicator: false,
             ListEmptyComponent: EmptyList,
-            contentContainerStyle: { padding: 10 },
+            contentContainerStyle: { padding: 10, paddingTop: 20 },
           }}
         />
       </Portal>
