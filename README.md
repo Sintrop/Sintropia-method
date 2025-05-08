@@ -1,8 +1,28 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+First Regeneration Credit evaluation method.
+
+# The project
+
+The goal is to create a project that helps inspectors measure the trees and biodiversity species in a regenerating area.
+
+## Regeneration Credit
+
+This project was created to be an official evaluation method of the Regeneration Credit. It is important to uderstand the logic behind the token and the Peer-to-Peer certification system to fully understand how Sintropia Method can help the project. 
+
+To further details, read the whitepaper.
+
+## The goal
+
+Help inspectors measure the number of trees. This app will create a visual interface so inspectors can use it to count and estimate the number of trees of an area. Only trees with more than 1m and 3cm in diamater must be count. For the biodiversity, only species planted by the regenerator must be counted.
+
+The app will deliver the result and a report with the justification of the result found.
+
+## How to contribute
+
+Developers and very welcome do review, test and optimize the application code. Run the project locally, create issues with bugs and improvements found and open PR with new code suggestions.
 
 # Getting Started
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+To run the project locally, follow the steps below:
 
 ## Step 1: Start the Metro Server
 
