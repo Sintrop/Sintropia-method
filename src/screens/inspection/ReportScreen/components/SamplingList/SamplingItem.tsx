@@ -36,12 +36,19 @@ export function SamplingItem({ collectionMethod, sampling }: Props) {
           {collectionMethod === 'sampling' && (
             <View className="mt-3 mb-2 items-center">
               <Text className="text-center text-black font-semibold">
-                {t('sampling')} #{sampling.number} - {sampling.size} m² ({trees.length}) {t('trees')}
+                {t('sampling')} #{sampling.number} - {sampling.size} m² (
+                {trees.length}) {t('trees')}
               </Text>
             </View>
           )}
           {trees.map((item, index) => (
-            <RegisterItem key={index} tree={item} />
+            <RegisterItem
+              key={index}
+              tree={item}
+              registerType="tree"
+              hiddenDeleteButton
+              updateList={() => {}}
+            />
           ))}
         </>
       )}

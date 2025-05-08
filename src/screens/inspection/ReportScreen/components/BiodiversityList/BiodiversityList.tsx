@@ -17,14 +17,18 @@ export function BiodiversityList({ list }: Props) {
       </Text>
       {list.length === 0 ? (
         <View className="mt-5">
-          <Text className="text-center">
-            {t('anyBiodiversityRegistered')}
-          </Text>
+          <Text className="text-center">{t('anyBiodiversityRegistered')}</Text>
         </View>
       ) : (
         <>
           {list.map((item, index) => (
-            <RegisterItem key={index} biodiversity={item} />
+            <RegisterItem
+              key={index}
+              biodiversity={item}
+              registerType="biodiversity"
+              hiddenDeleteButton
+              updateList={() => {}}
+            />
           ))}
         </>
       )}
