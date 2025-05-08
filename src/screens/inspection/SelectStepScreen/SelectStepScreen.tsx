@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, Alert, Platform, PermissionsAndroid } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Alert,
+  Platform,
+  PermissionsAndroid,
+} from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '../../../components/Screen/Screen';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -9,6 +17,7 @@ import { useInspectionContext } from '../../../hooks/useInspectionContext';
 import { useSQLite } from '../../../hooks/useSQLite';
 import { HeaderInspectionMode } from '../components/HeaderInspectionMode';
 import { FinishInspection } from './components/FinishInspection/FinishInspection';
+import { DeleteInspection } from './components/DeleteInspection/DeleteInspection';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -24,9 +33,9 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
 
   //TODO: Get permission location and disable btn inpsection when not location available]
   useEffect(() => {
-    requestLocationPermissions()
+    requestLocationPermissions();
   }, []);
-  
+
   useEffect(() => {
     getProofPhoto();
   }, [areaOpened]);
@@ -102,7 +111,9 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
   }
 
   return (
-    <Screen screenTitle={t('selectStep')}>
+    <Screen screenTitle={t('selectStep')} scrollable>
+      <View className="mt-5" />
+
       <HeaderInspectionMode />
 
       <TouchableOpacity
@@ -158,7 +169,11 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
 
       <FinishInspection
         areaId={areaOpened?.id as number}
-        disabled={proofPhoto === ''}  
+        disabled={proofPhoto === ''}
+      />
+
+      <DeleteInspection
+        areaId={areaOpened?.id as number}
       />
 
       {showCamera && (

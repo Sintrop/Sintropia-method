@@ -202,6 +202,66 @@ export function useSQLite() {
     })
   }
 
+  async function deleteArea(id: number) {
+    if (!db) return;
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'DELETE FROM biodiversity WHERE areaId = ?;',
+        [id],
+        (_, result) => {
+          console.log('Biodiversidades excluidas com sucesso:', result);
+        },
+        (_, error) => {
+          console.error('Erro ao excluir Biodiversidades:', error);
+          return true; // impede continuar a transação
+        }
+      );
+    });
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'DELETE FROM tree WHERE areaId = ?;',
+        [id],
+        (_, result) => {
+          console.log('Arvores excluidas com sucesso:', result);
+        },
+        (_, error) => {
+          console.error('Erro ao excluir as Arvores:', error);
+          return true; // impede continuar a transação
+        }
+      );
+    });
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'DELETE FROM sampling WHERE areaId = ?;',
+        [id],
+        (_, result) => {
+          console.log('Amostragems excluida com sucesso:', result);
+        },
+        (_, error) => {
+          console.error('Erro ao excluir as amostragems:', error);
+          return true; // impede continuar a transação
+        }
+      );
+    });
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'DELETE FROM area WHERE id = ?;',
+        [id],
+        (_, result) => {
+          console.log('Área excluida com sucesso:', result);
+        },
+        (_, error) => {
+          console.error('Erro ao excluir a area:', error);
+          return true; // impede continuar a transação
+        }
+      );
+    });
+  };
+
   async function addInspection(data: Omit<InspectionDBProps, 'id'>) {
     if (!db) return;
 
@@ -429,6 +489,7 @@ export function useSQLite() {
     deleteTree,
     deleteBiodiversity,
     deleteSampling,
-    fetchHistoryInspections
+    fetchHistoryInspections,
+    deleteArea
   };
 }

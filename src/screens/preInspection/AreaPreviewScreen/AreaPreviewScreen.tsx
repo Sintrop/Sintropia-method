@@ -55,7 +55,11 @@ export function AreaPreviewScreen({ route }: ScreenProps) {
   }
 
   return (
-    <Screen screenTitle={t('areaPreview')} showBackButton>
+    <Screen
+      screenTitle={t('areaPreview')}
+      showBackButton
+      scrollable
+    >
       <MapView style={styles.mapContainer} styleURL={StyleURL.SatelliteStreet}>
         <Camera
           centerCoordinate={[
@@ -114,5 +118,6 @@ const styles = StyleSheet.create({
   mapContainer: {
     height: 300,
     width: '100%',
+    marginTop: 20
   },
 });

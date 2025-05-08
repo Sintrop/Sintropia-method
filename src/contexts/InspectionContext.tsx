@@ -11,6 +11,7 @@ export interface InspectionContextProps {
   enterInspectionMode: () => void;
   areaOpened: AreaDBProps | undefined;
   finishInspection: (areaId: number) => void;
+  deleteAreaInspection: (areaId: number) => void;
 }
 
 interface InspectionProviderProps {
@@ -28,6 +29,7 @@ export function InspectionContextProvider({
     areasOpened,
     fetchOpenedAreas,
     updateAreaStatus,
+    deleteArea,
   } = useSQLite();
   const [inspectionMode, setInspectionMode] = useState(false);
   const [areaOpened, setAreaOpened] = useState<AreaDBProps>();
@@ -82,7 +84,7 @@ export function InspectionContextProvider({
   async function finishInspection(areaId: number) {
     await updateAreaStatus(1, areaId);
     exitInspectionMode();
-    fetchOpenedAreas();
+    setAreaOpened(undefined);
   }
 
   function exitInspectionMode() {
@@ -95,6 +97,12 @@ export function InspectionContextProvider({
     setInspectionMode(true);
   }
 
+  async function deleteAreaInspection(areaId: number) {
+    await deleteArea(areaId);
+    exitInspectionMode();
+    setAreaOpened(undefined);
+  }
+
   return (
     <InspectionContext.Provider
       value={{
@@ -104,6 +112,7 @@ export function InspectionContextProvider({
         enterInspectionMode,
         finishInspection,
         areaOpened,
+        deleteAreaInspection
       }}
     >
       {children}
