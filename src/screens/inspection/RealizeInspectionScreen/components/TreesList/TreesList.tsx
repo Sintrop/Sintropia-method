@@ -9,14 +9,21 @@ import { useTranslation } from 'react-i18next';
 
 interface Props {
   list: TreeDBProps[];
+  updateList: () => void;
 }
 
-export function TreesList({ list }: Props) {
+export function TreesList({ list, updateList }: Props) {
   const { t } = useTranslation();
   const modalRef = useRef<Modalize>();
 
-  function renderBiodiversityItem({ item }: ListRenderItemInfo<TreeDBProps>) {
-    return <RegisterItem biodiversity={item} />;
+  function renderTreeItem({ item }: ListRenderItemInfo<TreeDBProps>) {
+    return (
+      <RegisterItem
+        biodiversity={item}
+        updateList={updateList}
+        registerType="tree"
+      />
+    );
   }
 
   function EmptyList() {
@@ -48,7 +55,7 @@ export function TreesList({ list }: Props) {
           flatListProps={{
             data: list,
             keyExtractor: (item, index) => index.toString(),
-            renderItem: renderBiodiversityItem,
+            renderItem: renderTreeItem,
             showsVerticalScrollIndicator: false,
             ListEmptyComponent: EmptyList,
             contentContainerStyle: { padding: 10 },

@@ -9,16 +9,23 @@ import { useTranslation } from 'react-i18next';
 
 interface Props {
   list: BiodiversityDBProps[];
+  updateList: () => void;
 }
 
-export function BiodiversityList({ list }: Props) {
+export function BiodiversityList({ list, updateList }: Props) {
   const { t } = useTranslation();
   const modalRef = useRef<Modalize>();
 
   function renderBiodiversityItem({
     item,
   }: ListRenderItemInfo<BiodiversityDBProps>) {
-    return <RegisterItem biodiversity={item} />;
+    return (
+      <RegisterItem
+        biodiversity={item}
+        updateList={updateList}
+        registerType="biodiversity"
+      />
+    );
   }
 
   function EmptyList() {

@@ -277,8 +277,8 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
           )}
 
           <View className="flex-row">
-            {!collectOnlyBio && <TreesList list={trees} />}
-            <BiodiversityList list={biodiversity} />
+            {!collectOnlyBio && <TreesList list={trees} updateList={handleFetchTrees} />}
+            <BiodiversityList list={biodiversity} updateList={handleFetchBiodiversity} />
           </View>
         </View>
       </View>

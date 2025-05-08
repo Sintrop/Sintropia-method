@@ -3,6 +3,7 @@ import { ChevronLeft } from '../../assets/icons/ChevronLeft';
 import { Pressable } from 'react-native';
 import { ChevronRightIcon } from '../../assets/icons/ChevronRight';
 import { CloseIcon } from '../../assets/icons/Close';
+import { TrashIcon } from '../../assets/icons/Trash';
 
 export interface IconBaseProps {
   size?: number;
@@ -32,6 +33,7 @@ const icons = {
   chevronLeft: ChevronLeft,
   chevronRight: ChevronRightIcon,
   close: CloseIcon,
+  trash: TrashIcon
 };
 
 export type IconName = keyof typeof icons;
