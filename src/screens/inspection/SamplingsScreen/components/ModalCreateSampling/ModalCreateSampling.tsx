@@ -22,6 +22,7 @@ interface Props {
   areaCoordinates: CoordinateProps[];
   samplingsCount: number;
   samplingCreated: () => void;
+  samplingSize: number;
 }
 
 export function ModalCreateSampling({
@@ -29,7 +30,8 @@ export function ModalCreateSampling({
   areaId,
   areaCoordinates: coords,
   samplingsCount,
-  samplingCreated
+  samplingCreated,
+  samplingSize
 }: Props) {
   const { t } = useTranslation();
   const { addSampling } = useSQLite();
@@ -41,7 +43,7 @@ export function ModalCreateSampling({
   pathPolyline.push([...pathPolyline[0]]);
 
   const [centerCoord, setCenterCoord] = useState<[number, number]>();
-  const radius = 10;
+  const radius = samplingSize;
 
   const circleGeoJSON = circle(centerCoord ? centerCoord : [0, 0], radius, {
     steps: 64,
@@ -64,7 +66,7 @@ export function ModalCreateSampling({
         longitude: centerCoord[0],
       }),
       number: samplingsCount + 1,
-      size: 10
+      size: samplingSize
     })
     samplingCreated();
     close();

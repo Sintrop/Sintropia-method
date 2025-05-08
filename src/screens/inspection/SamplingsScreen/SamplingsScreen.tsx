@@ -8,6 +8,7 @@ import { SamplingDBProps } from '../../../types/database';
 import { useSQLite } from '../../../hooks/useSQLite';
 import { ModalCreateSampling } from './components/ModalCreateSampling/ModalCreateSampling';
 import { SamplingListItem } from './components/SamplingListItem/SamplingListItem';
+import { RadiusSamplingSelector } from './components/RadiusSamplingSelector/RadiusSamplingSelector';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -20,6 +21,7 @@ export function SamplingsScreen({ route }: ScreenProps) {
   const [samplings, setSamplings] = useState<SamplingDBProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateSampling, setShowCreateSampling] = useState(false);
+  const [radiusSampling, setRadiusSampling] = useState(5);
 
   useEffect(() => {
     if (db) {
@@ -31,6 +33,10 @@ export function SamplingsScreen({ route }: ScreenProps) {
     setLoading(true);
     const response = await fetchSampligsArea(areaId);
     setSamplings(response);
+
+    if (response.length > 0) {
+      setRadiusSampling(response[0].size)
+    }
     setLoading(false);
   }
 
@@ -56,6 +62,11 @@ export function SamplingsScreen({ route }: ScreenProps) {
     >
       {samplings.length === 0 ? (
         <View className="mt-10">
+          <RadiusSamplingSelector
+            sizeSelected={radiusSampling}
+            onChange={setRadiusSampling}
+          />
+
           <Text className="text-black text-center">
             {t('thereAreNotAnySamplingCreated')}
           </Text>
@@ -84,6 +95,7 @@ export function SamplingsScreen({ route }: ScreenProps) {
           areaCoordinates={areaCoordinates}
           samplingsCount={samplings.length}
           samplingCreated={handleGetSamplings}
+          samplingSize={radiusSampling}
         />
       )}
     </Screen>
