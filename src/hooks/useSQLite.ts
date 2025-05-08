@@ -288,6 +288,38 @@ export function useSQLite() {
     });
   };
 
+  async function deleteSampling(id: number) {
+    if (!db) return;
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'DELETE FROM tree WHERE samplingId = ?;',
+        [id],
+        (_, result) => {
+          console.log('Arvores da amostragem excluidas com sucesso:', result);
+        },
+        (_, error) => {
+          console.error('Erro ao excluir arvores da amostragem:', error);
+          return true; // impede continuar a transação
+        }
+      );
+    });
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'DELETE FROM sampling WHERE id = ?;',
+        [id],
+        (_, result) => {
+          console.log('Amostragem excluida com sucesso:', result);
+        },
+        (_, error) => {
+          console.error('Erro ao excluir a amostragem:', error);
+          return true; // impede continuar a transação
+        }
+      );
+    });
+  };
+
   async function fetchTreesSampling(samplingId: number): Promise<TreeDBProps[]> {
     if (!db) return [];
 
@@ -369,6 +401,7 @@ export function useSQLite() {
     updateProofPhoto,
     updateAreaStatus,
     deleteTree,
-    deleteBiodiversity
+    deleteBiodiversity,
+    deleteSampling
   };
 }

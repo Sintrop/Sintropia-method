@@ -205,7 +205,7 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
           <Camera
             followUserLocation={true}
             followUserMode={UserTrackingMode.Follow}
-            followZoomLevel={16}
+            followZoomLevel={18}
           />
 
           <UserLocation showsUserHeadingIndicator minDisplacement={1} />

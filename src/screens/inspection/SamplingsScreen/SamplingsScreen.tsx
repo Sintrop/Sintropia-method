@@ -31,7 +31,6 @@ export function SamplingsScreen({ route }: ScreenProps) {
     setLoading(true);
     const response = await fetchSampligsArea(areaId);
     setSamplings(response);
-    console.log(response);
     setLoading(false);
   }
 
@@ -69,6 +68,7 @@ export function SamplingsScreen({ route }: ScreenProps) {
             <SamplingListItem
               key={index.toString()}
               sampling={sampling}
+              updateList={handleGetSamplings}
             />
           ))}
           
