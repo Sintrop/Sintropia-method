@@ -91,6 +91,32 @@ export function useSQLite() {
     })
   }
 
+  async function fetchHistoryInspections(): Promise<AreaDBProps[]> {
+    if (!db) return [];
+
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        tx.executeSql(
+          'SELECT * from area WHERE status = 1;',
+          [],
+          (_, results) => {
+            const rows = results.rows;
+            const list: AreaDBProps[] = [];
+            for (let i = 0; i < rows.length; i++) {
+              list.push(rows.item(i));
+            }
+            resolve(list);
+          },
+          (_, error) => {
+            console.error('Erro ao buscar histórico:', error);
+            reject(error);
+            return true;
+          }
+        );
+      })
+    });
+  };
+
   async function addArea(data: Omit<AreaDBProps, 'id'>) {
     if (!db) return;
 
@@ -402,6 +428,7 @@ export function useSQLite() {
     updateAreaStatus,
     deleteTree,
     deleteBiodiversity,
-    deleteSampling
+    deleteSampling,
+    fetchHistoryInspections
   };
 }
