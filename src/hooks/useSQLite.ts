@@ -157,6 +157,25 @@ export function useSQLite() {
     })
   }
 
+  async function updateAreaStatus(status: number, areaId: number) {
+    if (!db) return;
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'UPDATE area SET status = ? WHERE id = ?;',
+        [status, areaId],
+        (_, result) => {
+          console.log('Área atualizada com sucesso:', result);
+          fetchOpenedAreas();
+        },
+        (_, error) => {
+          console.error('Erro ao atualizar área:', error);
+          return true; // impede continuar a transação
+        }
+      )
+    })
+  }
+
   async function addInspection(data: Omit<InspectionDBProps, 'id'>) {
     if (!db) return;
 
@@ -203,6 +222,24 @@ export function useSQLite() {
         'INSERT INTO biodiversity (photo, areaId, specieData, coordinate) VALUES (?, ?, ?, ?);',
         [data?.photo, data?.areaId, data.specieData, data.coordinate],
         () => { }
+      );
+    });
+  };
+
+  async function deleteBiodiversity(id: number) {
+    if (!db) return;
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'DELETE FROM biodiversity WHERE id = ?;',
+        [id],
+        (_, result) => {
+          console.log('Biodiversidade excluida com sucesso:', result);
+        },
+        (_, error) => {
+          console.error('Erro ao excluir a biodiversidade:', error);
+          return true; // impede continuar a transação
+        }
       );
     });
   };
@@ -295,6 +332,24 @@ export function useSQLite() {
     });
   };
 
+  async function deleteTree(id: number) {
+    if (!db) return;
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'DELETE FROM tree WHERE id = ?;',
+        [id],
+        (_, result) => {
+          console.log('Árvore excluida com sucesso:', result);
+        },
+        (_, error) => {
+          console.error('Erro ao excluir a arvore:', error);
+          return true; // impede continuar a transação
+        }
+      );
+    });
+  };
+
   return { 
     initDB,
     db,
@@ -311,6 +366,9 @@ export function useSQLite() {
     fetchTreesSampling,
     addTree,
     updateCollectionMethod,
-    updateProofPhoto
+    updateProofPhoto,
+    updateAreaStatus,
+    deleteTree,
+    deleteBiodiversity
   };
 }
