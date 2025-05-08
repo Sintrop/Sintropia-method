@@ -13,10 +13,11 @@ import { Icon } from '../../../../../components/Icon/Icon';
 interface Props {
   sampling: SamplingDBProps;
   updateList: () => void;
+  index: number;
 }
 
 type NavigationProps = NativeStackNavigationProp<InspectionStackParamsList>;
-export function SamplingListItem({ sampling, updateList }: Props) {
+export function SamplingListItem({ sampling, updateList, index }: Props) {
   const modalDeleteRef = useRef<Modalize>(null);
   const { t } = useTranslation();
   const { db, fetchTreesSampling, deleteSampling } = useSQLite();
@@ -38,7 +39,10 @@ export function SamplingListItem({ sampling, updateList }: Props) {
   function handleGoToInspection() {
     navigation.navigate('RealizeInspectionScreen', {
       collectionMethod: 'sampling',
-      sampling,
+      sampling: {
+        ...sampling,
+        number: index + 1
+      },
     });
   }
 
@@ -64,7 +68,7 @@ export function SamplingListItem({ sampling, updateList }: Props) {
       onPress={handleGoToInspection}
     >
       <Text className="font-bold text-black">
-        {t('sampling')} #{sampling.number}
+        {t('sampling')} #{index + 1}
       </Text>
 
       <View className="flex-row mt-3">

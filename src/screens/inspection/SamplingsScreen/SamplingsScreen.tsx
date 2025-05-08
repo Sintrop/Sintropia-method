@@ -69,6 +69,7 @@ export function SamplingsScreen({ route }: ScreenProps) {
               key={index.toString()}
               sampling={sampling}
               updateList={handleGetSamplings}
+              index={index}
             />
           ))}
           

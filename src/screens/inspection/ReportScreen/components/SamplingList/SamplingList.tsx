@@ -27,6 +27,7 @@ export function SamplingList({ collectionMethod, samplings }: Props) {
               key={index}
               collectionMethod={collectionMethod}
               sampling={item}
+              index={index}
             />
           ))}
         </>

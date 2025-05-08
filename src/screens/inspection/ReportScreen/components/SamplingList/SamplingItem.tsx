@@ -8,8 +8,9 @@ import { RegisterItem } from '../../../RealizeInspectionScreen/components/Regist
 interface Props {
   sampling: SamplingDBProps;
   collectionMethod: string;
+  index: number;
 }
-export function SamplingItem({ collectionMethod, sampling }: Props) {
+export function SamplingItem({ collectionMethod, sampling, index }: Props) {
   const { t } = useTranslation();
   const { fetchTreesSampling, db } = useSQLite();
   const [trees, setTrees] = useState<TreeDBProps[]>([]);
@@ -36,7 +37,7 @@ export function SamplingItem({ collectionMethod, sampling }: Props) {
           {collectionMethod === 'sampling' && (
             <View className="mt-3 mb-2 items-center">
               <Text className="text-center text-black font-semibold">
-                {t('sampling')} #{sampling.number} - {sampling.size} m² (
+                {t('sampling')} #{index + 1} - {sampling.size} m² (
                 {trees.length}) {t('trees')}
               </Text>
             </View>
