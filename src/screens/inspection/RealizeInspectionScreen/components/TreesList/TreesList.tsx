@@ -19,7 +19,7 @@ export function TreesList({ list, updateList }: Props) {
   function renderTreeItem({ item }: ListRenderItemInfo<TreeDBProps>) {
     return (
       <RegisterItem
-        biodiversity={item}
+        tree={item}
         updateList={updateList}
         registerType="tree"
       />
