@@ -74,9 +74,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.inspectionapp"
+    namespace "com.sintropia"
     defaultConfig {
-        applicationId "com.inspectionapp"
+        applicationId "com.sintropia"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

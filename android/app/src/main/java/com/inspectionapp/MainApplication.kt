@@ -1,4 +1,4 @@
-package com.inspectionapp
+package com.sintropia
 
 import android.app.Application
 import com.facebook.react.PackageList
