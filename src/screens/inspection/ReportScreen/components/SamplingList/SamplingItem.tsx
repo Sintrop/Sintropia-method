@@ -37,7 +37,7 @@ export function SamplingItem({ collectionMethod, sampling, index }: Props) {
           {collectionMethod === 'sampling' && (
             <View className="mt-3 mb-2 items-center">
               <Text className="text-center text-black font-semibold">
-                {t('sampling')} #{index + 1} - {sampling.size} m² (
+                {t('sampling')} #{index + 1} - {sampling.size} m (
                 {trees.length}) {t('trees')}
               </Text>
             </View>

@@ -66,7 +66,7 @@ function listTrees(samplings: SamplingPDFProps[]) {
   const samplingsHTML = samplings.map(item => `
     <div class="sampling-item">
       <p class="sampling-item_title">
-        Sampling #${item.samplingNumber} - ${item.size} m² (${item.trees.length}) trees
+        Sampling #${item.samplingNumber} - ${item.size} m (${item.trees.length}) trees
       </p>
       ${trees(item.trees)}
     </div> 
