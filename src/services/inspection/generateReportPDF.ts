@@ -15,6 +15,7 @@ interface GenerateReportPDFProps {
 
 const styleHTML = `
   <style>
+    @page { margin-top: 50px; }
     body { font-family: Arial; padding: 20px; }
     h1 { color: #1eb76f; }
     h3 { color: #1eb76f; margin-top: 50px; }
@@ -46,7 +47,7 @@ function listBiodiversity(biodiversity: BiodiversityDBProps[]) {
         </p>
       </div>
     </div> 
-  `)
+  `).join('');
 
   return `
       <h3>Biodiversity</h3>
@@ -69,7 +70,7 @@ function listTrees(trees: TreeDBProps[]) {
         </p>
       </div>
     </div> 
-  `)
+  `).join('');
 
   return `
       <h3>Trees</h3>
@@ -78,7 +79,7 @@ function listTrees(trees: TreeDBProps[]) {
 }
 
 function listCoordinates(coords: CoordinateProps[]) {
-  const coordsHTML = coords.map(item => `<p>Lat: ${item?.latitude}, Lng: ${item?.longitude}</p>`)
+  const coordsHTML = coords.map(item => `<p>Lat: ${item?.latitude}, Lng: ${item?.longitude}</p>`).join('');
   return `${coordsHTML}`;
 }
 

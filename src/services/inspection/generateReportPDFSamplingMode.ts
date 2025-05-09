@@ -1,6 +1,7 @@
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import { BiodiversityDBProps, TreeDBProps } from '../../types/database';
 import { CoordinateProps } from '../../types/regenerator';
+import { calculateAreaCircle } from './calculateAreaCircle';
 
 export interface SamplingPDFProps {
   samplingNumber: number;
@@ -21,6 +22,7 @@ interface GenerateReportPDFProps {
 
 const styleHTML = `
   <style>
+    @page { margin-top: 50px; }
     body { font-family: Arial; padding: 20px; }
     h1 { color: #1eb76f; }
     h3 { color: #1eb76f; margin-top: 50px; }
@@ -28,14 +30,22 @@ const styleHTML = `
     img { border-radius: 5px; }
     .map-img { width: 200px; height: 200px; border-radius: 16px; object-fit: cover; }
     .map-coordinates-box { display: flex; flex-direction: column; }
-    .div-flex-row { display: flex; flex-direction: row; gap: 20px; margin-top: 20px; }
+    .div-flex-row { display: flex; flex-direction: row; gap: 20px; margin-top: 20px; margin-bottom: 20px; }
     .card-count { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; background-color: #eee; width: 200px; padding-vertical: 10px;}
     .card_p { font-weight: bold; color: black; font-size: 30px; }
     .sampling-item { display: flex; flex-direction: column; }
-    .sampling-item_title { color: black; text-align: center; margin-top: 20px; margin-bottom: 10px; } 
+    .sampling-item_title { color: black; margin-top: 20px; margin-bottom: 10px; }
+    .sampling-item_header-data { display: flex; gap: 10px; margin-top: 5px; margin-bottom: 10px; }
+    .sampling-item_box-count { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; background-color: #eee; width: 120px; height: 80px; border-radius: 16px }
+    .sampling-item_count { color: black; font-weight: bold; font-size: 20px; }
     .register-item { background-color: #eee; display: flex; gap: 30px; padding: 10px; border-radius: 16px; margin-bottom: 10px; }
     .register-item_img { width: 100px; height: 100px; border-radius: 16px; object-fit: cover; }
     .register-item_box { display: flex; flex-direction: column;}
+    .box-trees-result { display: flex; flex-direction: column; align-items: center; border: 2px black; border-radius: 16px; padding: 10px; margin-top: 20px }
+    .box-trees-result_title { color: black; text-align: center; font-weight: bold; }
+    .box-trees-result_p1 { color: black; text-align: center; margin-top: 10px }
+    .box-trees-result_p { color: black; text-align: center }
+    .box-trees-result_result { color: black; text-align: center; font-weight: bold; margin-top: 20px; }
   </style>
 `
 
@@ -54,7 +64,7 @@ function listBiodiversity(biodiversity: BiodiversityDBProps[]) {
         </p>
       </div>
     </div> 
-  `)
+  `).join('');
 
   return `
       <h3>Biodiversity</h3>
@@ -66,11 +76,25 @@ function listTrees(samplings: SamplingPDFProps[]) {
   const samplingsHTML = samplings.map(item => `
     <div class="sampling-item">
       <p class="sampling-item_title">
-        Sampling #${item.samplingNumber} - ${item.size} m (${item.trees.length}) trees
+        Sampling #${item.samplingNumber}
       </p>
+      <div class="sampling-item_header-data">
+        <div class="sampling-item_box-count">
+          <p class="sampling-item_count">${item.trees.length}</p>
+          <p>Trees</p>
+        </div>
+        <div class="sampling-item_box-count">
+          <p class="sampling-item_count">${item.size} m</p>
+          <p>Radius</p>
+        </div>
+        <div class="sampling-item_box-count">
+          <p class="sampling-item_count">${calculateAreaCircle(item.size)} m²</p>
+          <p>Area</p>
+        </div>
+      </div>
       ${trees(item.trees)}
     </div> 
-  `)
+  `).join('');
 
   function trees(trees: TreeDBProps[]) {
     const treesHTML = trees.map(item => `
@@ -87,7 +111,7 @@ function listTrees(samplings: SamplingPDFProps[]) {
           </p>
         </div>
       </div> 
-    `)
+    `).join('');
 
     return treesHTML
   }
@@ -99,7 +123,7 @@ function listTrees(samplings: SamplingPDFProps[]) {
 }
 
 function listCoordinates(coords: CoordinateProps[]) {
-  const coordsHTML = coords.map(item => `<p>Lat: ${item?.latitude}, Lng: ${item?.longitude}</p>`)
+  const coordsHTML = coords.map(item => `<p>Lat: ${item?.latitude}, Lng: ${item?.longitude}</p>`).join('');
   return `${coordsHTML}`;
 }
 
@@ -136,6 +160,9 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
           </div>
         </div>
 
+        <p>Sampling radius: ${samplings[0].size} m</p>
+        <p>Sampling area: ${calculateAreaCircle(samplings[0].size)} m²</p>
+
         <div class="div-flex-row">
           <div class="card-count">
             <p class="card_p">
@@ -150,6 +177,16 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
             </p>
             <p>Biodiversity</p>
           </div>
+        </div>
+
+        <div class="box-trees-result">
+          <p class="box-trees-result_title">Trees result</p>
+          <p class="box-trees-result_p1">Ai = Inspected area</p>
+          <p class="box-trees-result_p">P1 = Sampling trees 1</p>
+          <p class="box-trees-result_p">Pn = Sampling trees n</p>
+          <p class="box-trees-result_p">Ap = Sampling area n</p>
+          <p class="box-trees-result_p">n = Number of samplings</p>
+          <p class="box-trees-result_result">Result = {[(P1 +...+ Pn) / n] * Ai} / Ap</p>
         </div>
         
         ${listBiodiversity(biodiversity)}
