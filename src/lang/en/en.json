@@ -86,6 +86,11 @@
     "report": "Report",
     "reportDescription": "As you fill in the data, an automated report with the justification for the result found will be created automatically and will be available for download.",
     "howWouldYouLikeCollectData": "How would you like to collect the data?",
-    "descHowWouldYouLikeCollectData": "In the manual method, trees need to be inserted one by one, which is recommended for small areas. In the sampling method, samples are collected and the total result is estimated, which is recommended for large areas."
+    "descHowWouldYouLikeCollectData": "In the manual method, trees need to be inserted one by one, which is recommended for small areas. In the sampling method, samples are collected and the total result is estimated, which is recommended for large areas.",
+    "samplingRadius": "Sampling radius",
+    "samplingArea": "Sampling area",
+    "numberOfTreesInTheSampling": "Number of trees in the sampling",
+    "": "",
+    "": ""
   }
 }

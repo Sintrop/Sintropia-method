@@ -87,6 +87,9 @@
     "touchToEnterThisSampling": "Toque para entrar nessa amostragem",
     "textConfirmDeleteSampling": "Você quer apagar essa amostragem? Todos os dados registrados nela serão perdidos.",
     "deleteSampling": "Apagar amostragem",
-    "tutorial": "Tutorial"
+    "tutorial": "Tutorial",
+    "samplingRadius": "Raio da amostragem",
+    "samplingArea": "Área da amostragem",
+    "numberOfTreesInTheSampling": "Quantidade de plantas na amostragem"
   }
 }

@@ -1,11 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import ViewShot from 'react-native-view-shot';
 import Share from 'react-native-share';
 import { Screen } from '../../../components/Screen/Screen';
 import { useTranslation } from 'react-i18next';
 import { Camera, MapView, PointAnnotation, StyleURL } from '@rnmapbox/maps';
-import { useInspectionContext } from '../../../hooks/useInspectionContext';
 import { Polyline } from '../../../components/Map/Polyline';
 import {
   BiodiversityDBProps,
@@ -17,14 +22,22 @@ import { CoordinateProps } from '../../../types/regenerator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { InspectionStackParamsList } from '../../../routes/InspectionRoutes';
 import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
-import { RegisterItem } from '../RealizeInspectionScreen/components/RegisterItem';
 import { generateReportPDF } from '../../../services/inspection/generateReportPDF';
 import { convertImageToBase64 } from '../../../services/inspection/convertImageToBase64';
 import { BiodiversityList } from './components/BiodiversityList/BiodiversityList';
 import { SamplingList } from './components/SamplingList/SamplingList';
-import { generateReportPDFSamplingMode, SamplingPDFProps } from '../../../services/inspection/generateReportPDFSamplingMode';
+import {
+  generateReportPDFSamplingMode,
+  SamplingPDFProps,
+} from '../../../services/inspection/generateReportPDFSamplingMode';
 import { extrapolateTreesToArea } from '../../../services/inspection/extrapolateTreesToArea';
+import { Calculation } from './components/Calculation/Calculation';
+import { calculateAreaCircle } from '../../../services/inspection/calculateAreaCircle';
 
+export interface TreesPerSamplingProps {
+  samplingNumber: number;
+  treesCount: number;
+}
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
   'ReportScreen'
@@ -43,9 +56,13 @@ export function ReportScreen({ route }: ScreenProps) {
   const [pathPolyline, setPathPolyline] = useState<[number, number][]>([]);
   const [biodiversity, setBiodiversity] = useState<BiodiversityDBProps[]>([]);
   const [samplings, setSamplings] = useState<SamplingDBProps[]>([]);
+  const [samplingSize, setSamplingSize] = useState<number>(0);
   const [trees, setTrees] = useState<TreeDBProps[]>([]);
+  const [treesPerSampling, setTreesPerSampling] = useState<
+    TreesPerSamplingProps[]
+  >([]);
   const [totalTrees, setTotalTrees] = useState<number>(0);
-  const [totalBiodiversity, setTotalBiodiversity] = useState<number>(0)
+  const [totalBiodiversity, setTotalBiodiversity] = useState<number>(0);
   const [coordinateMapCenter, setCoordinateMapCenter] = useState<Position>([
     -46.62714425279819, -23.576845138073693,
   ]);
@@ -114,11 +131,18 @@ export function ReportScreen({ route }: ScreenProps) {
     }
 
     if (collectionMethod === 'sampling') {
-      let treesCountPerSampling: number[] = []
+      setTreesPerSampling([]);
+      setSamplingSize(samplings[0].size);
+      let treesCountPerSampling: number[] = [];
       for (let s = 0; s < samplings.length; s++) {
         const sampling = samplings[s];
         const responseTrees = await fetchTreesSampling(sampling.id);
         treesCountPerSampling.push(responseTrees.length);
+
+        setTreesPerSampling(value => [
+          ...value,
+          { samplingNumber: s + 1, treesCount: responseTrees.length },
+        ]);
       }
 
       const treesTotalEstimated = extrapolateTreesToArea({
@@ -156,7 +180,7 @@ export function ReportScreen({ route }: ScreenProps) {
       });
     }
 
-    const proofPhoto = await convertImageToBase64(area.proofPhoto)
+    const proofPhoto = await convertImageToBase64(area.proofPhoto);
 
     const pdfUri = await generateReportPDF({
       areaName: area?.name,
@@ -188,30 +212,30 @@ export function ReportScreen({ route }: ScreenProps) {
 
     for (let s = 0; s < samplings.length; s++) {
       const sampling = samplings[s];
-      const trees = await fetchTreesSampling(sampling.id)
+      const trees = await fetchTreesSampling(sampling.id);
 
       let newTreesList: TreeDBProps[] = [];
-      
-      for(let t = 0; t < trees.length; t++) {
+
+      for (let t = 0; t < trees.length; t++) {
         const tree = trees[t];
         const photoBase64 = await convertImageToBase64(tree.photo);
         const newDataTree: TreeDBProps = {
           ...tree,
-          photo: photoBase64
-        }
-        newTreesList.push(newDataTree) 
+          photo: photoBase64,
+        };
+        newTreesList.push(newDataTree);
       }
 
       const newDataSampling: SamplingPDFProps = {
         samplingNumber: sampling.number,
         size: sampling.size,
         trees: newTreesList,
-      }
+      };
 
       newListSamplings.push(newDataSampling);
     }
 
-    const proofPhoto = await convertImageToBase64(area.proofPhoto)
+    const proofPhoto = await convertImageToBase64(area.proofPhoto);
 
     const pdfUri = await generateReportPDFSamplingMode({
       areaName: area?.name,
@@ -244,10 +268,10 @@ export function ReportScreen({ route }: ScreenProps) {
       Share.open({
         url: pdf,
         title: `Inspection Area: ${area?.name}`,
-        type: 'application/pdf'
+        type: 'application/pdf',
       });
     }
-    
+
     setLoadingShare(false);
   }
 
@@ -258,7 +282,7 @@ export function ReportScreen({ route }: ScreenProps) {
           <ActivityIndicator size={50} />
         </View>
       </Screen>
-    )
+    );
   }
 
   return (
@@ -323,9 +347,25 @@ export function ReportScreen({ route }: ScreenProps) {
         </MapView>
       </ViewShot>
 
-      <Text>
+      <Text className="mt-3">
         {t('areaSize')}: {Intl.NumberFormat('pt-BR').format(area.size)} m²
       </Text>
+
+      {collectionMethod === 'sampling' && (
+        <>
+          <Text>
+            {t('samplingRadius')}: {samplingSize} m
+          </Text>
+          <Text>
+            {t('samplingArea')}: {calculateAreaCircle(samplingSize)} m²
+          </Text>
+          {treesPerSampling.map((item, index) => (
+            <Text key={index}>
+              {t('numberOfTreesInTheSampling')} {item.samplingNumber}: {item.treesCount}
+            </Text>
+          ))}
+        </>
+      )}
 
       <View className="flex-row items-center justify-center mt-5">
         <View className="w-[48%] h-20 rounded-2xl items-center justify-center bg-gray-200">
@@ -341,12 +381,11 @@ export function ReportScreen({ route }: ScreenProps) {
         </View>
       </View>
 
+      {collectionMethod === 'sampling' && <Calculation />}
+
       <BiodiversityList list={biodiversity} />
-      
-      <SamplingList
-        samplings={samplings}
-        collectionMethod={collectionMethod}
-      />
+
+      <SamplingList samplings={samplings} collectionMethod={collectionMethod} />
 
       <View className="mb-20" />
     </Screen>
