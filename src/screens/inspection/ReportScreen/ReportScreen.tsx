@@ -327,7 +327,9 @@ export function ReportScreen({ route }: ScreenProps) {
                 JSON.parse(item.coordinate).longitude,
                 JSON.parse(item.coordinate).latitude,
               ]}
-              children={<View />}
+              children={
+                <View className="w-3 h-3 bg-yellow-500 rounded-full border border-black" />
+              }
             />
           ))}
 
@@ -340,7 +342,7 @@ export function ReportScreen({ route }: ScreenProps) {
                 JSON.parse(item.coordinate).latitude,
               ]}
               children={
-                <View className="w-2 h-2 bg-white rounded-full border-[1]" />
+                <View className="w-5 h-5 bg-green-500 rounded-full border border-black" />
               }
             />
           ))}
@@ -361,7 +363,8 @@ export function ReportScreen({ route }: ScreenProps) {
           </Text>
           {treesPerSampling.map((item, index) => (
             <Text key={index}>
-              {t('numberOfTreesInTheSampling')} {item.samplingNumber}: {item.treesCount}
+              {t('numberOfTreesInTheSampling')} {item.samplingNumber}:{' '}
+              {item.treesCount}
             </Text>
           ))}
         </>
