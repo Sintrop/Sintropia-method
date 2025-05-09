@@ -188,15 +188,10 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
 
   return (
     <View>
-      <Header
-        screenTitle={t('realizeInspection') }
-        showBackButton
-      />
+      <Header screenTitle={t('realizeInspection')} showBackButton />
       <View style={{ position: 'relative' }}>
         {collectionMethod === 'sampling' && !collectOnlyBio && (
-          <SamplingIndicator
-            samplingNumber={sampling.number}
-          />
+          <SamplingIndicator samplingNumber={sampling.number} />
         )}
         <MapView
           style={[styles.mapContainer, { width, height }]}
@@ -220,7 +215,9 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
                 JSON.parse(item.coordinate).longitude,
                 JSON.parse(item.coordinate).latitude,
               ]}
-              children={<View />}
+              children={
+                <View className="w-2 h-2 bg-yellow-500 rounded-full border-[1]" />
+              }
             />
           ))}
 
@@ -278,8 +275,13 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
           )}
 
           <View className="flex-row">
-            {!collectOnlyBio && <TreesList list={trees} updateList={handleFetchTrees} />}
-            <BiodiversityList list={biodiversity} updateList={handleFetchBiodiversity} />
+            {!collectOnlyBio && (
+              <TreesList list={trees} updateList={handleFetchTrees} />
+            )}
+            <BiodiversityList
+              list={biodiversity}
+              updateList={handleFetchBiodiversity}
+            />
           </View>
         </View>
       </View>
