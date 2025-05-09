@@ -93,6 +93,7 @@
     "inspectedArea": "Inspected area",
     "samplingTrees1": "Sampling trees 1",
     "samplingTreesN": "Sampling trees N",
-    "numberOfSamplings": "Number of samplings"
+    "numberOfSamplings": "Number of samplings",
+    "collectionMethod": "Collection method"
   }
 }

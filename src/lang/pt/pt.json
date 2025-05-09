@@ -94,6 +94,7 @@
     "inspectedArea": "Área inspecionada",
     "samplingTrees1": "Plantas amostragem 1",
     "samplingTreesN": "Plantas amostragem N",
-    "numberOfSamplings": "Quantidade de amostragens"
+    "numberOfSamplings": "Quantidade de amostragens",
+    "collectionMethod": "Método de coleta"
   }
 }
