@@ -16,6 +16,7 @@ import Mapbox, {
   MapView,
   PointAnnotation,
   StyleURL,
+  offlineManager,
 } from '@rnmapbox/maps';
 //@ts-ignore
 import { MAPBOX_ACCESS_TOKEN } from '@env';
@@ -29,7 +30,7 @@ type ScreenProps = NativeStackScreenProps<
   'AreaPreviewScreen'
 >;
 export function AreaPreviewScreen({ route }: ScreenProps) {
-  const { startInspection } = useInspectionContext()
+  const { startInspection } = useInspectionContext();
   const { coords, inspection, regenerator, areaSize } = route.params;
 
   const { t } = useTranslation();
@@ -43,23 +44,49 @@ export function AreaPreviewScreen({ route }: ScreenProps) {
 
   async function handleStartInspection() {
     setLoading(true);
+    downloadAreaMap();
     await startInspection({
       areaSize,
       coordinates: coords,
       inspection: {
         inspectionId: inspection.id.toString(),
-        regeneratorAddress: inspection?.regenerator
-      }
-    })
+        regeneratorAddress: inspection?.regenerator,
+      },
+    });
     setLoading(false);
   }
 
+  function downloadAreaMap() {
+    offlineManager.createPack(
+      {
+        name: coords[0].latitude,
+        styleURL: StyleURL.SatelliteStreet,
+        minZoom: 15,
+        maxZoom: 19,
+        bounds: [
+          [parseFloat(coords[0]?.longitude), parseFloat(coords[0]?.latitude)], // Coordenadas sudoeste
+          [parseFloat(coords[2]?.longitude), parseFloat(coords[2]?.latitude)], // Coordenadas nordeste
+        ],
+      },
+      offlinePack => {
+        offlinePack.resume();
+        offlinePack
+          .status()
+          .then(res => {
+            console.log('map downloaded: ' + res);
+          })
+          .catch(err => {
+            console.log('error dowload map: ' + err)
+          });
+      },
+      error => {
+        console.error('Error creating pack', error);
+      },
+    );
+  }
+
   return (
-    <Screen
-      screenTitle={t('areaPreview')}
-      showBackButton
-      scrollable
-    >
+    <Screen screenTitle={t('areaPreview')} showBackButton scrollable>
       <MapView style={styles.mapContainer} styleURL={StyleURL.SatelliteStreet}>
         <Camera
           centerCoordinate={[
@@ -118,6 +145,6 @@ const styles = StyleSheet.create({
   mapContainer: {
     height: 300,
     width: '100%',
-    marginTop: 20
+    marginTop: 20,
   },
 });
