@@ -90,7 +90,9 @@
     "samplingRadius": "Sampling radius",
     "samplingArea": "Sampling area",
     "numberOfTreesInTheSampling": "Number of trees in the sampling",
-    "": "",
-    "": ""
+    "inspectedArea": "Inspected area",
+    "samplingTrees1": "Sampling trees 1",
+    "samplingTreesN": "Sampling trees N",
+    "numberOfSamplings": "Number of samplings"
   }
 }

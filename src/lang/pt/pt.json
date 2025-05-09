@@ -90,6 +90,10 @@
     "tutorial": "Tutorial",
     "samplingRadius": "Raio da amostragem",
     "samplingArea": "Área da amostragem",
-    "numberOfTreesInTheSampling": "Quantidade de plantas na amostragem"
+    "numberOfTreesInTheSampling": "Quantidade de plantas na amostragem",
+    "inspectedArea": "Área inspecionada",
+    "samplingTrees1": "Plantas amostragem 1",
+    "samplingTreesN": "Plantas amostragem N",
+    "numberOfSamplings": "Quantidade de amostragens"
   }
 }
