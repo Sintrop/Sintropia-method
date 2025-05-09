@@ -30,6 +30,10 @@ export function TreesList({ list, updateList }: Props) {
     );
   }
 
+  function HeaderList() {
+    return <Text className="text-center mb-3">{t('trees')}</Text>;
+  }
+
   function handleOpenModal(): void {
     modalRef.current?.open();
   }
@@ -54,6 +58,7 @@ export function TreesList({ list, updateList }: Props) {
             renderItem: renderTreeItem,
             showsVerticalScrollIndicator: false,
             ListEmptyComponent: EmptyList,
+            ListHeaderComponent: HeaderList,
             contentContainerStyle: { padding: 10, paddingTop: 20 },
           }}
         />

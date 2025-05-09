@@ -38,6 +38,12 @@ export function BiodiversityList({ list, updateList }: Props) {
     );
   }
 
+  function HeaderList() {
+    return (
+      <Text className="text-center mb-3">{t('biodiversity')}</Text>
+    )
+  }
+
   function handleOpenModal(): void {
     modalRef.current?.open();
   }
@@ -62,6 +68,7 @@ export function BiodiversityList({ list, updateList }: Props) {
             renderItem: renderBiodiversityItem,
             showsVerticalScrollIndicator: false,
             ListEmptyComponent: EmptyList,
+            ListHeaderComponent: HeaderList,
             contentContainerStyle: { padding: 10, paddingTop: 20 },
           }}
         />
