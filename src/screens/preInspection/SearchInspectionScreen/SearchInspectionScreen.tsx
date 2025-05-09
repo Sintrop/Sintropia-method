@@ -79,7 +79,7 @@ export function SearchInspectionScreen({ navigation }: ScreenProps) {
         onPress={handleGoToInspectionsList}
       >
         <Text className="font-semibold text-[#229B13]">
-          {t('accessListOfInspections')}
+          {t('accessInspectionList')}
         </Text>
       </TouchableOpacity>
 

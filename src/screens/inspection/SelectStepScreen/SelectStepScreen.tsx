@@ -111,7 +111,7 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
   }
 
   return (
-    <Screen screenTitle={t('selectStep')} scrollable>
+    <Screen screenTitle={t('areaInspection')} scrollable>
       <View className="mt-5" />
 
       <HeaderInspectionMode />
@@ -146,7 +146,7 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
             className="w-full px-5 min-h-10 rounded-2xl border py-3 mt-5"
             onPress={handleGoToSamplings}
           >
-            <Text className="font-semibold text-black">{t('samplings')}</Text>
+            <Text className="font-semibold text-black">{t('treesSampling')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
