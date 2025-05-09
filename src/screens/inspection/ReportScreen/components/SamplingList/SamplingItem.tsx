@@ -4,6 +4,7 @@ import { SamplingDBProps, TreeDBProps } from '../../../../../types/database';
 import { useTranslation } from 'react-i18next';
 import { useSQLite } from '../../../../../hooks/useSQLite';
 import { RegisterItem } from '../../../RealizeInspectionScreen/components/RegisterItem';
+import { calculateAreaCircle } from '../../../../../services/inspection/calculateAreaCircle';
 
 interface Props {
   sampling: SamplingDBProps;
@@ -35,11 +36,32 @@ export function SamplingItem({ collectionMethod, sampling, index }: Props) {
       ) : (
         <>
           {collectionMethod === 'sampling' && (
-            <View className="mt-3 mb-2 items-center">
-              <Text className="text-center text-black font-semibold">
-                {t('sampling')} #{index + 1} - {sampling.size} m (
-                {trees.length}) {t('trees')}
+            <View className="mt-3 mb-2">
+              <Text className="text-black font-semibold">
+                {t('sampling')} #{index + 1}
               </Text>
+              <View className="mt-1 flex-row">
+                <View className="w-24 h-16 rounded-2xl bg-gray-200 items-center justify-center">
+                  <Text className="font-bold text-black text-xl">
+                    {trees.length}
+                  </Text>
+                  <Text>{t('trees')}</Text>
+                </View>
+
+                <View className="w-24 h-16 rounded-2xl bg-gray-200 items-center justify-center ml-5">
+                  <Text className="font-bold text-black text-xl">
+                    {sampling.size} m
+                  </Text>
+                  <Text>{t('radius')}</Text>
+                </View>
+
+                <View className="w-24 h-16 rounded-2xl bg-gray-200 items-center justify-center ml-5">
+                  <Text className="font-bold text-black">
+                    {calculateAreaCircle(sampling.size)} m²
+                  </Text>
+                  <Text>{t('area')}</Text>
+                </View>
+              </View>
             </View>
           )}
           {trees.map((item, index) => (
