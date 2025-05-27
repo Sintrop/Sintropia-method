@@ -1,25 +1,29 @@
-import React from 'react'
-import { View } from 'react-native'
-import { Header } from '../Header/Header'
-import { useSafeAreaApp } from '../../hooks/useSafeAreaApp'
+import React from 'react';
+import { ScrollView, View } from 'react-native';
+import { Header, HeaderProps } from '../Header/Header';
+import { useSafeAreaApp } from '../../hooks/useSafeAreaApp';
 
-interface Props {
-	children: React.ReactNode
-	screenTitle: string
+interface Props extends HeaderProps {
+  children: React.ReactNode;
+  scrollable?: boolean
 }
-export function Screen({ children, screenTitle }: Props): React.JSX.Element {
-	const { top } = useSafeAreaApp()
+export function Screen({ children, scrollable, ...headerProps }: Props): React.JSX.Element {
+  const { top } = useSafeAreaApp();
 
-	return (
-		<View 
-			className="flex-1"
-			style={{ paddingTop: top }}
-		>
-			<Header screenTitle={screenTitle} />
+  return (
+    <View className="flex-1" style={{ paddingTop: top }}>
+      <Header {...headerProps} />
 
-			<View className="p-5">
-				{children}
-			</View>
-		</View>
-	)
+      {scrollable ? (
+        <ScrollView
+          className="px-5"
+          showsVerticalScrollIndicator={false}
+        >
+          {children}
+        </ScrollView>
+      ) : (
+        <View className="p-5">{children}</View>
+      )}
+    </View>
+  );
 }

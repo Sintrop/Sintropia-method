@@ -1,10 +1,10 @@
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export function useSafeAreaApp() {
-  const { top, bottom } = useSafeAreaInsets()
+  const { top, bottom } = useSafeAreaInsets();
 
   return {
     top: top,
-    bottom: Math.max(bottom, 20)
-  }
+    bottom: Math.max(bottom, 20),
+  };
 }
