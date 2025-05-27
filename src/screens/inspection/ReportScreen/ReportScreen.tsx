@@ -300,22 +300,27 @@ export function ReportScreen({ route }: ScreenProps) {
 
   async function sharePdf(): Promise<void> {
     setTimeout(async () => {
-      if (collectionMethod === 'manual') {
-        const pdf = await generatePDFManualMode();
-        Share.open({
-          url: pdf,
-          title: `Inspection Area: ${area?.name}`,
-          type: 'application/pdf',
-        });
-      }
-
-      if (collectionMethod === 'sampling') {
-        const pdf = await generatePDFSamplingMode();
-        Share.open({
-          url: pdf,
-          title: `Inspection Area: ${area?.name}`,
-          type: 'application/pdf',
-        });
+      try {
+        if (collectionMethod === 'manual') {
+          const pdf = await generatePDFManualMode();
+          Share.open({
+            url: pdf,
+            title: `Inspection Area: ${area?.name}`,
+            type: 'application/pdf',
+          });
+        }
+  
+        if (collectionMethod === 'sampling') {
+          const pdf = await generatePDFSamplingMode();
+          Share.open({
+            url: pdf,
+            title: `Inspection Area: ${area?.name}`,
+            type: 'application/pdf',
+          });
+        }
+      } catch (e) {
+        Alert.alert(e as string)
+        setLoadingShare(false)
       }
       setLoadingShare(false);
     }, 1000);
