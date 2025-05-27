@@ -32,12 +32,19 @@ export function ModalRegisterItem({ registerItem, registerType, disabled, locati
   const [photo, setPhoto] = useState<string>();
   const [addNewBio, setAddNewBio] = useState(false);
   const [locationWhenOpened, setLocationWhenOpened] = useState({} as GeoPosition)
+  const [canChooseLocation, setCanChooseLocation] = useState(true)
 
   useEffect(() => {
-    if (location) setLocationWhenOpened(location)
-  }, [])
+    if (canChooseLocation) {
+      if (location) {
+        setLocationWhenOpened(location)
+        setCanChooseLocation(false)
+      }
+    }
+  }, [location])
 
   function handleOpenModal() {
+    setCanChooseLocation(true);
     modalRef.current?.open();
   }
 
@@ -46,7 +53,7 @@ export function ModalRegisterItem({ registerItem, registerType, disabled, locati
   }
 
   function handleRegisterItem(): void {
-    if (!location) {
+    if (!locationWhenOpened) {
       Alert.alert('Error', 'Location not available');
       return;
     };
