@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -254,25 +256,30 @@ export function ReportScreen({ route }: ScreenProps) {
   async function handleSharePDF() {
     setLoadingShare(true);
 
-    if (collectionMethod === 'manual') {
-      const pdf = await generatePDFManualMode();
-      Share.open({
-        url: pdf,
-        title: `Inspection Area: ${area?.name}`,
-        type: 'application/pdf',
-      });
-    }
+    sharePdf()
+  }
 
-    if (collectionMethod === 'sampling') {
-      const pdf = await generatePDFSamplingMode();
-      Share.open({
-        url: pdf,
-        title: `Inspection Area: ${area?.name}`,
-        type: 'application/pdf',
-      });
-    }
-
-    setLoadingShare(false);
+  async function sharePdf(): Promise<void> {
+    setTimeout( async () => {
+      if (collectionMethod === 'manual') {
+        const pdf = await generatePDFManualMode();
+        Share.open({
+          url: pdf,
+          title: `Inspection Area: ${area?.name}`,
+          type: 'application/pdf',
+        });
+      }
+  
+      if (collectionMethod === 'sampling') {
+        const pdf = await generatePDFSamplingMode();
+        Share.open({
+          url: pdf,
+          title: `Inspection Area: ${area?.name}`,
+          type: 'application/pdf',
+        });
+      }
+      setLoadingShare(false);
+    }, 1000)
   }
 
   if (loadingAreaData || loadingBio || loadingSamplings || loadingTrees) {
@@ -299,7 +306,11 @@ export function ReportScreen({ route }: ScreenProps) {
           disabled={loadingShare}
           style={{ opacity: loadingShare ? 0.5 : 1 }}
         >
-          <Text className="font-semibold text-white">{t('sharePDF')}</Text>
+          {loadingShare ? (
+            <ActivityIndicator size={30} color="white" />
+          ) : (
+            <Text className="font-semibold text-white">{t('sharePDF')}</Text>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -369,6 +380,15 @@ export function ReportScreen({ route }: ScreenProps) {
           ))}
         </>
       )}
+
+      <View className="mt-5">
+        <Text className="text-gray-500 text-sm">{t('proofPhoto')}</Text>
+        <Image
+          source={{ uri: area.proofPhoto }}
+          style={{ width: '100%' , height: 300, borderRadius: 16 }}
+          resizeMode="cover"
+        />
+      </View>
 
       <View className="flex-row items-center justify-center mt-5">
         <View className="w-[48%] h-20 rounded-2xl items-center justify-center bg-gray-200">

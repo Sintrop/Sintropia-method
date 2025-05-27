@@ -106,7 +106,10 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
 
     navigation.navigate('ReportScreen', {
       collectionMethod,
-      area: areaOpened,
+      area: {
+        ...areaOpened,
+        proofPhoto
+      },
     });
   }
 
