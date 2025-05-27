@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from '../../../../../hooks/useLocation';
 import { CameraComponent } from '../../../../../components/Camera/Camera';
 import { CoordinateProps } from '../../../../../types/regenerator';
+import { GeoPosition } from 'react-native-geolocation-service';
 
 type RegisterType = 'biodiversity' | 'tree';
 
@@ -21,15 +22,20 @@ interface Props {
   registerType: RegisterType;
   registerItem: (data: RegisterItemProps) => void;
   disabled?: boolean;
+  location: GeoPosition | null
 }
 
-export function ModalRegisterItem({ registerItem, registerType, disabled }: Props) {
+export function ModalRegisterItem({ registerItem, registerType, disabled, location }: Props) {
   const modalRef = useRef<Modalize>(null);
   const { t } = useTranslation();
-  const { location } = useLocation();
   const [showCamera, setShowCamera] = useState<boolean>(false);
   const [photo, setPhoto] = useState<string>();
   const [addNewBio, setAddNewBio] = useState(false);
+  const [locationWhenOpened, setLocationWhenOpened] = useState({} as GeoPosition)
+
+  useEffect(() => {
+    if (location) setLocationWhenOpened(location)
+  }, [])
 
   function handleOpenModal() {
     modalRef.current?.open();
@@ -55,8 +61,8 @@ export function ModalRegisterItem({ registerItem, registerType, disabled }: Prop
     };
 
     const coordinate: CoordinateProps = {
-      latitude: location?.coords?.latitude.toString(),
-      longitude: location?.coords?.longitude.toString()
+      latitude: locationWhenOpened?.coords?.latitude.toString(),
+      longitude: locationWhenOpened?.coords?.longitude.toString()
     };
 
     registerItem({
@@ -95,8 +101,8 @@ export function ModalRegisterItem({ registerItem, registerType, disabled }: Prop
 
             <Text className="mt-10">{t('yourLocation')}</Text>
             <Text className="text-black">
-              Lat: {location?.coords?.latitude}, Lng:{' '}
-              {location?.coords?.longitude}
+              Lat: {locationWhenOpened?.coords?.latitude}, Lng:{' '}
+              {locationWhenOpened?.coords?.longitude}
             </Text>
 
             <Text className="mt-5">{t('registerPhoto')}</Text>

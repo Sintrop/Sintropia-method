@@ -265,12 +265,14 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
               registerType="biodiversity"
               registerItem={handleRegisterItem}
               disabled={disableRegisterBio}
+              location={location}
             />
           ) : (
             <ModalRegisterItem
               registerType="tree"
               registerItem={handleRegisterItem}
               disabled={disableRegisterTree}
+              location={location}
             />
           )}
 
