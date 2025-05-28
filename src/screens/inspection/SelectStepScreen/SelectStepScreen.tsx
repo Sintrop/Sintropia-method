@@ -30,6 +30,7 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
   const { updateProofPhoto, fetchSampligsArea } = useSQLite();
   const [showCamera, setShowCamera] = useState(false);
   const [proofPhoto, setProofPhoto] = useState('');
+  const [hasGpsPermission, setHasGpsPermission] = useState<boolean>(false);
 
   //TODO: Get permission location and disable btn inpsection when not location available]
   useEffect(() => {
@@ -45,7 +46,9 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
       );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
+      const hasPermission = granted === PermissionsAndroid.RESULTS.GRANTED;
+      setHasGpsPermission(hasPermission);
+      return hasPermission;
     }
   }
 
@@ -108,9 +111,39 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
       collectionMethod,
       area: {
         ...areaOpened,
-        proofPhoto
+        proofPhoto,
       },
     });
+  }
+
+  if (!hasGpsPermission) {
+    return (
+      <Screen screenTitle={t('areaInspection')}>
+        <View className="items-center justify-center">
+          <HeaderInspectionMode />
+
+          <Text className="text-black text-center mt-10 font-semibold">
+            {t('weNeedYourGPSPermission')}
+          </Text>
+          <Text className="text-black text-center mt-1">
+            {t('descWeNeedYourGPSPermission')}
+          </Text>
+
+          <TouchableOpacity
+            className="mt-10 w-fit px-10 h-10 rounded-2xl bg-blue-500 items-center justify-center"
+            onPress={requestLocationPermissions}
+          >
+            <Text className="text-white font-semibold">
+              {t('givePermission')}
+            </Text>
+          </TouchableOpacity>
+
+          <Text className="text-gray-500 text-xs text-center mt-5">
+            {t('helpGivePermission')}
+          </Text>
+        </View>
+      </Screen>
+    );
   }
 
   return (
@@ -149,7 +182,9 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
             className="w-full px-5 min-h-10 rounded-2xl border py-3 mt-5"
             onPress={handleGoToSamplings}
           >
-            <Text className="font-semibold text-black">{t('treesSampling')}</Text>
+            <Text className="font-semibold text-black">
+              {t('treesSampling')}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -175,9 +210,7 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
         disabled={proofPhoto === ''}
       />
 
-      <DeleteInspection
-        areaId={areaOpened?.id as number}
-      />
+      <DeleteInspection areaId={areaOpened?.id as number} />
 
       {showCamera && (
         <CameraComponent
