@@ -22,26 +22,33 @@ interface Props {
   registerType: RegisterType;
   registerItem: (data: RegisterItemProps) => void;
   disabled?: boolean;
-  location: GeoPosition | null
+  location: GeoPosition | null;
 }
 
-export function ModalRegisterItem({ registerItem, registerType, disabled, location }: Props) {
+export function ModalRegisterItem({
+  registerItem,
+  registerType,
+  disabled,
+  location,
+}: Props) {
   const modalRef = useRef<Modalize>(null);
   const { t } = useTranslation();
   const [showCamera, setShowCamera] = useState<boolean>(false);
   const [photo, setPhoto] = useState<string>();
   const [addNewBio, setAddNewBio] = useState(false);
-  const [locationWhenOpened, setLocationWhenOpened] = useState({} as GeoPosition)
-  const [canChooseLocation, setCanChooseLocation] = useState(true)
+  const [locationWhenOpened, setLocationWhenOpened] = useState(
+    {} as GeoPosition,
+  );
+  const [canChooseLocation, setCanChooseLocation] = useState(true);
 
   useEffect(() => {
     if (canChooseLocation) {
       if (location) {
-        setLocationWhenOpened(location)
-        setCanChooseLocation(false)
+        setLocationWhenOpened(location);
+        setCanChooseLocation(false);
       }
     }
-  }, [location])
+  }, [location]);
 
   function handleOpenModal() {
     setCanChooseLocation(true);
@@ -56,11 +63,11 @@ export function ModalRegisterItem({ registerItem, registerType, disabled, locati
     if (!locationWhenOpened) {
       Alert.alert('Error', 'Location not available');
       return;
-    };
+    }
     if (!photo) {
       Alert.alert('Error', 'Take the picture');
       return;
-    };
+    }
 
     const mockSpecie = {
       id: 0,
@@ -69,7 +76,7 @@ export function ModalRegisterItem({ registerItem, registerType, disabled, locati
 
     const coordinate: CoordinateProps = {
       latitude: locationWhenOpened?.coords?.latitude.toString(),
-      longitude: locationWhenOpened?.coords?.longitude.toString()
+      longitude: locationWhenOpened?.coords?.longitude.toString(),
     };
 
     registerItem({
@@ -85,7 +92,7 @@ export function ModalRegisterItem({ registerItem, registerType, disabled, locati
   }
 
   function toggleAddNewBio() {
-    setAddNewBio((value) => !value);
+    setAddNewBio(value => !value);
   }
 
   return (
@@ -106,13 +113,13 @@ export function ModalRegisterItem({ registerItem, registerType, disabled, locati
           <View className="p-3">
             <Text className="text-black text-center">{t('register')}</Text>
 
-            <Text className="mt-10">{t('yourLocation')}</Text>
+            <Text className="mt-10 text-gray-500">{t('yourLocation')}</Text>
             <Text className="text-black">
               Lat: {locationWhenOpened?.coords?.latitude}, Lng:{' '}
               {locationWhenOpened?.coords?.longitude}
             </Text>
 
-            <Text className="mt-5">{t('registerPhoto')}</Text>
+            <Text className="mt-5 text-gray-500">{t('registerPhoto')}</Text>
             <View className="flex-row items-center mt-1">
               {photo && (
                 <Image
@@ -125,26 +132,32 @@ export function ModalRegisterItem({ registerItem, registerType, disabled, locati
                 className="w-32 h-12 rounded-2xl items-center justify-center border border-green-600"
                 onPress={handleTakePhoto}
               >
-                <Text className="text-green-600 font-semibold">{t('takePhoto')}</Text>
+                <Text className="text-green-600 font-semibold">
+                  {t('takePhoto')}
+                </Text>
               </TouchableOpacity>
             </View>
 
-            <Text className="mt-5">{t('specie')}</Text>
-            <Text className="text-black">
-              ID= 0 - Indefinido
-            </Text>
+            <Text className="mt-5 text-gray-500">{t('specie')}</Text>
+            <Text className="text-black">ID= 0 - Indefinido</Text>
 
             {registerType === 'tree' && (
-              <View className="my-5 flex-row items-center">
-                <TouchableOpacity
-                  onPress={toggleAddNewBio}
-                  className={`w-5 h-5 rounded-md border-2 items-center justify-center ${addNewBio ? 'bg-green-500 border-green-500' : 'bg-transparent'}`}
-                >
+              <TouchableOpacity
+                className="my-5 flex-row items-center"
+                onPress={toggleAddNewBio}
+              >
+                <View
+                  className={`w-5 h-5 rounded-md border-2 items-center justify-center ${
+                    addNewBio
+                      ? 'bg-green-500 border-green-500'
+                      : 'bg-transparent'
+                  }`}
+                ></View>
 
-                </TouchableOpacity>
-
-                <Text className="text-sm text-black ml-3">{t('addNewBiodiversity')}</Text>
-              </View>
+                <Text className="text-sm text-black ml-3">
+                  {t('addNewBiodiversity')}
+                </Text>
+              </TouchableOpacity>
             )}
 
             <TouchableOpacity

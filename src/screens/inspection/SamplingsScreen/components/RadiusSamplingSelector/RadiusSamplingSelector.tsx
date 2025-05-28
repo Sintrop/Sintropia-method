@@ -12,7 +12,7 @@ export function RadiusSamplingSelector({ onChange, sizeSelected }: Props) {
 
   return (
     <View className="items-center mb-10">
-      <Text className="text-center">
+      <Text className="text-center text-gray-500">
         {t('selectTheSizeOfRadiusOfSampling')}
       </Text>
 

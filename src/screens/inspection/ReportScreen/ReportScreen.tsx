@@ -341,7 +341,7 @@ export function ReportScreen({ route }: ScreenProps) {
       <Text className="font-bold text-black text-lg mt-5">
         {t('finalResult')}
       </Text>
-      <Text>{area?.name}</Text>
+      <Text className="text-gray-500">{area?.name}</Text>
 
       <View className="items-end w-full">
         <TouchableOpacity
@@ -400,20 +400,20 @@ export function ReportScreen({ route }: ScreenProps) {
         </MapView>
       </ViewShot>
 
-      <Text className="mt-3">
+      <Text className="mt-3 text-gray-500">
         {t('areaSize')}: {Intl.NumberFormat('pt-BR').format(area.size)} m²
       </Text>
 
       {collectionMethod === 'sampling' && (
         <>
-          <Text>
+          <Text className="text-gray-500">
             {t('samplingRadius')}: {samplingSize} m
           </Text>
-          <Text>
+          <Text className="text-gray-500">
             {t('samplingArea')}: {calculateAreaCircle(samplingSize)} m²
           </Text>
           {treesPerSampling.map((item, index) => (
-            <Text key={index}>
+            <Text key={index} className="text-gray-500">
               {t('numberOfTreesInTheSampling')} {item.samplingNumber}:{' '}
               {item.treesCount}
             </Text>
@@ -433,14 +433,14 @@ export function ReportScreen({ route }: ScreenProps) {
       <View className="flex-row items-center justify-center mt-5">
         <View className="w-[48%] h-20 rounded-2xl items-center justify-center bg-gray-200">
           <Text className="font-bold text-black text-4xl">{totalTrees}</Text>
-          <Text>{t('trees')}</Text>
+          <Text className="text-gray-500">{t('trees')}</Text>
         </View>
 
         <View className="w-[48%] h-20 rounded-2xl items-center justify-center bg-gray-200 ml-3">
           <Text className="font-bold text-black text-4xl">
             {totalBiodiversity}
           </Text>
-          <Text>{t('biodiversity')}</Text>
+          <Text className="text-gray-500">{t('biodiversity')}</Text>
         </View>
       </View>
 

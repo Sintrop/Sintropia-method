@@ -80,12 +80,12 @@ export function RegisterItem({
       </View>
 
       <View className="ml-3">
-        <Text className="text-xs">{t('coordinate')}</Text>
+        <Text className="text-xs text-gray-500">{t('coordinate')}</Text>
         <Text className="text-black text-sm">
           Lat: {coordinate?.latitude}, Lng: {coordinate?.longitude}
         </Text>
 
-        <Text className="text-xs mt-1">{t('specie')}</Text>
+        <Text className="text-xs mt-1 text-gray-500">{t('specie')}</Text>
         <Text className="text-black text-sm">ID= 0 - indefinido</Text>
       </View>
 

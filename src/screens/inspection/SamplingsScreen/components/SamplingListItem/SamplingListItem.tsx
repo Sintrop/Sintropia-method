@@ -76,11 +76,11 @@ export function SamplingListItem({ sampling, updateList, index }: Props) {
 
         <View className="w-20 h-20 rounded-2xl bg-gray-300 ml-5 items-center justify-center">
           <Text className="font-bold text-2xl text-black">{treesCount}</Text>
-          <Text className="text-sm">{t('trees')}</Text>
+          <Text className="text-sm text-gray-500">{t('trees')}</Text>
         </View>
       </View>
 
-      <Text className="text-xs mt-2 text-center">
+      <Text className="text-xs mt-2 text-center text-gray-500">
         {t('touchToEnterThisSampling')}
       </Text>
 

@@ -112,14 +112,14 @@ export function AreaPreviewScreen({ route }: ScreenProps) {
         <Polyline lineColor="red" lineWidth={4} coordinates={pathPolyline} />
       </MapView>
 
-      <Text>
+      <Text className="text-gray-500">
         {t('areaSize')}: {Intl.NumberFormat('pt-BR').format(areaSize)} m²
       </Text>
 
       <View className="p-3 rounded-2xl border mt-5">
-        <Text>{t('coordinates')}</Text>
+        <Text className="text-gray-500">{t('coordinates')}</Text>
         {coords.map((item, index) => (
-          <Text key={index} className="mb-1">
+          <Text key={index} className="mb-1 text-black">
             Lat: {item.latitude}, Lng: {item.longitude}
           </Text>
         ))}
