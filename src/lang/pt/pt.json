@@ -103,6 +103,7 @@
     "generatingPDF": "Gerando PDF",
     "optimizingPictures": "Otimizando imagens",
     "creatingPDF": "Criando PDF",
-    "youAreOutsideTheCollectionArea": "Você está fora da área de coleta"
+    "youAreOutsideTheCollectionArea": "Você está fora da área de coleta",
+    "subtitle": "Legenda"
   }
 }

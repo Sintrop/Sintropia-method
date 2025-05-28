@@ -102,6 +102,7 @@
     "generatingPDF": "Generating PDF",
     "optimizingPictures": "Optimizing pictures",
     "creatingPDF": "Creating PDF",
-    "youAreOutsideTheCollectionArea": "You are outside the collection area"
+    "youAreOutsideTheCollectionArea": "You are outside the collection area",
+    "subtitle": "Subtitle"
   }
 }

@@ -39,6 +39,7 @@ import { isPointInPolygon } from '../../../services/inspection/isPointInPolygon'
 import { isPointInCircle } from '../../../services/inspection/isPointInCircle';
 import { SamplingIndicator } from './components/SamplingIndicator/SamplingIndicator';
 import { OutsideTheCollectionArea } from './components/OutsideTheCollectionArea';
+import { Subtitle } from './components/Subtitle';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -195,6 +196,8 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
           {collectionMethod === 'sampling' && !collectOnlyBio && (
             <SamplingIndicator samplingNumber={sampling.number} />
           )}
+
+          <Subtitle />
 
           {collectOnlyBio ? (
             <OutsideTheCollectionArea outside={disableRegisterBio} />
