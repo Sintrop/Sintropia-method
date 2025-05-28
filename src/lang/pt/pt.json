@@ -99,6 +99,9 @@
     "weNeedYourGPSPermission": "Precisamos acessar sua localização",
     "descWeNeedYourGPSPermission": "Para realizar a inspeção é necessário acessar sua localização em tempo real, para garantir a coleta de coordenadas ao registrar os items.",
     "givePermission": "Dar permissão",
-    "helpGivePermission": "Se nada acontecer ao tocar no botão, entre nas configurações do seu dispositivo -> aplicativos -> Sintropia -> Permissões. E ative a permissão de localização."
+    "helpGivePermission": "Se nada acontecer ao tocar no botão, entre nas configurações do seu dispositivo -> aplicativos -> Sintropia -> Permissões. E ative a permissão de localização.",
+    "generatingPDF": "Gerando PDF",
+    "optimizingPictures": "Otimizando imagens",
+    "creatingPDF": "Criando PDF"
   }
 }

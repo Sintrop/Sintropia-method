@@ -22,7 +22,7 @@ export function LoadingGeneratingPdf({ percentage, message }: Props) {
 
           <Text className="font-bold text-black text-4xl text-center mt-5">{percentage} %</Text>
 
-          <Text className="text-center text-black">{message}...</Text>
+          <Text className="text-center text-black">{t(message)}...</Text>
         </View>
       </View>
     </Modal>

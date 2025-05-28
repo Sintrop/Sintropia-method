@@ -98,6 +98,9 @@
     "weNeedYourGPSPermission": "We need your GPS permission",
     "descWeNeedYourGPSPermission": "To carry out the inspection, it is necessary to access your location in real time, to ensure the collection of coordinates when registering the items.",
     "givePermission": "Give permission",
-    "helpGivePermission": "If nothing happens when you tap the button, go to your device's settings -> apps -> Syntropy -> Permissions. And enable the location permission."
+    "helpGivePermission": "If nothing happens when you tap the button, go to your device's settings -> apps -> Syntropy -> Permissions. And enable the location permission.",
+    "generatingPDF": "Generating PDF",
+    "optimizingPictures": "Optimizing pictures",
+    "creatingPDF": "Creating PDF"
   }
 }
