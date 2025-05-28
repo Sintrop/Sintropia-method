@@ -101,6 +101,7 @@
     "helpGivePermission": "If nothing happens when you tap the button, go to your device's settings -> apps -> Syntropy -> Permissions. And enable the location permission.",
     "generatingPDF": "Generating PDF",
     "optimizingPictures": "Optimizing pictures",
-    "creatingPDF": "Creating PDF"
+    "creatingPDF": "Creating PDF",
+    "youAreOutsideTheCollectionArea": "You are outside the collection area"
   }
 }

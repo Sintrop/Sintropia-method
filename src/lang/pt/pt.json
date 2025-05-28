@@ -102,6 +102,7 @@
     "helpGivePermission": "Se nada acontecer ao tocar no botão, entre nas configurações do seu dispositivo -> aplicativos -> Sintropia -> Permissões. E ative a permissão de localização.",
     "generatingPDF": "Gerando PDF",
     "optimizingPictures": "Otimizando imagens",
-    "creatingPDF": "Criando PDF"
+    "creatingPDF": "Criando PDF",
+    "youAreOutsideTheCollectionArea": "Você está fora da área de coleta"
   }
 }
