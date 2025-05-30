@@ -40,7 +40,7 @@ export function LanguageSelector(): React.JSX.Element {
           adjustToContentHeight
           childrenStyle={{height: 300}}>
           <View className="flex-1 p-5">
-            <Text className="text-center font-semibold">
+            <Text className="text-center font-semibold text-gray-500">
               {t('selectYourLanguage')}
             </Text>
 

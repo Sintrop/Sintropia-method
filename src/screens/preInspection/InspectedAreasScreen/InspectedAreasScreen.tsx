@@ -28,7 +28,7 @@ export function InspectedAreasScreen() {
   function EmptyList() {
     return (
       <View className="mt-10 items-center">
-        <Text>{t('noAreasInspected')}</Text>
+        <Text className="text-gray-500">{t('noAreasInspected')}</Text>
       </View>
     )
   }

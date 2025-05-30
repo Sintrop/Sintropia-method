@@ -25,13 +25,13 @@ export function TreesList({ list, updateList }: Props) {
   function EmptyList() {
     return (
       <View className="p-5">
-        <Text className="text-center">{t('noTreeRegistered')}</Text>
+        <Text className="text-center text-gray-500">{t('noTreeRegistered')}</Text>
       </View>
     );
   }
 
   function HeaderList() {
-    return <Text className="text-center mb-3">{t('trees')}</Text>;
+    return <Text className="text-center mb-3 text-gray-500">{t('trees')}</Text>;
   }
 
   function handleOpenModal(): void {
@@ -44,7 +44,7 @@ export function TreesList({ list, updateList }: Props) {
         className="w-[150] h-20 rounded-2xl bg-gray-200 items-center justify-center"
         onPress={handleOpenModal}
       >
-        <Text>{t('trees')}</Text>
+        <Text className="text-gray-500">{t('trees')}</Text>
         <Text className="font-bold text-black text-3xl">{list.length}</Text>
       </TouchableOpacity>
 

@@ -34,7 +34,7 @@ export function InspectionItem({inspection, onChangeInspection}: Props) {
         <StatusTagInspection status={inspection.status} />
       </View>
 
-      <Text className="mt-2">{t('regenerator')}</Text>
+      <Text className="mt-2 text-gray-500">{t('regenerator')}</Text>
       <Text className="text-black">{inspection.regenerator}</Text>
     </TouchableOpacity>
   );

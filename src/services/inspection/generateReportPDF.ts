@@ -21,14 +21,16 @@ const styleHTML = `
     h3 { color: #1eb76f; margin-top: 50px; }
     p { margin: 0px }
     img { border-radius: 5px; }
-    .map-img { width: 200px; height: 200px; border-radius: 16px; object-fit: cover; }
+    .map-img { width: 100px; height: 100px; border-radius: 16px; object-fit: cover; }
     .map-coordinates-box { display: flex; flex-direction: column; }
     .div-flex-row { display: flex; flex-direction: row; gap: 20px; margin-top: 20px; }
     .card-count { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; background-color: #eee; width: 200px; padding-vertical: 10px;}
     .card_p { font-weight: bold; color: black; font-size: 30px; } 
-    .register-item { background-color: #eee; display: flex; gap: 30px; padding: 10px; border-radius: 16px; margin-bottom: 10px; }
-    .register-item_img { width: 100px; height: 100px; border-radius: 16px; object-fit: cover; }
+    .register-item { background-color: #eee; display: flex; flex-direction: column; gap: 15px; padding: 10px; border-radius: 16px; margin-bottom: 10px; width: 110px }
+    .register-item_img { width: 70px; height: 70px; border-radius: 16px; object-fit: cover; }
     .register-item_box { display: flex; flex-direction: column;}
+    .div-flex-wrap { display: flex; gap: 15px; flex-wrap: wrap; }
+    .p-coordinate { font-size: 10px; }
   </style>
 `
 
@@ -41,16 +43,18 @@ function listBiodiversity(biodiversity: BiodiversityDBProps[]) {
       />
           
       <div class="register-item_box">
-        <p>coordinates</p>
-        <p>
-          Lat: ${JSON.parse(item.coordinate)?.latitude}, Lng: ${JSON.parse(item.coordinate)?.longitude}
+        <p class="p-coordinate">coordinate</p>
+        <p class="p-coordinate">
+          Lat: ${JSON.parse(item.coordinate)?.latitude}
+        </p>
+        <p class="p-coordinate">
+          Lng: ${JSON.parse(item.coordinate)?.longitude}
         </p>
       </div>
     </div> 
   `).join('');
 
   return `
-      <h3>Biodiversity</h3>
       ${bioHTML}
     `;
 }
@@ -64,16 +68,18 @@ function listTrees(trees: TreeDBProps[]) {
       />
           
       <div class="register-item_box">
-        <p>coordinates</p>
-        <p>
-          Lat: ${JSON.parse(item.coordinate)?.latitude}, Lng: ${JSON.parse(item.coordinate)?.longitude}
+        <p class="p-coordinate">coordinate</p>
+        <p class="p-coordinate">
+          Lat: ${JSON.parse(item.coordinate)?.latitude}
+        </p>
+        <p class="p-coordinate">
+          Lng: ${JSON.parse(item.coordinate)?.longitude}
         </p>
       </div>
     </div> 
   `).join('');
 
   return `
-      <h3>Trees</h3>
       ${bioHTML}
     `;
 }
@@ -132,8 +138,15 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
           </div>
         </div>
         
-        ${listBiodiversity(biodiversity)}
-        ${listTrees(trees)}
+        <h3>Biodiversity</h3>
+        <div class="div-flex-wrap">
+          ${listBiodiversity(biodiversity)}
+        </div>
+
+        <h3>Trees</h3>
+        <div class="div-flex-wrap">
+          ${listTrees(trees)}
+        </div>
       </body>
     </html>
   `;

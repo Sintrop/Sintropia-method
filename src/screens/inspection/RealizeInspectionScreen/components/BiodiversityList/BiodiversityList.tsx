@@ -31,7 +31,7 @@ export function BiodiversityList({ list, updateList }: Props) {
   function EmptyList() {
     return (
       <View className="p-5">
-        <Text className="text-center">
+        <Text className="text-center text-gray-500">
           {t('noBiodiversityRegistered')}
         </Text>
       </View>
@@ -40,7 +40,7 @@ export function BiodiversityList({ list, updateList }: Props) {
 
   function HeaderList() {
     return (
-      <Text className="text-center mb-3">{t('biodiversity')}</Text>
+      <Text className="text-center mb-3 text-gray-500">{t('biodiversity')}</Text>
     )
   }
 
@@ -54,7 +54,7 @@ export function BiodiversityList({ list, updateList }: Props) {
         className="w-[150] h-20 rounded-2xl bg-gray-200 items-center justify-center "
         onPress={handleOpenModal}
       >
-        <Text>{t('biodiversity')}</Text>
+        <Text className="text-gray-500">{t('biodiversity')}</Text>
         <Text className="font-bold text-black text-3xl">{list.length}</Text>
       </TouchableOpacity>
 

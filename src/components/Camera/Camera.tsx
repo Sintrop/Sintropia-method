@@ -31,8 +31,12 @@ export function CameraComponent({ close, photo }: Props) {
   const backCamera: CameraDevice | undefined = devices.find(
     d => d.position === 'back',
   );
+  const frontCamera: CameraDevice | undefined = devices.find(
+    d => d.position === 'front',
+  );
   const [imagePreview, setImagePreview] = useState<string>();
   const [loadingTake, setLoadingTake] = useState<boolean>(false);
+  const [camToUse, setCamToUse] = useState<'front' | 'back'>('back');
 
   useEffect(() => {
     (async () => {
@@ -60,6 +64,11 @@ export function CameraComponent({ close, photo }: Props) {
     if (!imagePreview) return;
     photo(imagePreview);
     close();
+  }
+
+  function handleSwitchCam() {
+    if (camToUse === 'back') setCamToUse('front');
+    if (camToUse === 'front') setCamToUse('back');
   }
 
   if (!backCamera || !hasPermission) {
@@ -104,23 +113,37 @@ export function CameraComponent({ close, photo }: Props) {
     <ModalContainer close={close}>
       <Camera
         style={[StyleSheet.absoluteFill, { width: '100%', height: '100%' }]}
-        device={backCamera}
+        //@ts-ignore
+        device={camToUse === 'front' ? frontCamera : backCamera}
         isActive={true}
         ref={camera}
         photo={true}
         photoQualityBalance="speed"
       />
-      <TouchableOpacity
-        onPress={handleTakePhoto}
-        style={styles.captureButton}
-        disabled={loadingTake}
-      >
-        {loadingTake ? (
-          <ActivityIndicator size={30} />
-        ) : (
-          <Text style={styles.buttonText}>📸</Text>
-        )}
-      </TouchableOpacity>
+
+      <View style={styles.viewBtnsAction}>
+        <View className="w-10 h-10 mr-10" />
+
+        <TouchableOpacity
+          onPress={handleTakePhoto}
+          style={styles.captureButton}
+          disabled={loadingTake}
+        >
+          {loadingTake ? (
+            <ActivityIndicator size={30} />
+          ) : (
+            <Text style={styles.buttonText}>📸</Text>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          className="w-10 h-10 ml-10 bg-white rounded-full items-center justify-center"
+          onPress={handleSwitchCam}
+        >
+          
+        </TouchableOpacity>
+
+      </View>
     </ModalContainer>
   );
 }
@@ -163,9 +186,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  captureButton: {
+  viewBtnsAction: {
     position: 'absolute',
     bottom: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    flexDirection: 'row'
+  },
+  captureButton: {
     alignSelf: 'center',
     backgroundColor: '#fff',
     borderRadius: 40,

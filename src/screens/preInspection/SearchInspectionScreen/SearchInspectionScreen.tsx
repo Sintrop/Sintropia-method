@@ -39,7 +39,17 @@ export function SearchInspectionScreen({ navigation }: ScreenProps) {
     });
 
     if (response.success) {
-      if (response.inspection) setInspection(response.inspection);
+      if (response.inspection) {
+        if (response.inspection.status === 0 || response.inspection.status === 1) {
+          setInspection(response.inspection);
+        } else {
+          Alert.alert(
+            t('atention'),
+            t('youCanOnlyInspectInspectionOpenedAndAccepted'),
+          );
+        }
+        
+      }
     } else {
       Alert.alert('Error', response.message);
     }
@@ -48,14 +58,14 @@ export function SearchInspectionScreen({ navigation }: ScreenProps) {
 
   return (
     <Screen screenTitle={t('searchInspection')} showBackButton>
-      <Text>{t('searchInspectionByID')}</Text>
+      <Text className="text-gray-500">{t('searchInspectionByID')}</Text>
       <View className="flex-row mt-1">
         <TextInput
           value={id}
           onChangeText={setId}
           placeholder={t('typeIDHere')}
           placeholderTextColor="#aaa"
-          className="flex-1 h-[48] rounded-2xl border px-5"
+          className="flex-1 h-[48] rounded-2xl border px-5 text-black"
           keyboardType="numeric"
         />
 
@@ -72,7 +82,7 @@ export function SearchInspectionScreen({ navigation }: ScreenProps) {
         </TouchableOpacity>
       </View>
 
-      <Text className="mt-10">{t('or')}</Text>
+      <Text className="mt-10 text-gray-500">{t('or')}</Text>
 
       <TouchableOpacity
         className="px-10 h-[48] border border-[#229B13] flex items-center justify-center rounded-2xl"

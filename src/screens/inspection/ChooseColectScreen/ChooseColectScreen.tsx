@@ -69,7 +69,7 @@ export function ChooseColectScreen({}: ScreenProps) {
         <Text className="font-bold text-black text-xl">
           {t('howWouldYouLikeCollectData')}
         </Text>
-        <Text className="mt-10 text-lg text-center">
+        <Text className="mt-10 text-lg text-center text-gray-500">
           {t('descHowWouldYouLikeCollectData')}
         </Text>
       </View>
