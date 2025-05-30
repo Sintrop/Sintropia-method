@@ -24,7 +24,7 @@ export function HomeScreen({navigation}: ScreenProps): React.JSX.Element {
   }
 
   return (
-    <Screen screenTitle="Sintropia">
+    <Screen screenTitle="Sintropia" homeScreen>
       <View className="items-end">
         <LanguageSelector />
       </View>
