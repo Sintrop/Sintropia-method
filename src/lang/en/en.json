@@ -78,7 +78,7 @@
     "deleteSampling": "Delete sampling",
     "tutorial": "Tutorial",
     "overview": "Overview",
-    "overviewDescription": "Your objective is to evaluate the number of trees larger than 5 cm in diameter in the selected area, as well as their species diversity.",
+    "overviewDescription": "Its objective is to evaluate the number of trees over 1 m in height and 3 cm in diameter found in the selected area, as well as their species diversity.",
     "treesResult": "Trees result",
     "treesResultDescription": "The number of trees, palm trees and other plants over 1m high and 3cm in diameter found in the regeneration area. Only plants managed or planted by the regenerator must be counted.",
     "biodiversityResult": "Biodiversity result",
@@ -103,6 +103,7 @@
     "optimizingPictures": "Optimizing pictures",
     "creatingPDF": "Creating PDF",
     "youAreOutsideTheCollectionArea": "You are outside the collection area",
-    "subtitle": "Subtitle"
+    "subtitle": "Subtitle",
+    "youHaveAnOpenedInspection": "You have an opened inspection"
   }
 }

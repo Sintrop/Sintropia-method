@@ -3,7 +3,7 @@
     "helloWorld": "Olá Mundo!!!",
     "whichAreaDoYouWantToInspect": "Qual área você quer inspecionar?",
     "overview": "Visão geral",
-    "overviewDescription": "O seu objetivo é avaliar a quantidade de árvores com mais de 5cm de diâmetro da área selecionada, bem como a diversidade de espécies das mesmas.",
+    "overviewDescription": "O seu objetivo é avaliar a quantidade de árvores com mais de 1 m de altura e 3 cm de diâmetro encontradas na área selecionada, bem como a diversidade de espécies das mesmas.",
     "treesResult": "Resultado de árvores",
     "treesResultDescription": "Número de árvores, palmeiras e outras plantas com mais de 1 m de altura e 3 cm de diâmetro encontradas na área de regeneração. Somente plantas manejadas ou plantadas pelo regenerador devem ser contabilizadas.",
     "biodiversityResult": "Resultado de biodiversidade",
@@ -104,6 +104,7 @@
     "optimizingPictures": "Otimizando imagens",
     "creatingPDF": "Criando PDF",
     "youAreOutsideTheCollectionArea": "Você está fora da área de coleta",
-    "subtitle": "Legenda"
+    "subtitle": "Legenda",
+    "youHaveAnOpenedInspection": "Você tem uma inspeção em aberto"
   }
 }
