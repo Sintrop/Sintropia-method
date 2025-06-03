@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "InspectionApp.app"
-               BlueprintName = "InspectionApp"
-               ReferencedContainer = "container:InspectionApp.xcodeproj">
+               BuildableName = "Sintropia.app"
+               BlueprintName = "Sintropia"
+               ReferencedContainer = "container:Sintropia.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "InspectionAppTests.xctest"
-               BlueprintName = "InspectionAppTests"
-               ReferencedContainer = "container:InspectionApp.xcodeproj">
+               BuildableName = "SintropiaTests.xctest"
+               BlueprintName = "SintropiaTests"
+               ReferencedContainer = "container:Sintropia.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "InspectionApp.app"
-            BlueprintName = "InspectionApp"
-            ReferencedContainer = "container:InspectionApp.xcodeproj">
+            BuildableName = "Sintropia.app"
+            BlueprintName = "Sintropia"
+            ReferencedContainer = "container:Sintropia.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "InspectionApp.app"
-            BlueprintName = "InspectionApp"
-            ReferencedContainer = "container:InspectionApp.xcodeproj">
+            BuildableName = "Sintropia.app"
+            BlueprintName = "Sintropia"
+            ReferencedContainer = "container:Sintropia.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
