@@ -44,3 +44,5 @@ end
 pre_install do |installer|
   $RNMapboxMaps.pre_install(installer)
 end
+
+pod 'react-native-config', :path => '../node_modules/react-native-config'

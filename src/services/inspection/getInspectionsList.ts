@@ -1,9 +1,12 @@
 import Web3 from 'web3';
-import {SEQUOIA_INSPECTION_RULES_ADDRESS, INSPECTION_RULES_ADDRESS} from '@env';
 import SequoiaInspectionRules from '../../data/abis/sequoia/InspectionRules.json';
 import InspectionRules from '../../data/abis/mainnet/InspectionRules.json';
 import {InspectionProps} from '../../types/inspection';
 import {parseInspectionData} from './parseInspectionData';
+import Config from 'react-native-config';
+
+const SEQUOIA_INSPECTION_RULES_ADDRESS = Config.SEQUOIA_INSPECTION_RULES_ADDRESS;
+const INSPECTION_RULES_ADDRESS = Config.INSPECTION_RULES_ADDRESS;
 
 interface ReturnGetInspectionsListProps {
   success: boolean;
