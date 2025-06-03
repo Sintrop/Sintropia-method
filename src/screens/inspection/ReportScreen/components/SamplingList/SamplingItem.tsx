@@ -45,21 +45,21 @@ export function SamplingItem({ collectionMethod, sampling, index }: Props) {
                   <Text className="font-bold text-black text-xl">
                     {trees.length}
                   </Text>
-                  <Text>{t('trees')}</Text>
+                  <Text className="text-gray-500">{t('trees')}</Text>
                 </View>
 
                 <View className="w-24 h-16 rounded-2xl bg-gray-200 items-center justify-center ml-5">
                   <Text className="font-bold text-black text-xl">
                     {sampling.size} m
                   </Text>
-                  <Text>{t('radius')}</Text>
+                  <Text className="text-gray-500">{t('radius')}</Text>
                 </View>
 
                 <View className="w-24 h-16 rounded-2xl bg-gray-200 items-center justify-center ml-5">
                   <Text className="font-bold text-black">
                     {calculateAreaCircle(sampling.size)} m²
                   </Text>
-                  <Text>{t('area')}</Text>
+                  <Text className="text-gray-500">{t('area')}</Text>
                 </View>
               </View>
             </View>

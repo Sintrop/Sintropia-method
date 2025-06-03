@@ -38,6 +38,8 @@ import { useLocation } from '../../../hooks/useLocation';
 import { isPointInPolygon } from '../../../services/inspection/isPointInPolygon';
 import { isPointInCircle } from '../../../services/inspection/isPointInCircle';
 import { SamplingIndicator } from './components/SamplingIndicator/SamplingIndicator';
+import { OutsideTheCollectionArea } from './components/OutsideTheCollectionArea';
+import { Subtitle } from './components/Subtitle';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -190,9 +192,20 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
     <View>
       <Header screenTitle={t('realizeInspection')} showBackButton />
       <View style={{ position: 'relative' }}>
-        {collectionMethod === 'sampling' && !collectOnlyBio && (
-          <SamplingIndicator samplingNumber={sampling.number} />
-        )}
+        <View className="absolute top-9 left-0 w-full px-5 z-20">
+          {collectionMethod === 'sampling' && !collectOnlyBio && (
+            <SamplingIndicator samplingNumber={sampling.number} />
+          )}
+
+          <Subtitle />
+
+          {collectOnlyBio ? (
+            <OutsideTheCollectionArea outside={disableRegisterBio} />
+          ) : (
+            <OutsideTheCollectionArea outside={disableRegisterTree} />
+          )}
+        </View>
+
         <MapView
           style={[styles.mapContainer, { width, height }]}
           styleURL={StyleURL.SatelliteStreet}
@@ -265,12 +278,14 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
               registerType="biodiversity"
               registerItem={handleRegisterItem}
               disabled={disableRegisterBio}
+              location={location}
             />
           ) : (
             <ModalRegisterItem
               registerType="tree"
               registerItem={handleRegisterItem}
               disabled={disableRegisterTree}
+              location={location}
             />
           )}
 

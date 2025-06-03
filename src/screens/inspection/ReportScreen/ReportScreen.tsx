@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -33,6 +35,7 @@ import {
 import { extrapolateTreesToArea } from '../../../services/inspection/extrapolateTreesToArea';
 import { Calculation } from './components/Calculation/Calculation';
 import { calculateAreaCircle } from '../../../services/inspection/calculateAreaCircle';
+import { LoadingGeneratingPdf } from './components/LoadingGeneratingPdf/LoadingGeneratingPdf';
 
 export interface TreesPerSamplingProps {
   samplingNumber: number;
@@ -73,6 +76,10 @@ export function ReportScreen({ route }: ScreenProps) {
   const [loadingTrees, setLoadingTrees] = useState(true);
   const [loadingSamplings, setLoadingSamplings] = useState(true);
 
+  const [totalPicturesToPdf, setTotalPicturesToPdf] = useState<number>(1);
+  const [percentGeneratingPdf, setPercentGeneratingPdf] = useState<number>(0);
+  const [messageGeneratingPdf, setMessageGeneratingPdf] = useState<string>('');
+
   useEffect(() => {
     if (db) {
       setAreaData();
@@ -109,6 +116,7 @@ export function ReportScreen({ route }: ScreenProps) {
     setLoadingBio(true);
     const bios = await fetchBiodiversityByAreaId(area?.id);
     setTotalBiodiversity(bios.length);
+    setTotalPicturesToPdf(value => value + bios.length);
     setBiodiversity(bios);
     setLoadingBio(false);
   }
@@ -128,6 +136,7 @@ export function ReportScreen({ route }: ScreenProps) {
       const responseTrees = await fetchTreesSampling(samplings[0].id);
       setTrees(responseTrees);
       setTotalTrees(responseTrees.length);
+      setTotalPicturesToPdf(value => value + responseTrees.length);
     }
 
     if (collectionMethod === 'sampling') {
@@ -143,6 +152,7 @@ export function ReportScreen({ route }: ScreenProps) {
           ...value,
           { samplingNumber: s + 1, treesCount: responseTrees.length },
         ]);
+        setTotalPicturesToPdf(value => value + responseTrees.length);
       }
 
       const treesTotalEstimated = extrapolateTreesToArea({
@@ -160,6 +170,8 @@ export function ReportScreen({ route }: ScreenProps) {
     const newListBio: BiodiversityDBProps[] = [];
     const newListTrees: TreeDBProps[] = [];
 
+    let totalConverted = 0;
+
     for (let b = 0; b < biodiversity.length; b++) {
       const bio = biodiversity[b];
       const photo = bio.photo;
@@ -168,6 +180,10 @@ export function ReportScreen({ route }: ScreenProps) {
         ...bio,
         photo: base64,
       });
+      totalConverted += 1;
+      setPercentGeneratingPdf(
+        Math.ceil((totalConverted / totalPicturesToPdf) * 100),
+      );
     }
 
     for (let t = 0; t < trees.length; t++) {
@@ -178,9 +194,18 @@ export function ReportScreen({ route }: ScreenProps) {
         ...tree,
         photo: base64,
       });
+      totalConverted += 1;
+      setPercentGeneratingPdf(
+        Math.ceil((totalConverted / totalPicturesToPdf) * 100),
+      );
     }
 
     const proofPhoto = await convertImageToBase64(area.proofPhoto);
+    totalConverted += 1;
+    setPercentGeneratingPdf(
+      Math.ceil((totalConverted / totalPicturesToPdf) * 100),
+    );
+    setMessageGeneratingPdf('creatingPDF');
 
     const pdfUri = await generateReportPDF({
       areaName: area?.name,
@@ -200,6 +225,8 @@ export function ReportScreen({ route }: ScreenProps) {
     const newListBio: BiodiversityDBProps[] = [];
     const newListSamplings: SamplingPDFProps[] = [];
 
+    let totalConverted = 0;
+
     for (let b = 0; b < biodiversity.length; b++) {
       const bio = biodiversity[b];
       const photo = bio.photo;
@@ -208,6 +235,10 @@ export function ReportScreen({ route }: ScreenProps) {
         ...bio,
         photo: base64,
       });
+      totalConverted += 1;
+      setPercentGeneratingPdf(
+        Math.ceil((totalConverted / totalPicturesToPdf) * 100),
+      );
     }
 
     for (let s = 0; s < samplings.length; s++) {
@@ -224,6 +255,10 @@ export function ReportScreen({ route }: ScreenProps) {
           photo: photoBase64,
         };
         newTreesList.push(newDataTree);
+        totalConverted += 1;
+        setPercentGeneratingPdf(
+          Math.ceil((totalConverted / totalPicturesToPdf) * 100),
+        );
       }
 
       const newDataSampling: SamplingPDFProps = {
@@ -236,6 +271,11 @@ export function ReportScreen({ route }: ScreenProps) {
     }
 
     const proofPhoto = await convertImageToBase64(area.proofPhoto);
+    totalConverted += 1;
+    setPercentGeneratingPdf(
+      Math.ceil((totalConverted / totalPicturesToPdf) * 100),
+    );
+    setMessageGeneratingPdf('creatingPDF');
 
     const pdfUri = await generateReportPDFSamplingMode({
       areaName: area?.name,
@@ -253,26 +293,37 @@ export function ReportScreen({ route }: ScreenProps) {
 
   async function handleSharePDF() {
     setLoadingShare(true);
+    setMessageGeneratingPdf('optimizingPictures');
+    setPercentGeneratingPdf(0);
+    sharePdf();
+  }
 
-    if (collectionMethod === 'manual') {
-      const pdf = await generatePDFManualMode();
-      Share.open({
-        url: pdf,
-        title: `Inspection Area: ${area?.name}`,
-        type: 'application/pdf',
-      });
-    }
-
-    if (collectionMethod === 'sampling') {
-      const pdf = await generatePDFSamplingMode();
-      Share.open({
-        url: pdf,
-        title: `Inspection Area: ${area?.name}`,
-        type: 'application/pdf',
-      });
-    }
-
-    setLoadingShare(false);
+  async function sharePdf(): Promise<void> {
+    setTimeout(async () => {
+      try {
+        if (collectionMethod === 'manual') {
+          const pdf = await generatePDFManualMode();
+          Share.open({
+            url: pdf,
+            title: `Inspection Area: ${area?.name}`,
+            type: 'application/pdf',
+          });
+        }
+  
+        if (collectionMethod === 'sampling') {
+          const pdf = await generatePDFSamplingMode();
+          Share.open({
+            url: pdf,
+            title: `Inspection Area: ${area?.name}`,
+            type: 'application/pdf',
+          });
+        }
+      } catch (e) {
+        Alert.alert(e as string)
+        setLoadingShare(false)
+      }
+      setLoadingShare(false);
+    }, 1000);
   }
 
   if (loadingAreaData || loadingBio || loadingSamplings || loadingTrees) {
@@ -290,7 +341,7 @@ export function ReportScreen({ route }: ScreenProps) {
       <Text className="font-bold text-black text-lg mt-5">
         {t('finalResult')}
       </Text>
-      <Text>{area?.name}</Text>
+      <Text className="text-gray-500">{area?.name}</Text>
 
       <View className="items-end w-full">
         <TouchableOpacity
@@ -349,20 +400,20 @@ export function ReportScreen({ route }: ScreenProps) {
         </MapView>
       </ViewShot>
 
-      <Text className="mt-3">
+      <Text className="mt-3 text-gray-500">
         {t('areaSize')}: {Intl.NumberFormat('pt-BR').format(area.size)} m²
       </Text>
 
       {collectionMethod === 'sampling' && (
         <>
-          <Text>
+          <Text className="text-gray-500">
             {t('samplingRadius')}: {samplingSize} m
           </Text>
-          <Text>
+          <Text className="text-gray-500">
             {t('samplingArea')}: {calculateAreaCircle(samplingSize)} m²
           </Text>
           {treesPerSampling.map((item, index) => (
-            <Text key={index}>
+            <Text key={index} className="text-gray-500">
               {t('numberOfTreesInTheSampling')} {item.samplingNumber}:{' '}
               {item.treesCount}
             </Text>
@@ -370,17 +421,26 @@ export function ReportScreen({ route }: ScreenProps) {
         </>
       )}
 
+      <View className="mt-5">
+        <Text className="text-gray-500 text-sm">{t('proofPhoto')}</Text>
+        <Image
+          source={{ uri: area.proofPhoto }}
+          style={{ width: '100%', height: 300, borderRadius: 16 }}
+          resizeMode="cover"
+        />
+      </View>
+
       <View className="flex-row items-center justify-center mt-5">
         <View className="w-[48%] h-20 rounded-2xl items-center justify-center bg-gray-200">
           <Text className="font-bold text-black text-4xl">{totalTrees}</Text>
-          <Text>{t('trees')}</Text>
+          <Text className="text-gray-500">{t('trees')}</Text>
         </View>
 
         <View className="w-[48%] h-20 rounded-2xl items-center justify-center bg-gray-200 ml-3">
           <Text className="font-bold text-black text-4xl">
             {totalBiodiversity}
           </Text>
-          <Text>{t('biodiversity')}</Text>
+          <Text className="text-gray-500">{t('biodiversity')}</Text>
         </View>
       </View>
 
@@ -391,6 +451,13 @@ export function ReportScreen({ route }: ScreenProps) {
       <SamplingList samplings={samplings} collectionMethod={collectionMethod} />
 
       <View className="mb-20" />
+
+      {loadingShare && (
+        <LoadingGeneratingPdf
+          percentage={percentGeneratingPdf}
+          message={messageGeneratingPdf}
+        />
+      )}
     </Screen>
   );
 }

@@ -13,7 +13,7 @@ export function StepCard({ step }: Props) {
   return (
     <View className="w-full items-center">
       <Text className="font-bold text-black text-xl">{t(data?.title)}</Text>
-      <Text className="mt-10 text-lg text-center">{t(data.description)}</Text>
+      <Text className="mt-10 text-lg text-gray-500 text-center">{t(data.description)}</Text>
     </View>
   )
 }

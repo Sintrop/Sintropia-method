@@ -24,7 +24,7 @@ export function HomeScreen({navigation}: ScreenProps): React.JSX.Element {
   }
 
   return (
-    <Screen screenTitle="Sintropia">
+    <Screen screenTitle="Sintropia" homeScreen>
       <View className="items-end">
         <LanguageSelector />
       </View>
@@ -60,7 +60,7 @@ export function HomeScreen({navigation}: ScreenProps): React.JSX.Element {
           </View>
         )}
 
-        <Text className="mt-10">{t('seeYourAreasAlreadyInspected')}</Text>
+        <Text className="mt-10 text-gray-500">{t('seeYourAreasAlreadyInspected')}</Text>
         <TouchableOpacity
           className="w-[320] h-[48] rounded-2xl border border-[#229B13] flex items-center justify-center mt-1"
           onPress={handleGoToInspectedAreasScreen}>

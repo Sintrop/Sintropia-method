@@ -3,11 +3,11 @@
     "helloWorld": "Olá Mundo!!!",
     "whichAreaDoYouWantToInspect": "Qual área você quer inspecionar?",
     "overview": "Visão geral",
-    "overviewDescription": "O seu objetivo é avaliar a quantidade de árvores com mais de 5cm de diâmetro da área selecionada, bem como a diversidade de espécies das mesmas.",
+    "overviewDescription": "O seu objetivo é avaliar a quantidade de árvores com mais de 1 m de altura e 3 cm de diâmetro encontradas na área selecionada, bem como a diversidade de espécies das mesmas.",
     "treesResult": "Resultado de árvores",
-    "treesResultDescription": "Número de árvores, palmeiras e outras plantas com mais de 5 cm de diâmetro encontradas na área de regeneração. Somente plantas manejadas ou plantadas pelo gerador devem ser contabilizadas.",
+    "treesResultDescription": "Número de árvores, palmeiras e outras plantas com mais de 1 m de altura e 3 cm de diâmetro encontradas na área de regeneração. Somente plantas manejadas ou plantadas pelo regenerador devem ser contabilizadas.",
     "biodiversityResult": "Resultado de biodiversidade",
-    "biodiversityResultDescription": "O número de diferentes espécies de árvores, palmeiras e outras plantas com mais de 5 cm de diâmetro encontradas na área de regeneração. Somente plantas manejadas ou plantadas pelo regenerador devem ser contabilizadas.",
+    "biodiversityResultDescription": "Número de diferentes espécies de árvores, palmeiras e outras plantas com mais de 1 m de altura e 3 cm de diâmetro encontradas na área de regeneração. Somente plantas manejadas ou plantadas pelo regenerador devem ser contabilizadas.",
     "report": "Relatório",
     "reportDescription": "Conforme for preenchendo os dados, um relatório automatizado com a justificativa do resultado encontrado será criado automaticamente e estará disponível para download.",
     "howWouldYouLikeCollectData": "Como gostaria de coletar os dados?",
@@ -95,6 +95,16 @@
     "samplingTrees1": "Plantas amostragem 1",
     "samplingTreesN": "Plantas amostragem N",
     "numberOfSamplings": "Quantidade de amostragens",
-    "collectionMethod": "Método de coleta"
+    "collectionMethod": "Método de coleta",
+    "weNeedYourGPSPermission": "Precisamos acessar sua localização",
+    "descWeNeedYourGPSPermission": "Para realizar a inspeção é necessário acessar sua localização em tempo real, para garantir a coleta de coordenadas ao registrar os items.",
+    "givePermission": "Dar permissão",
+    "helpGivePermission": "Se nada acontecer ao tocar no botão, entre nas configurações do seu dispositivo -> aplicativos -> Sintropia -> Permissões. E ative a permissão de localização.",
+    "generatingPDF": "Gerando PDF",
+    "optimizingPictures": "Otimizando imagens",
+    "creatingPDF": "Criando PDF",
+    "youAreOutsideTheCollectionArea": "Você está fora da área de coleta",
+    "subtitle": "Legenda",
+    "youHaveAnOpenedInspection": "Você tem uma inspeção em aberto"
   }
 }

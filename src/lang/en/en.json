@@ -78,11 +78,11 @@
     "deleteSampling": "Delete sampling",
     "tutorial": "Tutorial",
     "overview": "Overview",
-    "overviewDescription": "Your objective is to evaluate the number of trees larger than 5 cm in diameter in the selected area, as well as their species diversity.",
+    "overviewDescription": "Its objective is to evaluate the number of trees over 1 m in height and 3 cm in diameter found in the selected area, as well as their species diversity.",
     "treesResult": "Trees result",
-    "treesResultDescription": "The number of trees, palm trees and other plants larger than 5cm in diameter found in the regeneration area. Only plants managed or planted by the regenerator must be counted.",
+    "treesResultDescription": "The number of trees, palm trees and other plants over 1m high and 3cm in diameter found in the regeneration area. Only plants managed or planted by the regenerator must be counted.",
     "biodiversityResult": "Biodiversity result",
-    "biodiversityResultDescription": "The number of different species of trees, palm trees and other plants larger than 5 cm in diameter found in the regeneration area. Only plants managed or planted by the regenerator must be counted.",
+    "biodiversityResultDescription": "The number of different species of trees, palm trees and other plants over 1m high and 3cm in diameter found in the regeneration area. Only plants managed or planted by the regenerator must be counted.",
     "report": "Report",
     "reportDescription": "As you fill in the data, an automated report with the justification for the result found will be created automatically and will be available for download.",
     "howWouldYouLikeCollectData": "How would you like to collect the data?",
@@ -94,6 +94,16 @@
     "samplingTrees1": "Sampling trees 1",
     "samplingTreesN": "Sampling trees N",
     "numberOfSamplings": "Number of samplings",
-    "collectionMethod": "Collection method"
+    "collectionMethod": "Collection method",
+    "weNeedYourGPSPermission": "We need your GPS permission",
+    "descWeNeedYourGPSPermission": "To carry out the inspection, it is necessary to access your location in real time, to ensure the collection of coordinates when registering the items.",
+    "givePermission": "Give permission",
+    "helpGivePermission": "If nothing happens when you tap the button, go to your device's settings -> apps -> Syntropy -> Permissions. And enable the location permission.",
+    "generatingPDF": "Generating PDF",
+    "optimizingPictures": "Optimizing pictures",
+    "creatingPDF": "Creating PDF",
+    "youAreOutsideTheCollectionArea": "You are outside the collection area",
+    "subtitle": "Subtitle",
+    "youHaveAnOpenedInspection": "You have an opened inspection"
   }
 }
