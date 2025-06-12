@@ -14,7 +14,7 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'InspectionApp' do
+target 'Sintropia' do
   config = use_native_modules!
 
   use_react_native!(
@@ -23,7 +23,7 @@ target 'InspectionApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  target 'InspectionAppTests' do
+  target 'SintropiaTests' do
     inherit! :complete
     # Pods for testing
   end
@@ -36,5 +36,21 @@ target 'InspectionApp' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    installer.pods_project.targets.each do |target|
+      if target.name == "React-Core.common-RCTI18nStrings"
+        # https://github.com/facebook/react-native/issues/43610#issuecomment-2017636169                                                                                                                                   
+        target.remove_from_project
+      end
+    end
+    
+    $RNMapboxMaps.post_install(installer)
+    # ... other post install hooks  
   end
 end
+
+pre_install do |installer|
+  $RNMapboxMaps.pre_install(installer)
+end
+
+pod 'react-native-config', :path => '../node_modules/react-native-config'

@@ -18,12 +18,11 @@ import Mapbox, {
   StyleURL,
   offlineManager,
 } from '@rnmapbox/maps';
-//@ts-ignore
-import { MAPBOX_ACCESS_TOKEN } from '@env';
 import { Polyline } from '../../../components/Map/Polyline';
 import { useInspectionContext } from '../../../hooks/useInspectionContext';
+import Config from 'react-native-config';
 
-Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN ? MAPBOX_ACCESS_TOKEN : '');
+const MAPBOX_ACCESS_TOKEN = Config.MAPBOX_ACCESS_TOKEN;
 
 type ScreenProps = NativeStackScreenProps<
   PreInspectionStackParamsList,

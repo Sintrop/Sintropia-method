@@ -1,11 +1,11 @@
 import Web3 from 'web3';
-import {
-  SEQUOIA_REGENERATOR_RULES_ADDRESS,
-  REGENERATOR_RULES_ADDRESS,
-} from '@env';
 import SequoiaRegeneratorRules from '../../data/abis/sequoia/RegeneratorRules.json';
 import RegeneratorRules from '../../data/abis/mainnet/RegeneratorRules.json';
 import {CoordinateProps} from '../../types/regenerator';
+import Config from 'react-native-config';
+
+const SEQUOIA_REGENERATOR_RULES_ADDRESS = Config.SEQUOIA_REGENERATOR_RULES_ADDRESS;
+const REGENERATOR_RULES_ADDRESS = Config.REGENERATOR_RULES_ADDRESS;
 
 interface ReturnGetCoordinatesProps {
   success: boolean;

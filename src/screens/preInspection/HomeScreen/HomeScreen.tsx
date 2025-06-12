@@ -6,6 +6,7 @@ import {LanguageSelector} from '../../../components/LanguageSelector/LanguageSel
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {PreInspectionStackParamsList} from '../../../routes/PreInspectionRoutes';
 import { useInspectionContext } from '../../../hooks/useInspectionContext';
+import Config from 'react-native-config';
 
 type ScreenProps = NativeStackScreenProps<
   PreInspectionStackParamsList,
@@ -14,6 +15,7 @@ type ScreenProps = NativeStackScreenProps<
 export function HomeScreen({navigation}: ScreenProps): React.JSX.Element {
   const { areaOpened, enterInspectionMode } = useInspectionContext();
   const {t} = useTranslation();
+  const version = Config.VERSION;
 
   function handleGoToInspectionsScreen() {
     navigation.navigate('SearchInspectionScreen');
@@ -68,6 +70,8 @@ export function HomeScreen({navigation}: ScreenProps): React.JSX.Element {
             {t('inspectedAreas')}
           </Text>
         </TouchableOpacity>
+
+        <Text className="mt-10 text-gray-500">v{version}</Text>
       </View>
     </Screen>
   );
