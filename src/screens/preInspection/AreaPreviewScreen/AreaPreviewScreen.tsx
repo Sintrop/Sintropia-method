@@ -22,7 +22,8 @@ import { Polyline } from '../../../components/Map/Polyline';
 import { useInspectionContext } from '../../../hooks/useInspectionContext';
 import Config from 'react-native-config';
 
-const MAPBOX_ACCESS_TOKEN = Config.MAPBOX_ACCESS_TOKEN;
+const MAPBOX_ACCESS_TOKEN = Config.MAPBOX_ACCESS_TOKEN ? Config.MAPBOX_ACCESS_TOKEN : '';
+Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
 type ScreenProps = NativeStackScreenProps<
   PreInspectionStackParamsList,
