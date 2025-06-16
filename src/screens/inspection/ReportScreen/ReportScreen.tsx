@@ -15,6 +15,7 @@ import { Camera, MapView, PointAnnotation, StyleURL } from '@rnmapbox/maps';
 import { Polyline } from '../../../components/Map/Polyline';
 import {
   BiodiversityDBProps,
+  ProofPhotosDBProps,
   SamplingDBProps,
   TreeDBProps,
 } from '../../../types/database';
@@ -35,6 +36,7 @@ import { extrapolateTreesToArea } from '../../../services/inspection/extrapolate
 import { Calculation } from './components/Calculation/Calculation';
 import { calculateAreaCircle } from '../../../services/inspection/calculateAreaCircle';
 import { LoadingGeneratingPdf } from './components/LoadingGeneratingPdf/LoadingGeneratingPdf';
+import { generateReportProofPhotos } from '../../../services/inspection/generateReportProofPhotos';
 
 export interface TreesPerSamplingProps {
   samplingNumber: number;
@@ -51,6 +53,7 @@ export function ReportScreen({ route }: ScreenProps) {
     db,
     fetchSampligsArea,
     fetchTreesSampling,
+    fetchProofPhotosArea,
   } = useSQLite();
   const { t } = useTranslation();
   const [coordinatesArea, setCoordinatesArea] = useState<CoordinateProps[]>([]);
@@ -296,7 +299,7 @@ export function ReportScreen({ route }: ScreenProps) {
             type: 'application/pdf',
           });
         }
-  
+
         if (collectionMethod === 'sampling') {
           const pdf = await generatePDFSamplingMode();
           Share.open({
@@ -306,11 +309,64 @@ export function ReportScreen({ route }: ScreenProps) {
           });
         }
       } catch (e) {
-        Alert.alert(e as string)
-        setLoadingShare(false)
+        Alert.alert(e as string);
+        setLoadingShare(false);
       }
       setLoadingShare(false);
     }, 1000);
+  }
+
+  async function handleShareProofPhotosPDF() {
+    setLoadingShare(true);
+    setMessageGeneratingPdf('optimizingPictures');
+    setPercentGeneratingPdf(0);
+    const pdf = await generateProofPhotosPDF();
+    Share.open({
+      url: pdf,
+      title: `Proof Photos Report: ${area?.name}`,
+      type: 'application/pdf',
+    });
+    setLoadingShare(false);
+  }
+
+  async function generateProofPhotosPDF(): Promise<string> {
+    const newListPhotos: ProofPhotosDBProps[] = [];
+
+    const response = await fetchProofPhotosArea(area.id);
+    const totalProofPhotos = response.length + 1;
+
+    let totalConverted = 0;
+
+    for (let b = 0; b < response.length; b++) {
+      const register = response[b];
+      const photo = register.photo;
+      const base64 = await convertImageToBase64(photo, 200, 200);
+      newListPhotos.push({
+        ...register,
+        photo: base64,
+      });
+      totalConverted += 1;
+      setPercentGeneratingPdf(
+        Math.ceil((totalConverted / totalProofPhotos) * 100),
+      );
+    }
+
+    const proofPhoto = await convertImageToBase64(area.proofPhoto, 200, 200);
+    totalConverted += 1;
+    setPercentGeneratingPdf(
+      Math.ceil((totalConverted / totalProofPhotos) * 100),
+    );
+    setMessageGeneratingPdf('creatingPDF');
+
+    const pdfUri = await generateReportProofPhotos({
+      areaName: area?.name,
+      coordinates: coordinatesArea,
+      areaSize: `${Intl.NumberFormat('pt-BR').format(areaSize)} m²`,
+      proofPhotos: newListPhotos,
+      proofPhoto,
+    });
+
+    return pdfUri;
   }
 
   if (loadingAreaData || loadingBio || loadingSamplings || loadingTrees) {
@@ -330,14 +386,27 @@ export function ReportScreen({ route }: ScreenProps) {
       </Text>
       <Text className="text-gray-500">{area?.name}</Text>
 
-      <View className="items-end w-full">
+      <View className="w-full flex-row items-center justify-between py-1 px-2 rounded-2xl border border-gray-500 mt-2">
+        <Text className="text-gray-500">{t('inspectionReport')}</Text>
         <TouchableOpacity
           onPress={handleSharePDF}
-          className="h-10 w-32 rounded-2xl bg-green-600 flex-row items-center justify-center"
+          className="h-10 w-28 rounded-2xl bg-green-600 flex-row items-center justify-center"
           disabled={loadingShare}
           style={{ opacity: loadingShare ? 0.5 : 1 }}
         >
-          <Text className="font-semibold text-white">{t('sharePDF')}</Text>
+          <Text className="font-semibold text-white">{t('share')}</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View className="w-full flex-row items-center justify-between py-1 px-2 rounded-2xl border border-gray-500 mt-2">
+        <Text className="text-gray-500">{t('proofPhotosReport')}</Text>
+        <TouchableOpacity
+          onPress={handleShareProofPhotosPDF}
+          className="h-10 w-28 rounded-2xl bg-green-600 flex-row items-center justify-center"
+          disabled={loadingShare}
+          style={{ opacity: loadingShare ? 0.5 : 1 }}
+        >
+          <Text className="font-semibold text-white">{t('share')}</Text>
         </TouchableOpacity>
       </View>
 
