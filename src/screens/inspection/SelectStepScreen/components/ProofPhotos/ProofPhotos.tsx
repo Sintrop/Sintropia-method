@@ -9,7 +9,7 @@ import { ProofPhotosDBProps } from '../../../../../types/database';
 export function ProofPhotos() {
   const { t } = useTranslation();
   const { areaOpened } = useInspectionContext();
-  const { updateProofPhoto, fetchProofPhotosArea, addProofPhoto } = useSQLite();
+  const { updateProofPhoto, fetchProofPhotosArea, addProofPhoto, db, initDB } = useSQLite();
   const [showCamera, setShowCamera] = useState(false);
   const [proofPhoto, setProofPhoto] = useState('');
   const [proofPhotos, setProofPhotos] = useState<ProofPhotosDBProps[]>([]);
@@ -19,8 +19,12 @@ export function ProofPhotos() {
 
   useEffect(() => {
     getProofPhoto();
-    getProofPhotos();
-  }, [areaOpened]);
+    if (db) {
+      getProofPhotos();
+    } else {
+      initDB();
+    }
+  }, [areaOpened, db]);
 
   function getProofPhoto() {
     if (!areaOpened) return;
