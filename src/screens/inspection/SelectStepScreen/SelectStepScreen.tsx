@@ -18,6 +18,7 @@ import { useSQLite } from '../../../hooks/useSQLite';
 import { HeaderInspectionMode } from '../components/HeaderInspectionMode';
 import { FinishInspection } from './components/FinishInspection/FinishInspection';
 import { DeleteInspection } from './components/DeleteInspection/DeleteInspection';
+import { usePermissions } from '../../../hooks/usePermissions';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -30,27 +31,15 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
   const { updateProofPhoto, fetchSampligsArea } = useSQLite();
   const [showCamera, setShowCamera] = useState(false);
   const [proofPhoto, setProofPhoto] = useState('');
-  const [hasGpsPermission, setHasGpsPermission] = useState<boolean>(false);
+  const { checkLocationPermission, locationStatus, requestLocationPermission } = usePermissions();
 
-  //TODO: Get permission location and disable btn inpsection when not location available]
   useEffect(() => {
-    requestLocationPermissions();
+    checkLocationPermission();
   }, []);
 
   useEffect(() => {
     getProofPhoto();
   }, [areaOpened]);
-
-  async function requestLocationPermissions() {
-    if (Platform.OS === 'android') {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      );
-      const hasPermission = granted === PermissionsAndroid.RESULTS.GRANTED;
-      setHasGpsPermission(hasPermission);
-      return hasPermission;
-    }
-  }
 
   function getProofPhoto() {
     if (!areaOpened) return;
@@ -116,7 +105,7 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
     });
   }
 
-  if (!hasGpsPermission) {
+  if (locationStatus !== 'granted') {
     return (
       <Screen screenTitle={t('areaInspection')}>
         <View className="items-center justify-center">
@@ -131,7 +120,7 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
 
           <TouchableOpacity
             className="mt-10 w-fit px-10 h-10 rounded-2xl bg-blue-500 items-center justify-center"
-            onPress={requestLocationPermissions}
+            onPress={requestLocationPermission}
           >
             <Text className="text-white font-semibold">
               {t('givePermission')}
