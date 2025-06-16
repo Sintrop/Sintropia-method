@@ -17,7 +17,7 @@ export function BiodiversityList({ list }: Props) {
       </Text>
       {list.length === 0 ? (
         <View className="mt-5">
-          <Text className="text-center">{t('anyBiodiversityRegistered')}</Text>
+          <Text className="text-center text-gray-500">{t('anyBiodiversityRegistered')}</Text>
         </View>
       ) : (
         <>

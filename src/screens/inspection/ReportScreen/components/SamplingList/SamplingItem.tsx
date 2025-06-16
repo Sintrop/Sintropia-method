@@ -31,7 +31,7 @@ export function SamplingItem({ collectionMethod, sampling, index }: Props) {
     <View>
       {trees.length === 0 ? (
         <View className="mt-5">
-          <Text className="text-center">{t('anyTreeRegistered')}</Text>
+          <Text className="text-center text-gray-500">{t('anyTreeRegistered')}</Text>
         </View>
       ) : (
         <>

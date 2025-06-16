@@ -17,7 +17,6 @@ interface GenerateReportPDFProps {
   samplings: SamplingPDFProps[];
   areaSize: string;
   coordinates: CoordinateProps[];
-  proofPhoto: string;
 }
 
 const styleHTML = `
@@ -145,7 +144,6 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
     samplings,
     areaSize,
     coordinates,
-    proofPhoto
   } = props;
 
   const htmlContent = `
@@ -158,11 +156,6 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
         <p>${areaName}</p>
 
         <div class="div-flex-row">
-          <img
-            src="${proofPhoto}"
-            class="map-img"
-          />
-
           <div class="map-coordinates-box">
             <p>Area size: ${areaSize}</p>
             ${listCoordinates(coordinates)}

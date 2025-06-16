@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -200,11 +199,6 @@ export function ReportScreen({ route }: ScreenProps) {
       );
     }
 
-    const proofPhoto = await convertImageToBase64(area.proofPhoto);
-    totalConverted += 1;
-    setPercentGeneratingPdf(
-      Math.ceil((totalConverted / totalPicturesToPdf) * 100),
-    );
     setMessageGeneratingPdf('creatingPDF');
 
     const pdfUri = await generateReportPDF({
@@ -213,7 +207,6 @@ export function ReportScreen({ route }: ScreenProps) {
       treesCount: totalTrees,
       biodiversity: newListBio,
       trees: newListTrees,
-      proofPhoto,
       coordinates: coordinatesArea,
       areaSize: `${Intl.NumberFormat('pt-BR').format(areaSize)} m²`,
     });
@@ -270,11 +263,6 @@ export function ReportScreen({ route }: ScreenProps) {
       newListSamplings.push(newDataSampling);
     }
 
-    const proofPhoto = await convertImageToBase64(area.proofPhoto);
-    totalConverted += 1;
-    setPercentGeneratingPdf(
-      Math.ceil((totalConverted / totalPicturesToPdf) * 100),
-    );
     setMessageGeneratingPdf('creatingPDF');
 
     const pdfUri = await generateReportPDFSamplingMode({
@@ -283,7 +271,6 @@ export function ReportScreen({ route }: ScreenProps) {
       treesCount: totalTrees,
       biodiversity: newListBio,
       samplings: newListSamplings,
-      proofPhoto,
       coordinates: coordinatesArea,
       areaSize: `${Intl.NumberFormat('pt-BR').format(areaSize)} m²`,
     });
@@ -420,15 +407,6 @@ export function ReportScreen({ route }: ScreenProps) {
           ))}
         </>
       )}
-
-      <View className="mt-5">
-        <Text className="text-gray-500 text-sm">{t('proofPhoto')}</Text>
-        <Image
-          source={{ uri: area.proofPhoto }}
-          style={{ width: '100%', height: 300, borderRadius: 16 }}
-          resizeMode="cover"
-        />
-      </View>
 
       <View className="flex-row items-center justify-center mt-5">
         <View className="w-[48%] h-20 rounded-2xl items-center justify-center bg-gray-200">

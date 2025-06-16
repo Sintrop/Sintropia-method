@@ -7,15 +7,15 @@ export function Subtitle() {
 
   return (
     <View className="rounded-2xl px-3 py-1 bg-white mt-3 w-[120]">
-      <Text className="text-sm text-gray-500">{t('subtitle')}</Text>
+      <Text className="text-xs text-gray-500">{t('subtitle')}</Text>
       <View className="flex-row items-center">
         <View className="w-3 h-3 rounded-full bg-green-600 border"/>
-        <Text className="text-black ml-2">{t('trees')}</Text>
+        <Text className="text-black ml-2 text-xs">{t('trees')}</Text>
       </View>
 
       <View className="flex-row items-center">
         <View className="w-3 h-3 rounded-full bg-yellow-600 border"/>
-        <Text className="text-black ml-2">{t('biodiversity')}</Text>
+        <Text className="text-black ml-2 text-xs">{t('biodiversity')}</Text>
       </View>
     </View>
   )
