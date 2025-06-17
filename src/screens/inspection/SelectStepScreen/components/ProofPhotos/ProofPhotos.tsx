@@ -5,11 +5,14 @@ import { useSQLite } from '../../../../../hooks/useSQLite';
 import { useTranslation } from 'react-i18next';
 import { CameraComponent } from '../../../../../components/Camera/Camera';
 import { ProofPhotosDBProps } from '../../../../../types/database';
+import { ProofPhotoItem } from './ProofPhotoItem';
+
 
 export function ProofPhotos() {
   const { t } = useTranslation();
   const { areaOpened } = useInspectionContext();
-  const { updateProofPhoto, fetchProofPhotosArea, addProofPhoto, db, initDB } = useSQLite();
+  const { updateProofPhoto, fetchProofPhotosArea, addProofPhoto, db, initDB, deleteProofPhoto } =
+    useSQLite();
   const [showCamera, setShowCamera] = useState(false);
   const [proofPhoto, setProofPhoto] = useState('');
   const [proofPhotos, setProofPhotos] = useState<ProofPhotosDBProps[]>([]);
@@ -37,7 +40,6 @@ export function ProofPhotos() {
     setProofPhotos(response);
   }
 
-
   function handleTakeProofPhoto() {
     setRegisterType('proof-photo');
     setShowCamera(true);
@@ -59,7 +61,7 @@ export function ProofPhotos() {
       if (!areaOpened) return;
       await addProofPhoto({
         areaId: areaOpened.id,
-        photo: uri
+        photo: uri,
       });
       const response = await fetchProofPhotosArea(areaOpened.id);
       setProofPhotos(response);
@@ -69,15 +71,17 @@ export function ProofPhotos() {
   return (
     <View>
       <View className="w-full px-5 min-h-10 rounded-2xl border py-3 mt-5">
-        <Text className="font-semibold text-black">{t('proofPhotos')}</Text>
+        <Text className="font-semibold text-black">
+          {t('selectStepScreen.proofPhotos')}
+        </Text>
         <Text className="text-gray-500 text-xs">
-          {t('registerPhotoWithRegenerator')}
+          {t('selectStepScreen.registerPhotoWithRegenerator')}
         </Text>
         <TouchableOpacity onPress={handleTakeProofPhoto} className="w-20 h-20">
           {proofPhoto === '' ? (
             <View className="w-20 h-20 rounded-2xl items-center justify-center bg-gray-300">
               <Text className="text-black text-center text-xs">
-                {t('touchToRegister')}
+                {t('selectStepScreen.touchToRegister')}
               </Text>
             </View>
           ) : (
@@ -89,27 +93,30 @@ export function ProofPhotos() {
           )}
         </TouchableOpacity>
 
-        <Text className="text-gray-500 text-xs mt-2">
-          {t('registerMorePhotosOfArea')}
-        </Text>
+        <View className="flex-row items-center justify-between">
+          <Text className="text-gray-500 text-xs mt-2">
+            {t('selectStepScreen.registerMorePhotosOfArea')}
+          </Text>
+
+          <Text className="text-gray-500 text-xs mt-2">
+            {proofPhotos.length}/10
+          </Text>
+        </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {proofPhotos.map((item, index) => (
-            <Image
-              key={index}
-              source={{ uri: item.photo }}
-              className="w-20 h-20 rounded-2xl mr-3"
-              resizeMode="cover"
-            />
+            <ProofPhotoItem photo={item} proofPhotoDeleted={getProofPhotos} key={index} />
           ))}
 
-          <TouchableOpacity
-            onPress={handleTakeProofPhotos}
-            className="w-20 h-20 rounded-2xl items-center justify-center bg-gray-300"
-          >
-            <Text className="text-black text-center text-xs">
-              {t('touchToRegister')}
-            </Text>
-          </TouchableOpacity>
+          {proofPhotos.length < 10 && (
+            <TouchableOpacity
+              onPress={handleTakeProofPhotos}
+              className="w-20 h-20 rounded-2xl items-center justify-center bg-gray-300"
+            >
+              <Text className="text-black text-center text-xs">
+                {t('selectStepScreen.touchToRegister')}
+              </Text>
+            </TouchableOpacity>
+          )}
         </ScrollView>
       </View>
 

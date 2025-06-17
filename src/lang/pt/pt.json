@@ -108,6 +108,14 @@
     "youHaveAnOpenedInspection": "Você tem uma inspeção em aberto",
     "weNeedYourCameraPermission": "Precisamos acessar sua câmera",
     "descWeNeedYourCameraPermission": "Durante a inspeção é necessário registrar algumas fotos com sua câmera",
-    "helpGiveCameraPermission": "Se nada acontecer ao tocar no botão, entre nas configurações do seu dispositivo -> aplicativos -> Sintropia -> Permissões. E ative a permissão de câmera."
+    "helpGiveCameraPermission": "Se nada acontecer ao tocar no botão, entre nas configurações do seu dispositivo -> aplicativos -> Sintropia -> Permissões. E ative a permissão de câmera.",
+    "selectStepScreen": {
+      "proofPhotos": "Fotos de prova",
+      "registerPhotoWithRegenerator": "Registre uma foto com o regenerador",
+      "registerMorePhotosOfArea": "Registre mais fotos da área",
+      "touchToRegister": "Toque para registrar",
+      "textConfirmDeletePhoto": "Você quer excluir essa foto?",
+      "deletePhoto": "Excluir foto"
+    }
   }
 }
