@@ -46,26 +46,13 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Show current location on map.
-Show current location on map.
-Show current location on map.
-Show current location on map.
-ShowShow current location on map.
- current location on map.
-</string>
+	<string>Show current location on map.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Your location is used to help your registration process and to perform inspections.
-Your location is used to help your registration process and to perform inspections.
-Your lYour location is used to help your registration process and to perform inspections.
-ocation is used to help your registration process and to perform inspections.
-</string>
+	<string>Your location is used to perform inspections.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Your location is used to help your registration process and to perform inspections.
-Your location is used to help your registration process and to perform inspections.
-</string>
+	<string>Your location is used to perform inspections.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Your camera is used to take one photo at registration and to perform inspections.
-Your camera is used to take one photo at registration and to perform inspections.
+	<string>Your camera is used to take photos and to perform inspections.
 </string>
 </dict>
 </plist>
