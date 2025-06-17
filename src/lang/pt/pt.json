@@ -116,6 +116,11 @@
       "touchToRegister": "Toque para registrar",
       "textConfirmDeletePhoto": "Você quer excluir essa foto?",
       "deletePhoto": "Excluir foto"
+    },
+    "reportScreen": {
+      "inspectionReport": "Relatório da inspeção",
+      "proofPhotosReport": "Relatório das fotos de prova",
+      "share": "Compartilhar"
     }
   }
 }

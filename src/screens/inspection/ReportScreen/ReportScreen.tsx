@@ -340,7 +340,7 @@ export function ReportScreen({ route }: ScreenProps) {
     for (let b = 0; b < response.length; b++) {
       const register = response[b];
       const photo = register.photo;
-      const base64 = await convertImageToBase64(photo, 200, 200);
+      const base64 = await convertImageToBase64(photo, 500, 500);
       newListPhotos.push({
         ...register,
         photo: base64,
@@ -351,7 +351,7 @@ export function ReportScreen({ route }: ScreenProps) {
       );
     }
 
-    const proofPhoto = await convertImageToBase64(area.proofPhoto, 200, 200);
+    const proofPhoto = await convertImageToBase64(area.proofPhoto, 500, 500);
     totalConverted += 1;
     setPercentGeneratingPdf(
       Math.ceil((totalConverted / totalProofPhotos) * 100),
@@ -387,26 +387,26 @@ export function ReportScreen({ route }: ScreenProps) {
       <Text className="text-gray-500">{area?.name}</Text>
 
       <View className="w-full flex-row items-center justify-between py-1 px-2 rounded-2xl border border-gray-500 mt-2">
-        <Text className="text-gray-500">{t('inspectionReport')}</Text>
+        <Text className="text-gray-500">{t('reportScreen.inspectionReport')}</Text>
         <TouchableOpacity
           onPress={handleSharePDF}
           className="h-10 w-28 rounded-2xl bg-green-600 flex-row items-center justify-center"
           disabled={loadingShare}
           style={{ opacity: loadingShare ? 0.5 : 1 }}
         >
-          <Text className="font-semibold text-white">{t('share')}</Text>
+          <Text className="font-semibold text-white">{t('reportScreen.share')}</Text>
         </TouchableOpacity>
       </View>
 
       <View className="w-full flex-row items-center justify-between py-1 px-2 rounded-2xl border border-gray-500 mt-2">
-        <Text className="text-gray-500">{t('proofPhotosReport')}</Text>
+        <Text className="text-gray-500">{t('reportScreen.proofPhotosReport')}</Text>
         <TouchableOpacity
           onPress={handleShareProofPhotosPDF}
           className="h-10 w-28 rounded-2xl bg-green-600 flex-row items-center justify-center"
           disabled={loadingShare}
           style={{ opacity: loadingShare ? 0.5 : 1 }}
         >
-          <Text className="font-semibold text-white">{t('share')}</Text>
+          <Text className="font-semibold text-white">{t('reportScreen.share')}</Text>
         </TouchableOpacity>
       </View>
 
