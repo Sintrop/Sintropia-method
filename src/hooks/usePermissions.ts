@@ -58,32 +58,32 @@ export function usePermissions() {
     return permissionStatus;
   }, [checkPermission]);
 
-  const requestGalleryPermission = useCallback(() => {
-    const androidVersion = Platform.OS === 'android' ? Number(Platform.Version) : 0;
-    const permission =
-      Platform.OS === 'ios'
-        ? PERMISSIONS.IOS.PHOTO_LIBRARY
-        : androidVersion >= 33
-        ? PERMISSIONS.ANDROID.READ_MEDIA_IMAGES // Android 13+
-        : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE; // Android <=12
+  // const requestGalleryPermission = useCallback(() => {
+  //   const androidVersion = Platform.OS === 'android' ? Number(Platform.Version) : 0;
+  //   const permission =
+  //     Platform.OS === 'ios'
+  //       ? PERMISSIONS.IOS.PHOTO_LIBRARY
+  //       : androidVersion >= 33
+  //       ? PERMISSIONS.ANDROID.READ_MEDIA_IMAGES // Android 13+
+  //       : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE; // Android <=12
 
-    return getPermission(permission, setGalleryStatus);
-  }, [getPermission]);
+  //   return getPermission(permission, setGalleryStatus);
+  // }, [getPermission]);
 
-  const checkGalleryPermission = useCallback(async () => {
-    const androidVersion = Platform.OS === 'android' ? Number(Platform.Version) : 0;
-    const permission =
-      Platform.OS === 'ios'
-        ? PERMISSIONS.IOS.PHOTO_LIBRARY
-        : androidVersion >= 33
-        ? PERMISSIONS.ANDROID.READ_MEDIA_IMAGES
-        : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE;
+  // const checkGalleryPermission = useCallback(async () => {
+  //   const androidVersion = Platform.OS === 'android' ? Number(Platform.Version) : 0;
+  //   const permission =
+  //     Platform.OS === 'ios'
+  //       ? PERMISSIONS.IOS.PHOTO_LIBRARY
+  //       : androidVersion >= 33
+  //       ? PERMISSIONS.ANDROID.READ_MEDIA_IMAGES
+  //       : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE;
 
-    const permissionStatus = await checkPermission(permission);
-    setGalleryStatus(permissionStatus);
+  //   const permissionStatus = await checkPermission(permission);
+  //   setGalleryStatus(permissionStatus);
 
-    return permissionStatus;
-  }, [checkPermission]);
+  //   return permissionStatus;
+  // }, [checkPermission]);
 
   return {
     cameraStatus,
@@ -91,9 +91,9 @@ export function usePermissions() {
     galleryStatus,
     requestCameraPermission,
     requestLocationPermission,
-    requestGalleryPermission,
+    // requestGalleryPermission,
     checkLocationPermission,
     checkCameraPermission,
-    checkGalleryPermission
+    // checkGalleryPermission
   }
 }
