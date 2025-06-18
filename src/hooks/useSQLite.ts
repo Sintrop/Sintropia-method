@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import SQLite, { SQLiteDatabase } from 'react-native-sqlite-storage';
-import { AreaDBProps, BiodiversityDBProps, InspectionDBProps, SamplingDBProps, TreeDBProps } from '../types/database';
+import { AreaDBProps, BiodiversityDBProps, InspectionDBProps, ProofPhotosDBProps, SamplingDBProps, TreeDBProps } from '../types/database';
 
 export function useSQLite() {
   const [db, setDb] = useState<SQLiteDatabase | null>(null);
@@ -49,6 +49,11 @@ export function useSQLite() {
     await database.transaction(tx => {
       tx.executeSql(
         'CREATE TABLE IF NOT EXISTS tree (id INTEGER PRIMARY KEY AUTOINCREMENT, photo TEXT, areaId INTEGER, specieData TEXT, coordinate TEXT, samplingNumber INTEGER, samplingId INTEGER);',
+      );
+    });
+    await database.transaction(tx => {
+      tx.executeSql(
+        'CREATE TABLE IF NOT EXISTS proofPhotos ( id INTEGER PRIMARY KEY AUTOINCREMENT, photo TEXT, areaId INTEGER );',
       );
     });
   };
@@ -242,6 +247,20 @@ export function useSQLite() {
         },
         (_, error) => {
           console.error('Erro ao excluir as amostragems:', error);
+          return true; // impede continuar a transação
+        }
+      );
+    });
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'DELETE FROM proofPhotos WHERE areaId = ?;',
+        [id],
+        (_, result) => {
+          console.log('Fotos excluidas com sucesso:', result);
+        },
+        (_, error) => {
+          console.error('Erro ao excluir as fotos de prova:', error);
           return true; // impede continuar a transação
         }
       );
@@ -468,6 +487,68 @@ export function useSQLite() {
     });
   };
 
+  async function addProofPhoto(data: Omit<ProofPhotosDBProps, 'id'>) {
+    if (!db) return;
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'INSERT INTO proofPhotos (photo, areaId) VALUES (?, ?);',
+        [data?.photo, data.areaId],
+        (_, result) => {
+          console.log('Foto inserida com sucesso:', result);
+        },
+        (_, error) => {
+          console.error('Erro ao inserir a foto:', error);
+          return true;
+        }
+      );
+    });
+  };
+
+  async function deleteProofPhoto(id: number) {
+    if (!db) return;
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'DELETE FROM proofPhotos WHERE id = ?;',
+        [id],
+        (_, result) => {
+          console.log('Foto excluida com sucesso:', result);
+        },
+        (_, error) => {
+          console.error('Erro ao excluir a foto:', error);
+          return true; // impede continuar a transação
+        }
+      );
+    });
+  };
+
+  async function fetchProofPhotosArea(areaId: number): Promise<ProofPhotosDBProps[]> {
+    if (!db) return [];
+
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        tx.executeSql(
+          'SELECT * FROM proofPhotos WHERE areaId = ?;',
+          [areaId],
+          (_, results) => {
+            const rows = results.rows;
+            const list: ProofPhotosDBProps[] = [];
+            for (let i = 0; i < rows.length; i++) {
+              list.push(rows.item(i));
+            }
+            resolve(list);
+          },
+          (_, error) => {
+            console.error('Erro ao buscar proof photos:', error);
+            reject(error);
+            return true;
+          }
+        );
+      })
+    });
+  };
+
   return { 
     initDB,
     db,
@@ -490,6 +571,9 @@ export function useSQLite() {
     deleteBiodiversity,
     deleteSampling,
     fetchHistoryInspections,
-    deleteArea
+    deleteArea,
+    addProofPhoto,
+    deleteProofPhoto,
+    fetchProofPhotosArea
   };
 }

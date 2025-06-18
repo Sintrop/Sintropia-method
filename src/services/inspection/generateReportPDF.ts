@@ -10,7 +10,6 @@ interface GenerateReportPDFProps {
   trees: TreeDBProps[];
   areaSize: string;
   coordinates: CoordinateProps[];
-  proofPhoto: string;
 }
 
 const styleHTML = `
@@ -97,8 +96,7 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
     biodiversity,
     trees,
     areaSize,
-    coordinates,
-    proofPhoto
+    coordinates
   } = props;
 
   const htmlContent = `
@@ -111,11 +109,6 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
         <p>${areaName}</p>
 
         <div class="div-flex-row">
-          <img
-            src="${proofPhoto}"
-            class="map-img"
-          />
-
           <div class="map-coordinates-box">
             <p>Area size: ${areaSize}</p>
             ${listCoordinates(coordinates)}

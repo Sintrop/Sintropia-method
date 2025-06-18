@@ -42,3 +42,9 @@ export interface TreeDBProps {
   samplingId: number;
   coordinate: string;
 }
+
+export interface ProofPhotosDBProps {
+  id: number;
+  photo: string;
+  areaId: number;
+}

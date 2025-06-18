@@ -3,21 +3,19 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Image,
-  Alert,
-  Platform,
-  PermissionsAndroid,
+  Alert
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '../../../components/Screen/Screen';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { InspectionStackParamsList } from '../../../routes/InspectionRoutes';
-import { CameraComponent } from '../../../components/Camera/Camera';
 import { useInspectionContext } from '../../../hooks/useInspectionContext';
 import { useSQLite } from '../../../hooks/useSQLite';
 import { HeaderInspectionMode } from '../components/HeaderInspectionMode';
 import { FinishInspection } from './components/FinishInspection/FinishInspection';
 import { DeleteInspection } from './components/DeleteInspection/DeleteInspection';
+import { usePermissions } from '../../../hooks/usePermissions';
+import { ProofPhotos } from './components/ProofPhotos/ProofPhotos';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -27,41 +25,12 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
   const { collectionMethod } = route.params;
   const { t } = useTranslation();
   const { areaOpened } = useInspectionContext();
-  const { updateProofPhoto, fetchSampligsArea } = useSQLite();
-  const [showCamera, setShowCamera] = useState(false);
-  const [proofPhoto, setProofPhoto] = useState('');
-  const [hasGpsPermission, setHasGpsPermission] = useState<boolean>(false);
+  const { fetchSampligsArea } = useSQLite();
+  const { checkLocationPermission, locationStatus, requestLocationPermission } = usePermissions();
 
-  //TODO: Get permission location and disable btn inpsection when not location available]
   useEffect(() => {
-    requestLocationPermissions();
+    checkLocationPermission();
   }, []);
-
-  useEffect(() => {
-    getProofPhoto();
-  }, [areaOpened]);
-
-  async function requestLocationPermissions() {
-    if (Platform.OS === 'android') {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      );
-      const hasPermission = granted === PermissionsAndroid.RESULTS.GRANTED;
-      setHasGpsPermission(hasPermission);
-      return hasPermission;
-    }
-  }
-
-  function getProofPhoto() {
-    if (!areaOpened) return;
-    setProofPhoto(areaOpened?.proofPhoto);
-  }
-
-  function handleUpdateProofPhoto(uri: string) {
-    if (!areaOpened) return;
-    setProofPhoto(uri);
-    updateProofPhoto(uri, areaOpened?.id);
-  }
 
   async function handleGoToInspectionManual() {
     if (!areaOpened) return;
@@ -102,21 +71,14 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
 
   function handleGoToReport(): void {
     if (!areaOpened) return;
-    if (proofPhoto === '') {
-      Alert.alert(t('atention', t('youNeedToTakeTheProofPhoto')));
-      return;
-    }
 
     navigation.navigate('ReportScreen', {
       collectionMethod,
-      area: {
-        ...areaOpened,
-        proofPhoto,
-      },
+      area: areaOpened
     });
   }
 
-  if (!hasGpsPermission) {
+  if (locationStatus !== 'granted') {
     return (
       <Screen screenTitle={t('areaInspection')}>
         <View className="items-center justify-center">
@@ -131,7 +93,7 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
 
           <TouchableOpacity
             className="mt-10 w-fit px-10 h-10 rounded-2xl bg-blue-500 items-center justify-center"
-            onPress={requestLocationPermissions}
+            onPress={requestLocationPermission}
           >
             <Text className="text-white font-semibold">
               {t('givePermission')}
@@ -152,20 +114,7 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
 
       <HeaderInspectionMode />
 
-      <TouchableOpacity
-        className="w-full px-5 min-h-10 rounded-2xl border py-3 mt-5"
-        onPress={() => setShowCamera(true)}
-      >
-        <Text className="font-semibold text-black">{t('proofPhoto')}</Text>
-
-        {proofPhoto !== '' && (
-          <Image
-            source={{ uri: proofPhoto }}
-            className="w-20 h-20 rounded-2xl"
-            resizeMode="cover"
-          />
-        )}
-      </TouchableOpacity>
+      <ProofPhotos />
 
       {collectionMethod === 'manual' && (
         <TouchableOpacity
@@ -207,17 +156,10 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
 
       <FinishInspection
         areaId={areaOpened?.id as number}
-        disabled={proofPhoto === ''}
+        disabled={false}
       />
 
       <DeleteInspection areaId={areaOpened?.id as number} />
-
-      {showCamera && (
-        <CameraComponent
-          close={() => setShowCamera(false)}
-          photo={handleUpdateProofPhoto}
-        />
-      )}
     </Screen>
   );
 }

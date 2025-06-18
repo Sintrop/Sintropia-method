@@ -17,6 +17,7 @@ import {
 } from 'react-native-vision-camera';
 import type { CameraDevice } from 'react-native-vision-camera';
 import { Icon } from '../Icon/Icon';
+import { usePermissions } from '../../hooks/usePermissions';
 
 interface Props {
   close: () => void;
@@ -25,7 +26,6 @@ interface Props {
 
 export function CameraComponent({ close, photo }: Props) {
   const { t } = useTranslation();
-  const [hasPermission, setHasPermission] = useState(false);
   const camera = useRef<Camera>(null);
   const devices = useCameraDevices();
   const backCamera: CameraDevice | undefined = devices.find(
@@ -37,12 +37,11 @@ export function CameraComponent({ close, photo }: Props) {
   const [imagePreview, setImagePreview] = useState<string>();
   const [loadingTake, setLoadingTake] = useState<boolean>(false);
   const [camToUse, setCamToUse] = useState<'front' | 'back'>('back');
+  const { cameraStatus, checkCameraPermission, requestCameraPermission } =
+    usePermissions();
 
   useEffect(() => {
-    (async () => {
-      const status = await Camera.requestCameraPermission();
-      setHasPermission(status === 'granted');
-    })();
+    checkCameraPermission();
   }, []);
 
   async function handleTakePhoto() {
@@ -71,7 +70,35 @@ export function CameraComponent({ close, photo }: Props) {
     if (camToUse === 'front') setCamToUse('back');
   }
 
-  if (!backCamera || !hasPermission) {
+  if (cameraStatus !== 'granted') {
+    return (
+      <ModalContainer close={close} closeIconBlack>
+        <View className="items-center justify-center h-screen p-5">
+          <Text className="text-black text-center mt-10 font-semibold">
+            {t('weNeedYourCameraPermission')}
+          </Text>
+          <Text className="text-black text-center mt-1">
+            {t('descWeNeedYourCameraPermission')}
+          </Text>
+
+          <TouchableOpacity
+            className="mt-10 w-fit px-10 h-10 rounded-2xl bg-blue-500 items-center justify-center"
+            onPress={requestCameraPermission}
+          >
+            <Text className="text-white font-semibold">
+              {t('givePermission')}
+            </Text>
+          </TouchableOpacity>
+
+          <Text className="text-gray-500 text-xs text-center mt-5">
+            {t('helpGiveCameraPermission')}
+          </Text>
+        </View>
+      </ModalContainer>
+    );
+  }
+
+  if (!backCamera) {
     return (
       <ModalContainer close={close}>
         <View className="w-screen h-screen items-center justify-center">
@@ -139,10 +166,7 @@ export function CameraComponent({ close, photo }: Props) {
         <TouchableOpacity
           className="w-10 h-10 ml-10 bg-white rounded-full items-center justify-center"
           onPress={handleSwitchCam}
-        >
-          
-        </TouchableOpacity>
-
+        ></TouchableOpacity>
       </View>
     </ModalContainer>
   );
@@ -151,8 +175,9 @@ export function CameraComponent({ close, photo }: Props) {
 interface ModalContainerProps {
   children: ReactNode;
   close: () => void;
+  closeIconBlack?: boolean;
 }
-function ModalContainer({ children, close }: ModalContainerProps) {
+function ModalContainer({ children, close, closeIconBlack }: ModalContainerProps) {
   return (
     <Modal
       visible={true}
@@ -165,7 +190,7 @@ function ModalContainer({ children, close }: ModalContainerProps) {
           onPress={close}
           className="absolute top-5 right-5 z-20"
         >
-          <Icon name="close" size={30} color="white" />
+          <Icon name="close" size={30} color={closeIconBlack ? 'black' : 'white'} />
         </TouchableOpacity>
         {children}
       </View>
@@ -192,7 +217,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   captureButton: {
     alignSelf: 'center',

@@ -104,6 +104,22 @@
     "creatingPDF": "Creating PDF",
     "youAreOutsideTheCollectionArea": "You are outside the collection area",
     "subtitle": "Subtitle",
-    "youHaveAnOpenedInspection": "You have an opened inspection"
+    "youHaveAnOpenedInspection": "You have an opened inspection",
+    "weNeedYourCameraPermission": "We need your camera permission",
+    "descWeNeedYourCameraPermission": "During the inspection it is necessary to take some photos with your camera.",
+    "helpGiveCameraPermission": "If nothing happens when you tap the button, go to your device's settings -> apps -> Syntropy -> Permissions. And enable the camera permission.",
+    "selectStepScreen": {
+      "proofPhotos": "Proof photos",
+      "registerPhotoWithRegenerator": "Register photo with regenerator",
+      "registerMorePhotosOfArea": "Register more photos of area",
+      "touchToRegister": "Touch to register",
+      "textConfirmDeletePhoto": "Do you want to delete this photo?",
+      "deletePhoto": "Delete photo"
+    },
+    "reportScreen": {
+      "inspectionReport": "Inspection report",
+      "proofPhotosReport": "Proof photos report",
+      "share": "Share"
+    }
   }
 }
