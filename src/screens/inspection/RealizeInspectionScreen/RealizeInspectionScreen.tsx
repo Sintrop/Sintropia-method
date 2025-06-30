@@ -32,7 +32,6 @@ import {
 import { BiodiversityList } from './components/BiodiversityList/BiodiversityList';
 import { Header } from '../../../components/Header/Header';
 import { TreesList } from './components/TreesList/TreesList';
-import { Icon } from '../../../components/Icon/Icon';
 import { circle } from '@turf/turf';
 import { useLocation } from '../../../hooks/useLocation';
 import { isPointInPolygon } from '../../../services/inspection/isPointInPolygon';
@@ -40,12 +39,14 @@ import { isPointInCircle } from '../../../services/inspection/isPointInCircle';
 import { SamplingIndicator } from './components/SamplingIndicator/SamplingIndicator';
 import { OutsideTheCollectionArea } from './components/OutsideTheCollectionArea';
 import { Subtitle } from './components/Subtitle';
+import { useSafeAreaApp } from '../../../hooks/useSafeAreaApp';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
   'RealizeInspectionScreen'
 >;
 export function RealizeInspectionScreen({ route }: ScreenProps) {
+  const { top } = useSafeAreaApp();
   const { collectionMethod, sampling, collectOnlyBio } = route.params;
   const {
     fetchBiodiversityByAreaId,
@@ -189,7 +190,7 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
   }
 
   return (
-    <View>
+    <View style={{ paddingTop: top }}>
       <Header screenTitle={t('realizeInspection')} showBackButton />
       <View style={{ position: 'relative' }}>
         <View className="absolute top-9 left-0 w-full px-5 z-20">
