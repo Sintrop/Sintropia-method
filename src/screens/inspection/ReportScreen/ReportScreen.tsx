@@ -212,6 +212,9 @@ export function ReportScreen({ route }: ScreenProps) {
       trees: newListTrees,
       coordinates: coordinatesArea,
       areaSize: `${Intl.NumberFormat('pt-BR').format(areaSize)} m²`,
+      regenerator: {
+        address: area.regeneratorAddress
+      }
     });
 
     return pdfUri;
@@ -276,6 +279,9 @@ export function ReportScreen({ route }: ScreenProps) {
       samplings: newListSamplings,
       coordinates: coordinatesArea,
       areaSize: `${Intl.NumberFormat('pt-BR').format(areaSize)} m²`,
+      regenerator: {
+        address: area.regeneratorAddress
+      }
     });
 
     return pdfUri;
@@ -382,7 +388,7 @@ export function ReportScreen({ route }: ScreenProps) {
   return (
     <Screen screenTitle={t('report')} showBackButton scrollable>
       <Text className="font-bold text-black text-lg mt-5">
-        {t('finalResult')}
+        {t('justificationReport')}
       </Text>
       <Text className="text-gray-500">{area?.name}</Text>
 

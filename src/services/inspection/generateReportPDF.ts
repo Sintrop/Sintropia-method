@@ -10,6 +10,9 @@ interface GenerateReportPDFProps {
   trees: TreeDBProps[];
   areaSize: string;
   coordinates: CoordinateProps[];
+  regenerator: {
+    address?: string;
+  }
 }
 
 const styleHTML = `
@@ -96,7 +99,8 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
     biodiversity,
     trees,
     areaSize,
-    coordinates
+    coordinates,
+    regenerator
   } = props;
 
   const htmlContent = `
@@ -105,8 +109,11 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
         ${styleHTML}
       </head>
       <body>
-        <h1>Final Result</h1>
+        <h1>Justification Report</h1>
         <p>${areaName}</p>
+
+        <h2>Regenerator Address</h2>
+        <p>${regenerator.address}</p>
 
         <div class="div-flex-row">
           <div class="map-coordinates-box">

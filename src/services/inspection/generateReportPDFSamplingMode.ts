@@ -17,6 +17,9 @@ interface GenerateReportPDFProps {
   samplings: SamplingPDFProps[];
   areaSize: string;
   coordinates: CoordinateProps[];
+  regenerator: {
+    address?: string;
+  }
 }
 
 const styleHTML = `
@@ -144,6 +147,7 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
     samplings,
     areaSize,
     coordinates,
+    regenerator
   } = props;
 
   const htmlContent = `
@@ -152,8 +156,11 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
         ${styleHTML}
       </head>
       <body>
-        <h1>Final Result</h1>
+        <h1>Justification Report</h1>
         <p>${areaName}</p>
+
+        <h1>Regenerator Address</h1>
+        <p>${regenerator.address}</p>
 
         <div class="div-flex-row">
           <div class="map-coordinates-box">

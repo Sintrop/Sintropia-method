@@ -156,11 +156,11 @@ export function ProofPhotos() {
         >
           <View className="p-5 bg-white rounded-t-3xl">
             <Text className="font-semibold text-lg text-center text-black">
-              {t('select')}
+              {t('selectStepScreen.selectPhotoSource')}
             </Text>
 
             <Text className="mt-5 text-black">
-              {t('textConfirmSelectOriginPhoto')}
+              {t('selectStepScreen.textConfirmSelectPhotoSource')}
             </Text>
 
             <View className="mt-10 mb-5 flex-row items-center justify-center">
@@ -169,7 +169,7 @@ export function ProofPhotos() {
                 className="w-20 h-20 items-center justify-center rounded-2xl bg-gray-300"
               >
                 <Text className="text-black font-semibold">
-                  {t('gallery')}
+                  {t('selectStepScreen.gallery')}
                 </Text>
               </TouchableOpacity>
 
@@ -177,7 +177,7 @@ export function ProofPhotos() {
                 onPress={() => setShowCamera(true)}
                 className="w-20 h-20 items-center justify-center rounded-2xl bg-gray-300 ml-10"
               >
-                <Text className="text-black font-semibold">{t('camera')}</Text>
+                <Text className="text-black font-semibold">{t('selectStepScreen.camera')}</Text>
               </TouchableOpacity>
             </View>
           </View>

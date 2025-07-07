@@ -115,12 +115,17 @@
       "registerMorePhotosOfArea": "Registre mais fotos da área",
       "touchToRegister": "Toque para registrar",
       "textConfirmDeletePhoto": "Você quer excluir essa foto?",
-      "deletePhoto": "Excluir foto"
+      "deletePhoto": "Excluir foto",
+      "selectPhotoSource": "Selecionar origem da imagem",
+      "textConfirmSelectPhotoSource": "Escolha se você quer tirar uma foto ou selecionar da galeria do seu dispositivo",
+      "gallery": "Galeria",
+      "camera": "Câmera"
     },
     "reportScreen": {
       "inspectionReport": "Relatório da inspeção",
       "proofPhotosReport": "Relatório das fotos de prova",
-      "share": "Compartilhar"
+      "share": "Compartilhar",
+      "justificationReport": "Relatório de justificativa"
     }
   }
 }
