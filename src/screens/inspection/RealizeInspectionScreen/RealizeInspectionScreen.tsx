@@ -46,7 +46,7 @@ type ScreenProps = NativeStackScreenProps<
   'RealizeInspectionScreen'
 >;
 export function RealizeInspectionScreen({ route }: ScreenProps) {
-  const { top } = useSafeAreaApp();
+  const { top, bottom } = useSafeAreaApp();
   const { collectionMethod, sampling, collectOnlyBio } = route.params;
   const {
     fetchBiodiversityByAreaId,
@@ -190,7 +190,7 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
   }
 
   return (
-    <View style={{ paddingTop: top }}>
+    <View style={{ paddingTop: top, position: 'relative' }}>
       <Header screenTitle={t('realizeInspection')} showBackButton />
       <View style={{ position: 'relative' }}>
         <View className="absolute top-9 left-0 w-full px-5 z-20">
@@ -269,7 +269,7 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
         <View
           style={{
             position: 'absolute',
-            top: height - 220,
+            top: height - 250 - bottom,
             right: 20,
             alignItems: 'flex-end',
           }}
