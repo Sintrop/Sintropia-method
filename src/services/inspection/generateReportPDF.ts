@@ -112,7 +112,7 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
         <h1>Justification Report</h1>
         <p>${areaName}</p>
 
-        <h2>Regenerator Address</h2>
+        <p>Regenerator Address:</p>
         <p>${regenerator.address}</p>
 
         <div class="div-flex-row">

@@ -159,7 +159,7 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
         <h1>Justification Report</h1>
         <p>${areaName}</p>
 
-        <h1>Regenerator Address</h1>
+        <p>Regenerator Address:</p>
         <p>${regenerator.address}</p>
 
         <div class="div-flex-row">
