@@ -9,6 +9,7 @@ import {
   Modal,
   Image,
   Alert,
+  Platform,
 } from 'react-native';
 import {
   Camera,
@@ -18,6 +19,7 @@ import {
 import type { CameraDevice } from 'react-native-vision-camera';
 import { Icon } from '../Icon/Icon';
 import { usePermissions } from '../../hooks/usePermissions';
+import { useSafeAreaApp } from '../../hooks/useSafeAreaApp';
 
 interface Props {
   close: () => void;
@@ -85,9 +87,7 @@ export function CameraComponent({ close, photo }: Props) {
             className="mt-10 w-fit px-10 h-10 rounded-2xl bg-blue-500 items-center justify-center"
             onPress={requestCameraPermission}
           >
-            <Text className="text-white font-semibold">
-              {t('givePermission')}
-            </Text>
+            <Text className="text-white font-semibold">{t('continue')}</Text>
           </TouchableOpacity>
 
           <Text className="text-gray-500 text-xs text-center mt-5">
@@ -177,7 +177,11 @@ interface ModalContainerProps {
   close: () => void;
   closeIconBlack?: boolean;
 }
-function ModalContainer({ children, close, closeIconBlack }: ModalContainerProps) {
+function ModalContainer({
+  children,
+  close,
+  closeIconBlack,
+}: ModalContainerProps) {
   return (
     <Modal
       visible={true}
@@ -188,9 +192,15 @@ function ModalContainer({ children, close, closeIconBlack }: ModalContainerProps
       <View className="flex-1 bg-white relative">
         <TouchableOpacity
           onPress={close}
-          className="absolute top-5 right-5 z-20"
+          className={`absolute right-5 z-20 ${
+            Platform.OS === 'android' ? 'top-5' : 'top-14'
+          }`}
         >
-          <Icon name="close" size={30} color={closeIconBlack ? 'black' : 'white'} />
+          <Icon
+            name="close"
+            size={30}
+            color={closeIconBlack ? 'black' : 'white'}
+          />
         </TouchableOpacity>
         {children}
       </View>
