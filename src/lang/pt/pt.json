@@ -1,5 +1,8 @@
 {
   "translation": {
+    "homeScreen": {
+      "privacyPolicy": "Política de privacidade"
+    },
     "helloWorld": "Olá Mundo!!!",
     "whichAreaDoYouWantToInspect": "Qual área você quer inspecionar?",
     "overview": "Visão geral",

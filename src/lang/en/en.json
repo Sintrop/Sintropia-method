@@ -1,5 +1,8 @@
 {
   "translation": {
+    "homeScreen": {
+      "privacyPolicy": "Privacy policy"
+    },
     "whichAreaDoYouWantToInspect": "Which Area Do You Want To Inspect?",
     "selectInspection": "Select inspection",
     "seeYourAreasAlreadyInspected": "See your areas already inspected",
