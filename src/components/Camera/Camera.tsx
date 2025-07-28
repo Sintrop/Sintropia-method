@@ -19,7 +19,6 @@ import {
 import type { CameraDevice } from 'react-native-vision-camera';
 import { Icon } from '../Icon/Icon';
 import { usePermissions } from '../../hooks/usePermissions';
-import { useSafeAreaApp } from '../../hooks/useSafeAreaApp';
 
 interface Props {
   close: () => void;
@@ -39,11 +38,10 @@ export function CameraComponent({ close, photo }: Props) {
   const [imagePreview, setImagePreview] = useState<string>();
   const [loadingTake, setLoadingTake] = useState<boolean>(false);
   const [camToUse, setCamToUse] = useState<'front' | 'back'>('back');
-  const { cameraStatus, checkCameraPermission, requestCameraPermission } =
-    usePermissions();
+  const { requestCameraPermission } = usePermissions();
 
   useEffect(() => {
-    checkCameraPermission();
+    requestCameraPermission();
   }, []);
 
   async function handleTakePhoto() {
@@ -72,31 +70,31 @@ export function CameraComponent({ close, photo }: Props) {
     if (camToUse === 'front') setCamToUse('back');
   }
 
-  if (cameraStatus !== 'granted') {
-    return (
-      <ModalContainer close={close} closeIconBlack>
-        <View className="items-center justify-center h-screen p-5">
-          <Text className="text-black text-center mt-10 font-semibold">
-            {t('weNeedYourCameraPermission')}
-          </Text>
-          <Text className="text-black text-center mt-1">
-            {t('descWeNeedYourCameraPermission')}
-          </Text>
+  // if (cameraStatus !== 'granted') {
+  //   return (
+  //     <ModalContainer close={close} closeIconBlack>
+  //       <View className="items-center justify-center h-screen p-5">
+  //         <Text className="text-black text-center mt-10 font-semibold">
+  //           {t('weNeedYourCameraPermission')}
+  //         </Text>
+  //         <Text className="text-black text-center mt-1">
+  //           {t('descWeNeedYourCameraPermission')}
+  //         </Text>
 
-          <TouchableOpacity
-            className="mt-10 w-fit px-10 h-10 rounded-2xl bg-blue-500 items-center justify-center"
-            onPress={requestCameraPermission}
-          >
-            <Text className="text-white font-semibold">{t('continue')}</Text>
-          </TouchableOpacity>
+  //         <TouchableOpacity
+  //           className="mt-10 w-fit px-10 h-10 rounded-2xl bg-blue-500 items-center justify-center"
+  //           onPress={requestCameraPermission}
+  //         >
+  //           <Text className="text-white font-semibold">{t('continue')}</Text>
+  //         </TouchableOpacity>
 
-          <Text className="text-gray-500 text-xs text-center mt-5">
-            {t('helpGiveCameraPermission')}
-          </Text>
-        </View>
-      </ModalContainer>
-    );
-  }
+  //         <Text className="text-gray-500 text-xs text-center mt-5">
+  //           {t('helpGiveCameraPermission')}
+  //         </Text>
+  //       </View>
+  //     </ModalContainer>
+  //   );
+  // }
 
   if (!backCamera) {
     return (

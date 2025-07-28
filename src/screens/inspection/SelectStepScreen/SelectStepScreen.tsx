@@ -11,7 +11,6 @@ import { FinishInspection } from './components/FinishInspection/FinishInspection
 import { DeleteInspection } from './components/DeleteInspection/DeleteInspection';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { ProofPhotos } from './components/ProofPhotos/ProofPhotos';
-import { useResetNavigation } from '../../../hooks/useResetNavigation';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -22,12 +21,10 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
   const { t } = useTranslation();
   const { areaOpened } = useInspectionContext();
   const { fetchSampligsArea } = useSQLite();
-  const { resetToTutorialScreen } = useResetNavigation();
-  const { checkLocationPermission, locationStatus, requestLocationPermission } =
-    usePermissions();
+  const { requestLocationPermission } = usePermissions();
 
   useEffect(() => {
-    checkLocationPermission();
+    requestLocationPermission();
   }, []);
 
   async function handleGoToInspectionManual() {
@@ -76,40 +73,40 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
     });
   }
 
-  if (locationStatus !== 'granted') {
-    return (
-      <Screen screenTitle={t('areaInspection')}>
-        <View className="items-center justify-center">
-          <HeaderInspectionMode />
+  // if (locationStatus !== 'granted') {
+  //   return (
+  //     <Screen screenTitle={t('areaInspection')}>
+  //       <View className="items-center justify-center">
+  //         <HeaderInspectionMode />
 
-          <Text className="text-black text-center mt-10 font-semibold">
-            {t('weNeedYourGPSPermission')}
-          </Text>
-          <Text className="text-black text-center mt-1">
-            {t('descWeNeedYourGPSPermission')}
-          </Text>
+  //         <Text className="text-black text-center mt-10 font-semibold">
+  //           {t('weNeedYourGPSPermission')}
+  //         </Text>
+  //         <Text className="text-black text-center mt-1">
+  //           {t('descWeNeedYourGPSPermission')}
+  //         </Text>
 
-          <TouchableOpacity
-            className="mt-10 w-fit px-10 h-10 rounded-2xl bg-blue-500 items-center justify-center"
-            onPress={requestLocationPermission}
-          >
-            <Text className="text-white font-semibold">{t('continue')}</Text>
-          </TouchableOpacity>
+  //         <TouchableOpacity
+  //           className="mt-10 w-fit px-10 h-10 rounded-2xl bg-blue-500 items-center justify-center"
+  //           onPress={requestLocationPermission}
+  //         >
+  //           <Text className="text-white font-semibold">{t('continue')}</Text>
+  //         </TouchableOpacity>
 
-          <TouchableOpacity
-            className="mt-3 w-fit px-10 h-10 rounded-2xl items-center justify-center"
-            onPress={resetToTutorialScreen}
-          >
-            <Text className="text-black font-semibold">{t('back')}</Text>
-          </TouchableOpacity>
+  //         <TouchableOpacity
+  //           className="mt-3 w-fit px-10 h-10 rounded-2xl items-center justify-center"
+  //           onPress={resetToTutorialScreen}
+  //         >
+  //           <Text className="text-black font-semibold">{t('back')}</Text>
+  //         </TouchableOpacity>
 
-          <Text className="text-gray-500 text-xs text-center mt-5">
-            {t('helpGivePermission')}
-          </Text>
-        </View>
-      </Screen>
-    );
-  }
+  //         <Text className="text-gray-500 text-xs text-center mt-5">
+  //           {t('helpGivePermission')}
+  //         </Text>
+  //       </View>
+  //     </Screen>
+  //   );
+  // }
 
   return (
     <Screen screenTitle={t('areaInspection')} scrollable>
