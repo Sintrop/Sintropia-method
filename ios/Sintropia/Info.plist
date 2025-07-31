@@ -17,11 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.5</string>
+	<string>1.0.6</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>5</string>
+	<string>6</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -46,13 +46,13 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Show current location on map.</string>
+	<string>The location is used to register the trees and biodiversity coordinate points and to help you get located at the map.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Your location is used to perform inspections.</string>
+	<string>The location is used to register the trees and biodiversity coordinate points and to help you get located at the map.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Your location is used to perform inspections.</string>
+	<string>The location is used to register the trees and biodiversity coordinate points and to help you get located at the map.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Your camera is used to take photos and to perform inspections.
+	<string>Your camera is used to take photos of the trees to perform inspections.
 </string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Your photo library is used if you want to upload a photo to the report.</string>
