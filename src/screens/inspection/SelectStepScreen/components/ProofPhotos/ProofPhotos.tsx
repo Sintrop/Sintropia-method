@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Portal } from 'react-native-portalize';
+import { Modalize } from 'react-native-modalize';
+import { launchImageLibrary } from 'react-native-image-picker';
 import { useInspectionContext } from '../../../../../hooks/useInspectionContext';
 import { useSQLite } from '../../../../../hooks/useSQLite';
 import { useTranslation } from 'react-i18next';
@@ -7,12 +10,17 @@ import { CameraComponent } from '../../../../../components/Camera/Camera';
 import { ProofPhotosDBProps } from '../../../../../types/database';
 import { ProofPhotoItem } from './ProofPhotoItem';
 
-
 export function ProofPhotos() {
+  const modalChoosePhoto = useRef<Modalize>(null);
   const { t } = useTranslation();
   const { areaOpened } = useInspectionContext();
-  const { updateProofPhoto, fetchProofPhotosArea, addProofPhoto, db, initDB, deleteProofPhoto } =
-    useSQLite();
+  const {
+    updateProofPhoto,
+    fetchProofPhotosArea,
+    addProofPhoto,
+    db,
+    initDB
+  } = useSQLite();
   const [showCamera, setShowCamera] = useState(false);
   const [proofPhoto, setProofPhoto] = useState('');
   const [proofPhotos, setProofPhotos] = useState<ProofPhotosDBProps[]>([]);
@@ -42,12 +50,19 @@ export function ProofPhotos() {
 
   function handleTakeProofPhoto() {
     setRegisterType('proof-photo');
-    setShowCamera(true);
+    modalChoosePhoto.current?.open();
   }
 
   function handleTakeProofPhotos() {
     setRegisterType('proof-photos');
-    setShowCamera(true);
+    modalChoosePhoto.current?.open();
+  }
+
+  async function handlePickImage(): Promise<void> {
+    const result = await launchImageLibrary({ mediaType: 'photo' });
+    if (result.assets) {
+      photoTaked(result.assets[0].uri as string);
+    }
   }
 
   async function photoTaked(uri: string) {
@@ -55,6 +70,7 @@ export function ProofPhotos() {
       if (!areaOpened) return;
       setProofPhoto(uri);
       await updateProofPhoto(uri, areaOpened?.id);
+      modalChoosePhoto.current?.close();
     }
 
     if (registerType === 'proof-photos') {
@@ -65,6 +81,7 @@ export function ProofPhotos() {
       });
       const response = await fetchProofPhotosArea(areaOpened.id);
       setProofPhotos(response);
+      modalChoosePhoto.current?.close();
     }
   }
 
@@ -104,7 +121,11 @@ export function ProofPhotos() {
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {proofPhotos.map((item, index) => (
-            <ProofPhotoItem photo={item} proofPhotoDeleted={getProofPhotos} key={index} />
+            <ProofPhotoItem
+              photo={item}
+              proofPhotoDeleted={getProofPhotos}
+              key={index}
+            />
           ))}
 
           {proofPhotos.length < 10 && (
@@ -126,6 +147,42 @@ export function ProofPhotos() {
           photo={photoTaked}
         />
       )}
+
+      <Portal>
+        <Modalize
+          ref={modalChoosePhoto}
+          adjustToContentHeight
+          modalStyle={{ backgroundColor: 'transparent' }}
+        >
+          <View className="p-5 bg-white rounded-t-3xl">
+            <Text className="font-semibold text-lg text-center text-black">
+              {t('selectStepScreen.selectPhotoSource')}
+            </Text>
+
+            <Text className="mt-5 text-black">
+              {t('selectStepScreen.textConfirmSelectPhotoSource')}
+            </Text>
+
+            <View className="mt-10 mb-5 flex-row items-center justify-center">
+              <TouchableOpacity
+                onPress={handlePickImage}
+                className="w-20 h-20 items-center justify-center rounded-2xl bg-gray-300"
+              >
+                <Text className="text-black font-semibold">
+                  {t('selectStepScreen.gallery')}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setShowCamera(true)}
+                className="w-20 h-20 items-center justify-center rounded-2xl bg-gray-300 ml-10"
+              >
+                <Text className="text-black font-semibold">{t('selectStepScreen.camera')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modalize>
+      </Portal>
     </View>
   );
 }

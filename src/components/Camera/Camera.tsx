@@ -9,6 +9,7 @@ import {
   Modal,
   Image,
   Alert,
+  Platform,
 } from 'react-native';
 import {
   Camera,
@@ -37,11 +38,10 @@ export function CameraComponent({ close, photo }: Props) {
   const [imagePreview, setImagePreview] = useState<string>();
   const [loadingTake, setLoadingTake] = useState<boolean>(false);
   const [camToUse, setCamToUse] = useState<'front' | 'back'>('back');
-  const { cameraStatus, checkCameraPermission, requestCameraPermission } =
-    usePermissions();
+  const { requestCameraPermission } = usePermissions();
 
   useEffect(() => {
-    checkCameraPermission();
+    requestCameraPermission();
   }, []);
 
   async function handleTakePhoto() {
@@ -70,33 +70,31 @@ export function CameraComponent({ close, photo }: Props) {
     if (camToUse === 'front') setCamToUse('back');
   }
 
-  if (cameraStatus !== 'granted') {
-    return (
-      <ModalContainer close={close} closeIconBlack>
-        <View className="items-center justify-center h-screen p-5">
-          <Text className="text-black text-center mt-10 font-semibold">
-            {t('weNeedYourCameraPermission')}
-          </Text>
-          <Text className="text-black text-center mt-1">
-            {t('descWeNeedYourCameraPermission')}
-          </Text>
+  // if (cameraStatus !== 'granted') {
+  //   return (
+  //     <ModalContainer close={close} closeIconBlack>
+  //       <View className="items-center justify-center h-screen p-5">
+  //         <Text className="text-black text-center mt-10 font-semibold">
+  //           {t('weNeedYourCameraPermission')}
+  //         </Text>
+  //         <Text className="text-black text-center mt-1">
+  //           {t('descWeNeedYourCameraPermission')}
+  //         </Text>
 
-          <TouchableOpacity
-            className="mt-10 w-fit px-10 h-10 rounded-2xl bg-blue-500 items-center justify-center"
-            onPress={requestCameraPermission}
-          >
-            <Text className="text-white font-semibold">
-              {t('givePermission')}
-            </Text>
-          </TouchableOpacity>
+  //         <TouchableOpacity
+  //           className="mt-10 w-fit px-10 h-10 rounded-2xl bg-blue-500 items-center justify-center"
+  //           onPress={requestCameraPermission}
+  //         >
+  //           <Text className="text-white font-semibold">{t('continue')}</Text>
+  //         </TouchableOpacity>
 
-          <Text className="text-gray-500 text-xs text-center mt-5">
-            {t('helpGiveCameraPermission')}
-          </Text>
-        </View>
-      </ModalContainer>
-    );
-  }
+  //         <Text className="text-gray-500 text-xs text-center mt-5">
+  //           {t('helpGiveCameraPermission')}
+  //         </Text>
+  //       </View>
+  //     </ModalContainer>
+  //   );
+  // }
 
   if (!backCamera) {
     return (
@@ -177,7 +175,11 @@ interface ModalContainerProps {
   close: () => void;
   closeIconBlack?: boolean;
 }
-function ModalContainer({ children, close, closeIconBlack }: ModalContainerProps) {
+function ModalContainer({
+  children,
+  close,
+  closeIconBlack,
+}: ModalContainerProps) {
   return (
     <Modal
       visible={true}
@@ -188,9 +190,15 @@ function ModalContainer({ children, close, closeIconBlack }: ModalContainerProps
       <View className="flex-1 bg-white relative">
         <TouchableOpacity
           onPress={close}
-          className="absolute top-5 right-5 z-20"
+          className={`absolute right-5 z-20 ${
+            Platform.OS === 'android' ? 'top-5' : 'top-14'
+          }`}
         >
-          <Icon name="close" size={30} color={closeIconBlack ? 'black' : 'white'} />
+          <Icon
+            name="close"
+            size={30}
+            color={closeIconBlack ? 'black' : 'white'}
+          />
         </TouchableOpacity>
         {children}
       </View>

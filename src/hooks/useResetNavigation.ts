@@ -13,7 +13,15 @@ export function useResetNavigation() {
     });
   };
 
+  function resetToTutorialScreen() {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'TutorialScreen' }]
+    });
+  };
+
   return {
-    resetToSelectStepScreen
+    resetToSelectStepScreen,
+    resetToTutorialScreen
   }
 }
