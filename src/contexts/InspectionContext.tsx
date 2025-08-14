@@ -12,6 +12,7 @@ export interface InspectionContextProps {
   areaOpened: AreaDBProps | undefined;
   finishInspection: (areaId: number) => void;
   deleteAreaInspection: (areaId: number) => void;
+  fetchOpenedAreas: () => void;
 }
 
 interface InspectionProviderProps {
@@ -112,7 +113,8 @@ export function InspectionContextProvider({
         enterInspectionMode,
         finishInspection,
         areaOpened,
-        deleteAreaInspection
+        deleteAreaInspection,
+        fetchOpenedAreas,
       }}
     >
       {children}

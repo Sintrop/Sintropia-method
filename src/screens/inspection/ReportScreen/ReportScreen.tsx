@@ -369,7 +369,6 @@ export function ReportScreen({ route }: ScreenProps) {
         Math.ceil((totalConverted / totalProofPhotos) * 100),
       );
     }
-
     const proofPhoto = await convertImageToBase64({
       uri: area.proofPhoto,
       width: 500,
