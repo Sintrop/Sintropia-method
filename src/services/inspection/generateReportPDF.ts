@@ -1,6 +1,8 @@
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import { BiodiversityDBProps, TreeDBProps } from '../../types/database';
 import { CoordinateProps } from '../../types/regenerator';
+import { LogoBase64 } from '../../data/base64/images';
+import { RCLogoBase64 } from '../../data/base64/images';
 
 interface GenerateReportPDFProps {
   areaName: string;
@@ -20,17 +22,23 @@ const styleHTML = `
     @page { margin-top: 50px; }
     body { font-family: Arial; padding: 20px;}
     h1 { color: #1eb76f; }
-    h3 { color: #1eb76f; margin-top: 50px; }
+    h3 { margin-top: 50px; }
+    h4 { margin: 0px }
     p { margin: 0px }
     img { border-radius: 5px; }
 
     .header-file { width: 100%; display: flex; align-items: center; justify-content: space-between; }
-    .logo-sintropy { width: 100px; height: 100px; background-color: #000; display: flex; }
-    .card-rc { width: 100%; height: 100px; display: flex; flex-direction: row; align-items: center; justify-content: center; background-color: #eee; margin: 50px 0px; }
-
+    .logo-sintropy { width: 200px; height: 70px; object-fit: contain; }
+    .logo-rc { width: 120px; height: 120px; object-fit: contain; }
+    .card-rc { width: 92%; display: flex; align-items: center; justify-content: space-between; background-color: #22CC3F; padding: 30px; margin-top: 30px; margin-bottom: 30px; gap: 50px }
+    .text-center { text-align: center; }
+    .text-limit { max-width: 500px }
+    .margin-vertical-50 { margin: 50px 0 50px 0 };
+    .mt-20 {margin-top: 20px};
+    .div-col-center { display: flex; flex-direction: column; align-items: center; width: 100% };
 
     .map-img { width: 100px; height: 100px; border-radius: 16px; object-fit: cover; }
-    .map-coordinates-box { display: flex; flex-direction: column; }
+    .map-coordinates-box { display: flex; flex-direction: column; margin-bottom: 30px; }
     .div-flex-row { display: flex; flex-direction: row; gap: 20px; margin-top: 20px; }
     .card-count { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; border: 2px solid #000; width: 120px; height: 100px;}
     .card_p { font-weight: bold; color: black; font-size: 30px; } 
@@ -116,7 +124,10 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
       </head>
       <body>
         <div class="header-file">
-          <div class="logo-sintropy"></div>
+          <img
+            src="${LogoBase64}"
+            class="logo-sintropy"
+          />
 
           <div class="div-flex-row">
             <div class="card-count">
@@ -135,26 +146,35 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
           </div>
         </div>
 
-        <div style={ display: flex; flex-direction: row; }>
-          <div class="logo-sintropy"></div>
-          <p>Text description rc method</p>
+        
+        <div class="card-rc">
+          <img
+            src="${RCLogoBase64}"
+            class="logo-rc"
+          />
+          <p class="text-center text-limit">
+            This resport was automatically generated using Sintropia Method version. It is designed
+            to help inspectors to perform the Regeneration Credit inspections. The goal is to measure how many tress
+            over 1m high and 3cm of diameter there is on the regeneration area, and of how many different species.
+          </p>
         </div>
+        
+        <h4 class"text-center">${areaName}</h4>
+        <p class"text-center">Generated on: 12/08/2025</p>
 
-        <h1>Justification Report</h1>
-
-        <p>${areaName}</p>
-
-        <p>Regenerator Address:</p>
+        <h2 class="text-center">Regenerator Data</h2>
+        <h4>Regenerator Address:</h4>
         <p>${regenerator.address}</p>
 
         <div class="div-flex-row">
           <div class="map-coordinates-box">
-            <p>Area size: ${areaSize}</p>
+            <h4>Area size: ${areaSize}</h4>
             ${listCoordinates(coordinates)}
           </div>
         </div>
         
-        <h3>Biodiversity</h3>
+        <h2 class="text-center mt-20">Justification Report</h2>
+        <h3 class="mt-20">Biodiversity</h3>
         <div class="div-flex-wrap">
           ${listBiodiversity(biodiversity)}
         </div>
