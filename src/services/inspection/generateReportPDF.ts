@@ -32,7 +32,7 @@ const styleHTML = `
     .header-file { width: 100%; display: flex; align-items: center; justify-content: space-between; }
     .logo-sintropy { width: 200px; height: 70px; object-fit: contain; }
     .logo-rc { width: 120px; height: 120px; object-fit: contain; }
-    .card-rc { width: 92%; display: flex; align-items: center; justify-content: space-between; background-color: #22CC3F; padding: 30px; margin-top: 30px; margin-bottom: 30px; gap: 50px }
+    .card-rc { width: 92%; display: flex; align-items: center; justify-content: space-between; background-color: #F0FFF0; padding: 30px; margin-top: 30px; margin-bottom: 30px; gap: 50px }
     .text-center { text-align: center; }
     .text-limit { max-width: 500px }
     .margin-vertical-50 { margin: 50px 0 50px 0 };

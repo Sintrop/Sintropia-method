@@ -386,6 +386,11 @@ export function ReportScreen({ route }: ScreenProps) {
       areaSize: `${Intl.NumberFormat('pt-BR').format(areaSize)} m²`,
       proofPhotos: newListPhotos,
       proofPhoto,
+      regenerator: {
+        address: area.regeneratorAddress,
+      },
+      date: format(new Date(), 'dd/MM/yyyy'),
+      version: '1',
     });
 
     return pdfUri;
