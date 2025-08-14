@@ -2,6 +2,8 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import { BiodiversityDBProps, TreeDBProps } from '../../types/database';
 import { CoordinateProps } from '../../types/regenerator';
 import { calculateAreaCircle } from './calculateAreaCircle';
+import { LogoBase64 } from '../../data/base64/images';
+import { RCLogoBase64 } from '../../data/base64/images';
 
 export interface SamplingPDFProps {
   samplingNumber: number;
@@ -19,7 +21,9 @@ interface GenerateReportPDFProps {
   coordinates: CoordinateProps[];
   regenerator: {
     address?: string;
-  }
+  },
+  date: string;
+  version: string;
 }
 
 const styleHTML = `
@@ -28,12 +32,25 @@ const styleHTML = `
     body { font-family: Arial; padding: 20px; }
     h1 { color: #1eb76f; }
     h3 { color: #1eb76f; margin-top: 50px; }
+    h4 { margin: 0px }
     p { margin: 0px }
     img { border-radius: 5px; }
+
+
+    .header-file { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+    .logo-sintropy { width: 200px; height: 70px; object-fit: contain; }
+    .logo-rc { width: 120px; height: 120px; object-fit: contain; }
+    .card-rc { width: 92%; display: flex; align-items: center; justify-content: space-between; background-color: #22CC3F; padding: 30px; margin-top: 30px; margin-bottom: 30px; gap: 50px }
+    .text-center { text-align: center; }
+    .text-limit { max-width: 500px }
+    .margin-vertical-50 { margin: 50px 0 50px 0 };
+    .mt-20 {margin-top: 20px};
+    .div-col { display: flex; flex-direction: column; };
+
     .map-img { width: 100px; height: 100px; border-radius: 16px; object-fit: cover; }
     .map-coordinates-box { display: flex; flex-direction: column; }
     .div-flex-row { display: flex; flex-direction: row; gap: 20px; margin-top: 20px; margin-bottom: 20px; }
-    .card-count { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; background-color: #eee; width: 200px; padding-vertical: 10px;}
+    .card-count { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; border: 2px solid #000; width: 120px; height: 100px;}
     .card_p { font-weight: bold; color: black; font-size: 30px; }
     .sampling-item { display: flex; flex-direction: column; }
     .sampling-item_title { color: black; margin-top: 20px; margin-bottom: 10px; }
@@ -147,7 +164,9 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
     samplings,
     areaSize,
     coordinates,
-    regenerator
+    regenerator,
+    date,
+    version
   } = props;
 
   const htmlContent = `
@@ -156,46 +175,73 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
         ${styleHTML}
       </head>
       <body>
-        <h1>Justification Report</h1>
-        <p>${areaName}</p>
+        <div class="header-file">
+          <img
+            src="${LogoBase64}"
+            class="logo-sintropy"
+          />
 
-        <p>Regenerator Address:</p>
+          <div class="div-flex-row">
+            <div class="card-count">
+              <p class="card_p">
+                ${treesCount}
+              </p>
+              <p>Trees</p>
+            </div>
+            
+            <div class="card-count">
+              <p class="card_p">
+                ${biodiversityCount}
+              </p>
+              <p>Biodiversity</p>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="card-rc">
+          <img
+            src="${RCLogoBase64}"
+            class="logo-rc"
+          />
+          <p class="text-center text-limit">
+            This report was automatically generated using Sintropia Method version ${version}. It is designed
+            to help inspectors to perform the Regeneration Credit inspections. The goal is to measure how many tress
+            over 1m high and 3cm of diameter there is on the regeneration area, and of how many different species.
+          </p>
+        </div>
+        
+        <h4 class"text-center">${areaName}</h4>
+        <p class"text-center">Generated on: ${date}</p>
+
+        <h2 class="text-center">Regenerator Data</h2>
+        <h4>Regenerator Address:</h4>
         <p>${regenerator.address}</p>
 
         <div class="div-flex-row">
           <div class="map-coordinates-box">
-            <p>Area size: ${areaSize}</p>
+            <h4>Area size: ${areaSize}</h4>
             ${listCoordinates(coordinates)}
           </div>
         </div>
 
-        <p>Sampling radius: ${samplings[0].size} m</p>
-        <p>Sampling area: ${calculateAreaCircle(samplings[0].size)} m²</p>
+        <h2 class="text-center mt-20">Justification Report</h2>
 
-        <div class="div-flex-row">
-          <div class="card-count">
-            <p class="card_p">
-              ${treesCount}
-            </p>
-            <p>Trees</p>
+        <div class="header-file">
+          <div class="div-col">
+            <p>Sampling radius: ${samplings[0].size} m</p>
+            <p>Sampling area: ${calculateAreaCircle(samplings[0].size)} m²</p>
           </div>
-          
-          <div class="card-count">
-            <p class="card_p">
-              ${biodiversityCount}
-            </p>
-            <p>Biodiversity</p>
-          </div>
-        </div>
 
-        <div class="box-trees-result">
-          <p class="box-trees-result_title">Trees result</p>
-          <p class="box-trees-result_p1">Ai = Inspected area</p>
-          <p class="box-trees-result_p">P1 = Sampling trees 1</p>
-          <p class="box-trees-result_p">Pn = Sampling trees n</p>
-          <p class="box-trees-result_p">Ap = Sampling area n</p>
-          <p class="box-trees-result_p">n = Number of samplings</p>
-          <p class="box-trees-result_result">Result = {[(P1 +...+ Pn) / n] * Ai} / Ap</p>
+          <div class="box-trees-result">
+            <p class="box-trees-result_title">Trees result</p>
+            <p class="box-trees-result_p1">Ai = Inspected area</p>
+            <p class="box-trees-result_p">P1 = Sampling trees 1</p>
+            <p class="box-trees-result_p">Pn = Sampling trees n</p>
+            <p class="box-trees-result_p">Ap = Sampling area n</p>
+            <p class="box-trees-result_p">n = Number of samplings</p>
+            <p class="box-trees-result_result">Result = {[(P1 +...+ Pn) / n] * Ai} / Ap</p>
+          </div>
         </div>
         
         <h3>Biodiversity</h3>

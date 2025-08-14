@@ -15,6 +15,8 @@ interface GenerateReportPDFProps {
   regenerator: {
     address?: string;
   }
+  date: string;
+  version: string;
 }
 
 const styleHTML = `
@@ -114,7 +116,9 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
     trees,
     areaSize,
     coordinates,
-    regenerator
+    regenerator,
+    date,
+    version
   } = props;
 
   const htmlContent = `
@@ -153,14 +157,14 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
             class="logo-rc"
           />
           <p class="text-center text-limit">
-            This resport was automatically generated using Sintropia Method version. It is designed
+            This report was automatically generated using Sintropia Method version ${version}. It is designed
             to help inspectors to perform the Regeneration Credit inspections. The goal is to measure how many tress
             over 1m high and 3cm of diameter there is on the regeneration area, and of how many different species.
           </p>
         </div>
         
         <h4 class"text-center">${areaName}</h4>
-        <p class"text-center">Generated on: 12/08/2025</p>
+        <p class"text-center">Generated on: ${date}</p>
 
         <h2 class="text-center">Regenerator Data</h2>
         <h4>Regenerator Address:</h4>

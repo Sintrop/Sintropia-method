@@ -41,6 +41,7 @@ import { generateReportProofPhotos } from '../../../services/inspection/generate
 
 //@ts-ignore
 import SintropiaLogo from '../../../assets/images/syntropy-method-en.png';
+import { format } from 'date-fns';
 
 export interface TreesPerSamplingProps {
   samplingNumber: number;
@@ -219,6 +220,8 @@ export function ReportScreen({ route }: ScreenProps) {
       regenerator: {
         address: area.regeneratorAddress,
       },
+      date: format(new Date(), 'dd/MM/yyyy'),
+      version: '1',
     });
 
     return pdfUri;
@@ -286,6 +289,8 @@ export function ReportScreen({ route }: ScreenProps) {
       regenerator: {
         address: area.regeneratorAddress,
       },
+      date: format(new Date(), 'dd/MM/yyyy'),
+      version: '1',
     });
 
     return pdfUri;
