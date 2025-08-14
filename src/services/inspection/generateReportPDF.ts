@@ -18,15 +18,21 @@ interface GenerateReportPDFProps {
 const styleHTML = `
   <style>
     @page { margin-top: 50px; }
-    body { font-family: Arial; padding: 20px; }
+    body { font-family: Arial; padding: 20px;}
     h1 { color: #1eb76f; }
     h3 { color: #1eb76f; margin-top: 50px; }
     p { margin: 0px }
     img { border-radius: 5px; }
+
+    .header-file { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+    .logo-sintropy { width: 100px; height: 100px; background-color: #000; display: flex; }
+    .card-rc { width: 100%; height: 100px; display: flex; flex-direction: row; align-items: center; justify-content: center; background-color: #eee; margin: 50px 0px; }
+
+
     .map-img { width: 100px; height: 100px; border-radius: 16px; object-fit: cover; }
     .map-coordinates-box { display: flex; flex-direction: column; }
     .div-flex-row { display: flex; flex-direction: row; gap: 20px; margin-top: 20px; }
-    .card-count { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; background-color: #eee; width: 200px; padding-vertical: 10px;}
+    .card-count { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; border: 2px solid #000; width: 120px; height: 100px;}
     .card_p { font-weight: bold; color: black; font-size: 30px; } 
     .register-item { background-color: #eee; display: flex; flex-direction: column; gap: 15px; padding: 10px; border-radius: 16px; margin-bottom: 10px; width: 110px }
     .register-item_img { width: 70px; height: 70px; border-radius: 16px; object-fit: cover; }
@@ -109,7 +115,33 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
         ${styleHTML}
       </head>
       <body>
+        <div class="header-file">
+          <div class="logo-sintropy"></div>
+
+          <div class="div-flex-row">
+            <div class="card-count">
+              <p class="card_p">
+                ${treesCount}
+              </p>
+              <p>Trees</p>
+            </div>
+            
+            <div class="card-count">
+              <p class="card_p">
+                ${biodiversityCount}
+              </p>
+              <p>Biodiversity</p>
+            </div>
+          </div>
+        </div>
+
+        <div style={ display: flex; flex-direction: row; }>
+          <div class="logo-sintropy"></div>
+          <p>Text description rc method</p>
+        </div>
+
         <h1>Justification Report</h1>
+
         <p>${areaName}</p>
 
         <p>Regenerator Address:</p>
@@ -119,22 +151,6 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
           <div class="map-coordinates-box">
             <p>Area size: ${areaSize}</p>
             ${listCoordinates(coordinates)}
-          </div>
-        </div>
-
-        <div class="div-flex-row">
-          <div class="card-count">
-            <p class="card_p">
-              ${treesCount}
-            </p>
-            <p>Trees</p>
-          </div>
-          
-          <div class="card-count">
-            <p class="card_p">
-              ${biodiversityCount}
-            </p>
-            <p>Biodiversity</p>
           </div>
         </div>
         

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -37,6 +38,9 @@ import { Calculation } from './components/Calculation/Calculation';
 import { calculateAreaCircle } from '../../../services/inspection/calculateAreaCircle';
 import { LoadingGeneratingPdf } from './components/LoadingGeneratingPdf/LoadingGeneratingPdf';
 import { generateReportProofPhotos } from '../../../services/inspection/generateReportProofPhotos';
+
+//@ts-ignore
+import SintropiaLogo from '../../../assets/images/syntropy-method-en.png';
 
 export interface TreesPerSamplingProps {
   samplingNumber: number;
@@ -177,7 +181,7 @@ export function ReportScreen({ route }: ScreenProps) {
     for (let b = 0; b < biodiversity.length; b++) {
       const bio = biodiversity[b];
       const photo = bio.photo;
-      const base64 = await convertImageToBase64(photo);
+      const base64 = await convertImageToBase64({ uri: photo });
       newListBio.push({
         ...bio,
         photo: base64,
@@ -191,7 +195,7 @@ export function ReportScreen({ route }: ScreenProps) {
     for (let t = 0; t < trees.length; t++) {
       const tree = trees[t];
       const photo = tree.photo;
-      const base64 = await convertImageToBase64(photo);
+      const base64 = await convertImageToBase64({ uri: photo });
       newListTrees.push({
         ...tree,
         photo: base64,
@@ -213,8 +217,8 @@ export function ReportScreen({ route }: ScreenProps) {
       coordinates: coordinatesArea,
       areaSize: `${Intl.NumberFormat('pt-BR').format(areaSize)} m²`,
       regenerator: {
-        address: area.regeneratorAddress
-      }
+        address: area.regeneratorAddress,
+      },
     });
 
     return pdfUri;
@@ -229,7 +233,7 @@ export function ReportScreen({ route }: ScreenProps) {
     for (let b = 0; b < biodiversity.length; b++) {
       const bio = biodiversity[b];
       const photo = bio.photo;
-      const base64 = await convertImageToBase64(photo);
+      const base64 = await convertImageToBase64({ uri: photo });
       newListBio.push({
         ...bio,
         photo: base64,
@@ -248,7 +252,7 @@ export function ReportScreen({ route }: ScreenProps) {
 
       for (let t = 0; t < trees.length; t++) {
         const tree = trees[t];
-        const photoBase64 = await convertImageToBase64(tree.photo);
+        const photoBase64 = await convertImageToBase64({ uri: tree.photo });
         const newDataTree: TreeDBProps = {
           ...tree,
           photo: photoBase64,
@@ -280,8 +284,8 @@ export function ReportScreen({ route }: ScreenProps) {
       coordinates: coordinatesArea,
       areaSize: `${Intl.NumberFormat('pt-BR').format(areaSize)} m²`,
       regenerator: {
-        address: area.regeneratorAddress
-      }
+        address: area.regeneratorAddress,
+      },
     });
 
     return pdfUri;
@@ -346,7 +350,11 @@ export function ReportScreen({ route }: ScreenProps) {
     for (let b = 0; b < response.length; b++) {
       const register = response[b];
       const photo = register.photo;
-      const base64 = await convertImageToBase64(photo, 500, 500);
+      const base64 = await convertImageToBase64({
+        uri: photo,
+        width: 500,
+        height: 500,
+      });
       newListPhotos.push({
         ...register,
         photo: base64,
@@ -357,7 +365,11 @@ export function ReportScreen({ route }: ScreenProps) {
       );
     }
 
-    const proofPhoto = await convertImageToBase64(area.proofPhoto, 500, 500);
+    const proofPhoto = await convertImageToBase64({
+      uri: area.proofPhoto,
+      width: 500,
+      height: 500,
+    });
     totalConverted += 1;
     setPercentGeneratingPdf(
       Math.ceil((totalConverted / totalProofPhotos) * 100),
@@ -387,32 +399,47 @@ export function ReportScreen({ route }: ScreenProps) {
 
   return (
     <Screen screenTitle={t('report')} showBackButton scrollable>
+      <View className="items-center mt-5">
+        <Image
+          source={SintropiaLogo}
+          className="w-36 h-[80]"
+          resizeMode="contain"
+        />
+      </View>
       <Text className="font-bold text-black text-lg mt-5">
-        {t('justificationReport')}
+        {t('reportScreen.justificationReport')}
       </Text>
       <Text className="text-gray-500">{area?.name}</Text>
 
       <View className="w-full flex-row items-center justify-between py-1 px-2 rounded-2xl border border-gray-500 mt-2">
-        <Text className="text-gray-500">{t('reportScreen.inspectionReport')}</Text>
+        <Text className="text-gray-500">
+          {t('reportScreen.inspectionReport')}
+        </Text>
         <TouchableOpacity
           onPress={handleSharePDF}
           className="h-10 w-28 rounded-2xl bg-green-600 flex-row items-center justify-center"
           disabled={loadingShare}
           style={{ opacity: loadingShare ? 0.5 : 1 }}
         >
-          <Text className="font-semibold text-white">{t('reportScreen.share')}</Text>
+          <Text className="font-semibold text-white">
+            {t('reportScreen.share')}
+          </Text>
         </TouchableOpacity>
       </View>
 
       <View className="w-full flex-row items-center justify-between py-1 px-2 rounded-2xl border border-gray-500 mt-2">
-        <Text className="text-gray-500">{t('reportScreen.proofPhotosReport')}</Text>
+        <Text className="text-gray-500">
+          {t('reportScreen.proofPhotosReport')}
+        </Text>
         <TouchableOpacity
           onPress={handleShareProofPhotosPDF}
           className="h-10 w-28 rounded-2xl bg-green-600 flex-row items-center justify-center"
           disabled={loadingShare}
           style={{ opacity: loadingShare ? 0.5 : 1 }}
         >
-          <Text className="font-semibold text-white">{t('reportScreen.share')}</Text>
+          <Text className="font-semibold text-white">
+            {t('reportScreen.share')}
+          </Text>
         </TouchableOpacity>
       </View>
 
