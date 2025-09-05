@@ -13,14 +13,9 @@ import { ProofPhotoItem } from './ProofPhotoItem';
 export function ProofPhotos() {
   const modalChoosePhoto = useRef<Modalize>(null);
   const { t } = useTranslation();
-  const { areaOpened } = useInspectionContext();
-  const {
-    updateProofPhoto,
-    fetchProofPhotosArea,
-    addProofPhoto,
-    db,
-    initDB
-  } = useSQLite();
+  const { areaOpened, fetchOpenedAreas } = useInspectionContext();
+  const { updateProofPhoto, fetchProofPhotosArea, addProofPhoto, db, initDB } =
+    useSQLite();
   const [showCamera, setShowCamera] = useState(false);
   const [proofPhoto, setProofPhoto] = useState('');
   const [proofPhotos, setProofPhotos] = useState<ProofPhotosDBProps[]>([]);
@@ -71,6 +66,7 @@ export function ProofPhotos() {
       setProofPhoto(uri);
       await updateProofPhoto(uri, areaOpened?.id);
       modalChoosePhoto.current?.close();
+      fetchOpenedAreas();
     }
 
     if (registerType === 'proof-photos') {
@@ -177,7 +173,9 @@ export function ProofPhotos() {
                 onPress={() => setShowCamera(true)}
                 className="w-20 h-20 items-center justify-center rounded-2xl bg-gray-300 ml-10"
               >
-                <Text className="text-black font-semibold">{t('selectStepScreen.camera')}</Text>
+                <Text className="text-black font-semibold">
+                  {t('selectStepScreen.camera')}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
