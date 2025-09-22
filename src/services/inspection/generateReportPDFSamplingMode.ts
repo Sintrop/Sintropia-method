@@ -24,6 +24,7 @@ interface GenerateReportPDFProps {
   },
   date: string;
   version: string;
+  inspectorReport: string;
 }
 
 const styleHTML = `
@@ -38,8 +39,8 @@ const styleHTML = `
 
 
     .header-file { width: 100%; display: flex; align-items: center; justify-content: space-between; }
-    .logo-sintropy { width: 200px; height: 70px; object-fit: contain; }
-    .logo-rc { width: 120px; height: 120px; object-fit: contain; }
+    .logo-sintropy { width: 150px; height: 50px; object-fit: contain; }
+    .logo-rc { width: 50px; height: 50px; object-fit: contain; }
     .card-rc { width: 92%; display: flex; align-items: center; justify-content: space-between; background-color: #F0FFF0; padding: 30px; margin-top: 30px; margin-bottom: 30px; gap: 50px }
     .text-center { text-align: center; }
     .text-limit { max-width: 500px }
@@ -166,7 +167,8 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
     coordinates,
     regenerator,
     date,
-    version
+    version,
+    inspectorReport
   } = props;
 
   const htmlContent = `
@@ -176,10 +178,16 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
       </head>
       <body>
         <div class="header-file">
-          <img
-            src="${LogoBase64}"
-            class="logo-sintropy"
-          />
+          <div class="div-flex-row">
+            <img
+              src="${LogoBase64}"
+              class="logo-sintropy"
+            />
+            <img
+              src="${RCLogoBase64}"
+              class="logo-rc"
+            />
+          </div>
 
           <div class="div-flex-row">
             <div class="card-count">
@@ -198,18 +206,10 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
           </div>
         </div>
 
-        
-        <div class="card-rc">
-          <img
-            src="${RCLogoBase64}"
-            class="logo-rc"
-          />
-          <p class="text-center text-limit">
-            This report was automatically generated using Sintropia Method version ${version}. It is designed
-            to help inspectors to perform the Regeneration Credit inspections. The goal is to measure how many tress
-            over 1m high and 3cm of diameter there is on the regeneration area, and of how many different species.
-          </p>
-        </div>
+        <p class="text-center margin-vertical-50">
+          This report was automatically generated using Sintropia Method version ${version}. The goal is to measure how many tress
+          over 1m high and 3cm of diameter there is on the regeneration area, and of how many different species.
+        </p>
         
         <h4 class"text-center">${areaName}</h4>
         <p class"text-center">Generated on: ${date}</p>
@@ -243,6 +243,9 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
             <p class="box-trees-result_result">Result = {[(P1 +...+ Pn) / n] * Ai} / Ap</p>
           </div>
         </div>
+
+        <h4>Inspector report:</h4>
+        <p>${inspectorReport}</p>
         
         <h3>Biodiversity</h3>
         <div class="div-flex-wrap">
