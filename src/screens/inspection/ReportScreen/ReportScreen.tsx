@@ -222,6 +222,7 @@ export function ReportScreen({ route }: ScreenProps) {
       },
       date: format(new Date(), 'dd/MM/yyyy'),
       version: '1',
+      inspectorReport: area?.inspectorReport,
     });
 
     return pdfUri;
@@ -291,6 +292,7 @@ export function ReportScreen({ route }: ScreenProps) {
       },
       date: format(new Date(), 'dd/MM/yyyy'),
       version: '1',
+      inspectorReport: area?.inspectorReport,
     });
 
     return pdfUri;
