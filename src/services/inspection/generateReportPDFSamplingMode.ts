@@ -313,6 +313,8 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
           </tbody>
         </table>
 
+        <div class="margin-vertical-50"></div>
+
         <h4>Biodiversity</h4>
         <p>Indicator to measure the level of biodiversity of trees, palm trees and other plants over 1m high and 3cm in diameter in the regenerating area. How many different species are there in the area? Each different species is equivalent to one point and only trees and plants managed or planted by the regenerator should be counted.</p>
         <table>
