@@ -28,7 +28,7 @@ export function useSQLite() {
     // })
     await database.transaction(tx => {
       tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS area (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT, inspectionId TEXT, regeneratorAddress TEXT, coordinates TEXT, size INTEGER, proofPhoto TEXT, status INTEGER, collectionMethod TEXT);',
+        'CREATE TABLE IF NOT EXISTS area (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT, inspectionId TEXT, regeneratorAddress TEXT, coordinates TEXT, size INTEGER, proofPhoto TEXT, status INTEGER, collectionMethod TEXT, inspectorReport TEXT);',
       );
     });
     await database.transaction(tx => {
@@ -80,7 +80,7 @@ export function useSQLite() {
   async function fetchOpenedAreas() {
     if (!db) return;
 
-    await db.transaction (tx => {
+    await db.transaction(tx => {
       tx.executeSql(
         'SELECT * from area WHERE status = 0;',
         [],
@@ -127,7 +127,7 @@ export function useSQLite() {
 
     await db.transaction(tx => {
       tx.executeSql(
-        'INSERT INTO area (name, description, inspectionId, regeneratorAddress, coordinates, size, proofPhoto, status, collectionMethod) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);',
+        'INSERT INTO area (name, description, inspectionId, regeneratorAddress, coordinates, size, proofPhoto, status, collectionMethod, inspectorReport) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);',
         [
           data?.name,
           data?.description,
@@ -137,7 +137,8 @@ export function useSQLite() {
           data?.size,
           data?.proofPhoto,
           data?.status,
-          data?.collectionMethod
+          data?.collectionMethod,
+          data?.inspectorReport
         ],
         (_, result) => {
           console.log('Área inserida com sucesso:', result);
@@ -176,6 +177,25 @@ export function useSQLite() {
       tx.executeSql(
         'UPDATE area SET proofPhoto = ? WHERE id = ?;',
         [proofPhoto, areaId],
+        (_, result) => {
+          console.log('Área atualizada com sucesso:', result);
+          fetchOpenedAreas();
+        },
+        (_, error) => {
+          console.error('Erro ao atualizar área:', error);
+          return true; // impede continuar a transação
+        }
+      )
+    })
+  }
+
+  async function updateInspectorReport(inspectorReport: string, areaId: number) {
+    if (!db) return;
+
+    await db.transaction(tx => {
+      tx.executeSql(
+        'UPDATE area SET inspectorReport = ? WHERE id = ?;',
+        [inspectorReport, areaId],
         (_, result) => {
           console.log('Área atualizada com sucesso:', result);
           fetchOpenedAreas();
@@ -549,7 +569,7 @@ export function useSQLite() {
     });
   };
 
-  return { 
+  return {
     initDB,
     db,
     fetchAreas,
@@ -574,6 +594,7 @@ export function useSQLite() {
     deleteArea,
     addProofPhoto,
     deleteProofPhoto,
-    fetchProofPhotosArea
+    fetchProofPhotosArea,
+    updateInspectorReport
   };
 }

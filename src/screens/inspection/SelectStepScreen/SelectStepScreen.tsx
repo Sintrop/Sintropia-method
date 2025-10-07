@@ -73,40 +73,9 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
     });
   }
 
-  // if (locationStatus !== 'granted') {
-  //   return (
-  //     <Screen screenTitle={t('areaInspection')}>
-  //       <View className="items-center justify-center">
-  //         <HeaderInspectionMode />
-
-  //         <Text className="text-black text-center mt-10 font-semibold">
-  //           {t('weNeedYourGPSPermission')}
-  //         </Text>
-  //         <Text className="text-black text-center mt-1">
-  //           {t('descWeNeedYourGPSPermission')}
-  //         </Text>
-
-  //         <TouchableOpacity
-  //           className="mt-10 w-fit px-10 h-10 rounded-2xl bg-blue-500 items-center justify-center"
-  //           onPress={requestLocationPermission}
-  //         >
-  //           <Text className="text-white font-semibold">{t('continue')}</Text>
-  //         </TouchableOpacity>
-
-  //         <TouchableOpacity
-  //           className="mt-3 w-fit px-10 h-10 rounded-2xl items-center justify-center"
-  //           onPress={resetToTutorialScreen}
-  //         >
-  //           <Text className="text-black font-semibold">{t('back')}</Text>
-  //         </TouchableOpacity>
-
-  //         <Text className="text-gray-500 text-xs text-center mt-5">
-  //           {t('helpGivePermission')}
-  //         </Text>
-  //       </View>
-  //     </Screen>
-  //   );
-  // }
+  function handleGoToInspectorReport(): void {
+    navigation.navigate('InspectorReportScreen');
+  }
 
   return (
     <Screen screenTitle={t('areaInspection')} scrollable>
@@ -146,6 +115,15 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
           </TouchableOpacity>
         </>
       )}
+
+      <TouchableOpacity
+        className="w-full px-5 min-h-10 rounded-2xl border py-3 mt-5"
+        onPress={handleGoToInspectorReport}
+      >
+        <Text className="font-semibold text-black">
+          {t('inspectorReport.title')}
+        </Text>
+      </TouchableOpacity>
 
       <TouchableOpacity
         className="w-full px-5 min-h-10 rounded-2xl border py-3 mt-5"

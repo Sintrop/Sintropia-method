@@ -129,6 +129,10 @@
       "proofPhotosReport": "Relatório das fotos de prova",
       "share": "Compartilhar",
       "justificationReport": "Relatório de justificativa"
+    },
+    "inspectorReport": {
+      "title": "Relatório do inspetor",
+      "description": "Este é um lugar onde os inspetores podem relatar como foi a inspeção ou adicionar uma delação"
     }
   }
 }
