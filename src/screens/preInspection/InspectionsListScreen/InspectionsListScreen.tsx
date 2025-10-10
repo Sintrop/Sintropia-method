@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -6,15 +6,15 @@ import {
   ListRenderItemInfo,
   View,
 } from 'react-native';
-import {Screen} from '../../../components/Screen/Screen';
-import {useTranslation} from 'react-i18next';
-import {getInspectionsList} from '../../../services/inspection/getInspectionsList';
-import {InspectionProps} from '../../../types/inspection';
-import {InspectionItem} from './components/InspectionItem';
-import {PreviewInspection} from '../../../components/PreviewInspection/PreviewInspection';
+import { Screen } from '../../../components/Screen/Screen';
+import { useTranslation } from 'react-i18next';
+import { getInspectionsList } from '../../../services/inspection/getInspectionsList';
+import { InspectionProps } from '../../../types/inspection';
+import { InspectionItem } from './components/InspectionItem';
+import { PreviewInspection } from '../../../components/PreviewInspection/PreviewInspection';
 
 export function InspectionsListScreen() {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [inspections, setInspections] = useState<InspectionProps[]>([]);
   const [selectedInspection, setSelecetedInspection] = useState(
@@ -28,8 +28,8 @@ export function InspectionsListScreen() {
   async function handleGetInspections(): Promise<void> {
     setLoading(true);
     const response = await getInspectionsList({
-      rpcUrl: 'https://sequoiarpc.sintrop.com',
-      testnet: true,
+      rpcUrl: 'https://rpc.sintrop.com',
+      testnet: false,
     });
 
     if (response.success) {
@@ -40,7 +40,7 @@ export function InspectionsListScreen() {
     setLoading(false);
   }
 
-  function renderInspectionItem({item}: ListRenderItemInfo<InspectionProps>) {
+  function renderInspectionItem({ item }: ListRenderItemInfo<InspectionProps>) {
     return (
       <InspectionItem
         inspection={item}

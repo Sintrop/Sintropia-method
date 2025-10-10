@@ -34,13 +34,16 @@ export function SearchInspectionScreen({ navigation }: ScreenProps) {
     setLoadingSearch(true);
     const response = await getInspectionById({
       id: parseInt(id),
-      rpcUrl: 'https://sequoiarpc.sintrop.com',
-      testnet: true,
+      rpcUrl: 'https://rpc.sintrop.com',
+      testnet: false,
     });
 
     if (response.success) {
       if (response.inspection) {
-        if (response.inspection.status === 0 || response.inspection.status === 1) {
+        if (
+          response.inspection.status === 0 ||
+          response.inspection.status === 1
+        ) {
           setInspection(response.inspection);
         } else {
           Alert.alert(
@@ -48,7 +51,6 @@ export function SearchInspectionScreen({ navigation }: ScreenProps) {
             t('youCanOnlyInspectInspectionOpenedAndAccepted'),
           );
         }
-        
       }
     } else {
       Alert.alert('Error', response.message);
