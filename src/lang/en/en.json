@@ -121,7 +121,8 @@
       "selectPhotoSource": "Select photo source",
       "textConfirmSelectPhotoSource": "Choose whether you want to take a photo or select from your device's gallery",
       "gallery": "Gallery",
-      "camera": "Camera"
+      "camera": "Camera",
+      "createOneSamplingFirst": "Create one sampling first"
     },
     "reportScreen": {
       "inspectionReport": "Inspection report",
@@ -132,6 +133,9 @@
     "inspectorReport": {
       "title": "Inspector report",
       "description": "This is a place where inspectors can relate how was the inspection or add a delation text"
+    },
+    "common": {
+      "typeHere": "Type here"
     }
   }
 }
