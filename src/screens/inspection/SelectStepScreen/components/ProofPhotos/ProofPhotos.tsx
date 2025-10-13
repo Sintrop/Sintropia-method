@@ -9,8 +9,10 @@ import { useTranslation } from 'react-i18next';
 import { CameraComponent } from '../../../../../components/Camera/Camera';
 import { ProofPhotosDBProps } from '../../../../../types/database';
 import { ProofPhotoItem } from './ProofPhotoItem';
+import { useSafeAreaApp } from '../../../../../hooks/useSafeAreaApp';
 
 export function ProofPhotos() {
+  const { bottom } = useSafeAreaApp();
   const modalChoosePhoto = useRef<Modalize>(null);
   const { t } = useTranslation();
   const { areaOpened, fetchOpenedAreas } = useInspectionContext();
@@ -150,7 +152,10 @@ export function ProofPhotos() {
           adjustToContentHeight
           modalStyle={{ backgroundColor: 'transparent' }}
         >
-          <View className="p-5 bg-white rounded-t-3xl">
+          <View
+            className="p-5 bg-white rounded-t-3xl"
+            style={{ paddingBottom: bottom }}
+          >
             <Text className="font-semibold text-lg text-center text-black">
               {t('selectStepScreen.selectPhotoSource')}
             </Text>

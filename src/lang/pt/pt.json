@@ -122,7 +122,8 @@
       "selectPhotoSource": "Selecionar origem da imagem",
       "textConfirmSelectPhotoSource": "Escolha se você quer tirar uma foto ou selecionar da galeria do seu dispositivo",
       "gallery": "Galeria",
-      "camera": "Câmera"
+      "camera": "Câmera",
+      "createOneSamplingFirst": "Crie primeiro uma amostragem"
     },
     "reportScreen": {
       "inspectionReport": "Relatório da inspeção",
@@ -133,6 +134,9 @@
     "inspectorReport": {
       "title": "Relatório do inspetor",
       "description": "Este é um lugar onde os inspetores podem relatar como foi a inspeção ou adicionar uma delação"
+    },
+    "common": {
+      "typeHere": "Digite aqui"
     }
   }
 }

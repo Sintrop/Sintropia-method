@@ -6,6 +6,7 @@ import { Portal } from 'react-native-portalize';
 import { Modalize } from 'react-native-modalize';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaApp } from '../../../../../hooks/useSafeAreaApp';
 
 interface Props {
   list: BiodiversityDBProps[];
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function BiodiversityList({ list, updateList }: Props) {
+  const { bottom } = useSafeAreaApp();
   const { t } = useTranslation();
   const modalRef = useRef<Modalize>();
 
@@ -30,7 +32,7 @@ export function BiodiversityList({ list, updateList }: Props) {
 
   function EmptyList() {
     return (
-      <View className="p-5">
+      <View className="p-5" style={{ paddingBottom: bottom }}>
         <Text className="text-center text-gray-500">
           {t('noBiodiversityRegistered')}
         </Text>
@@ -40,8 +42,10 @@ export function BiodiversityList({ list, updateList }: Props) {
 
   function HeaderList() {
     return (
-      <Text className="text-center mb-3 text-gray-500">{t('biodiversity')}</Text>
-    )
+      <Text className="text-center mb-3 text-gray-500">
+        {t('biodiversity')}
+      </Text>
+    );
   }
 
   function handleOpenModal(): void {
@@ -69,7 +73,11 @@ export function BiodiversityList({ list, updateList }: Props) {
             showsVerticalScrollIndicator: false,
             ListEmptyComponent: EmptyList,
             ListHeaderComponent: HeaderList,
-            contentContainerStyle: { padding: 10, paddingTop: 20 },
+            contentContainerStyle: {
+              padding: 10,
+              paddingTop: 20,
+              paddingBottom: bottom,
+            },
           }}
         />
       </Portal>

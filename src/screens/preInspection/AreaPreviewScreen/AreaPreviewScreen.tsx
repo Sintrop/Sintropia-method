@@ -22,7 +22,9 @@ import { Polyline } from '../../../components/Map/Polyline';
 import { useInspectionContext } from '../../../hooks/useInspectionContext';
 import Config from 'react-native-config';
 
-const MAPBOX_ACCESS_TOKEN = Config.MAPBOX_ACCESS_TOKEN ? Config.MAPBOX_ACCESS_TOKEN : '';
+const MAPBOX_ACCESS_TOKEN = Config.MAPBOX_ACCESS_TOKEN
+  ? Config.MAPBOX_ACCESS_TOKEN
+  : '';
 Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
 type ScreenProps = NativeStackScreenProps<
@@ -76,7 +78,7 @@ export function AreaPreviewScreen({ route }: ScreenProps) {
             console.log('map downloaded: ' + res);
           })
           .catch(err => {
-            console.log('error dowload map: ' + err)
+            console.log('error dowload map: ' + err);
           });
       },
       error => {
@@ -126,7 +128,7 @@ export function AreaPreviewScreen({ route }: ScreenProps) {
       </View>
 
       <TouchableOpacity
-        className="w-full h-[48] bg-[#229B13] flex items-center justify-center rounded-2xl mt-10"
+        className="w-full h-[48] bg-[#229B13] flex items-center justify-center rounded-2xl my-10"
         onPress={handleStartInspection}
       >
         {loading ? (

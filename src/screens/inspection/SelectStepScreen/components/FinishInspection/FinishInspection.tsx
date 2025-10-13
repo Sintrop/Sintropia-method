@@ -4,12 +4,14 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { Portal } from 'react-native-portalize';
 import { Modalize } from 'react-native-modalize';
 import { useInspectionContext } from '../../../../../hooks/useInspectionContext';
+import { useSafeAreaApp } from '../../../../../hooks/useSafeAreaApp';
 
 interface Props {
   areaId: number;
   disabled: boolean;
 }
 export function FinishInspection({ areaId, disabled }: Props) {
+  const { bottom } = useSafeAreaApp();
   const modalRef = useRef<Modalize>(null);
   const { finishInspection } = useInspectionContext();
   const { t } = useTranslation();
@@ -35,7 +37,7 @@ export function FinishInspection({ areaId, disabled }: Props) {
 
       <Portal>
         <Modalize ref={modalRef} adjustToContentHeight>
-          <View className="p-5">
+          <View className="p-5" style={{ paddingBottom: bottom }}>
             <Text className="font-semibold text-lg text-center text-black">
               {t('atention')}
             </Text>
