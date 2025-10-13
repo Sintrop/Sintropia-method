@@ -17,6 +17,7 @@ import { getCoordinates } from '../../services/regenerator/getCoordinates';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { PreInspectionStackParamsList } from '../../routes/PreInspectionRoutes';
+import { useSafeAreaApp } from '../../hooks/useSafeAreaApp';
 
 type NavigationProps = NativeStackNavigationProp<
   PreInspectionStackParamsList,
@@ -26,6 +27,7 @@ interface Props {
   inspection: InspectionProps;
 }
 export function PreviewInspection({ inspection }: Props) {
+  const { bottom } = useSafeAreaApp();
   const navigation = useNavigation<NavigationProps>();
   const modalRef = useRef<Modalize>();
   const { t } = useTranslation();
@@ -86,7 +88,7 @@ export function PreviewInspection({ inspection }: Props) {
   return (
     <Portal>
       <Modalize ref={modalRef} adjustToContentHeight>
-        <View className="flex-1 p-5">
+        <View className="flex-1 p-5" style={{ paddingBottom: bottom }}>
           <Text className="font-semibold text-black text-center">
             {t('inspection')} #{inspection.id}
           </Text>
@@ -119,7 +121,7 @@ export function PreviewInspection({ inspection }: Props) {
                   </Text>
 
                   <TouchableOpacity
-                    className="w-full h-[48] rounded-2xl bg-[#229B13] flex items-center justify-center mt-5"
+                    className="w-full h-[48] rounded-2xl bg-[#229B13] flex items-center justify-center my-5"
                     onPress={handleGetCoordinates}
                     disabled={loadingCoordinates}
                   >

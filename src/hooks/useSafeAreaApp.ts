@@ -5,6 +5,6 @@ export function useSafeAreaApp() {
 
   return {
     top: top,
-    bottom: Math.max(bottom, 20),
+    bottom: Math.max(bottom, 10),
   };
 }

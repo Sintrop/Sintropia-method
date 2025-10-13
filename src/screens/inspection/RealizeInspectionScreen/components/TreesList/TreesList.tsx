@@ -6,6 +6,7 @@ import { Portal } from 'react-native-portalize';
 import { Modalize } from 'react-native-modalize';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaApp } from '../../../../../hooks/useSafeAreaApp';
 
 interface Props {
   list: TreeDBProps[];
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function TreesList({ list, updateList }: Props) {
+  const { bottom } = useSafeAreaApp();
   const { t } = useTranslation();
   const modalRef = useRef<Modalize>();
 
@@ -25,7 +27,9 @@ export function TreesList({ list, updateList }: Props) {
   function EmptyList() {
     return (
       <View className="p-5">
-        <Text className="text-center text-gray-500">{t('noTreeRegistered')}</Text>
+        <Text className="text-center text-gray-500">
+          {t('noTreeRegistered')}
+        </Text>
       </View>
     );
   }
@@ -59,7 +63,11 @@ export function TreesList({ list, updateList }: Props) {
             showsVerticalScrollIndicator: false,
             ListEmptyComponent: EmptyList,
             ListHeaderComponent: HeaderList,
-            contentContainerStyle: { padding: 10, paddingTop: 20 },
+            contentContainerStyle: {
+              padding: 10,
+              paddingTop: 20,
+              paddingBottom: bottom,
+            },
           }}
         />
       </Portal>

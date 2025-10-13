@@ -13,6 +13,7 @@ import { Portal } from 'react-native-portalize';
 import { Modalize } from 'react-native-modalize';
 import { Icon } from '../../../../components/Icon/Icon';
 import { useSQLite } from '../../../../hooks/useSQLite';
+import { useSafeAreaApp } from '../../../../hooks/useSafeAreaApp';
 
 interface Props {
   biodiversity?: BiodiversityDBProps;
@@ -28,6 +29,7 @@ export function RegisterItem({
   registerType,
   hiddenDeleteButton,
 }: Props) {
+  const { bottom } = useSafeAreaApp();
   const deleteModalRef = useRef<Modalize>(null);
   const { deleteBiodiversity, deleteTree } = useSQLite();
   const { t } = useTranslation();
@@ -65,7 +67,7 @@ export function RegisterItem({
       updateList();
       closeModalConfirmDelete();
     }
-    
+
     setLoadingDelete(false);
   }
 
@@ -100,7 +102,7 @@ export function RegisterItem({
 
       <Portal>
         <Modalize ref={deleteModalRef} adjustToContentHeight>
-          <View className="p-5">
+          <View className="p-5" style={{ paddingBottom: bottom }}>
             <Text className="font-semibold text-lg text-center text-black">
               {t('atention')}
             </Text>

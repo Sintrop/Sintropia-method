@@ -7,6 +7,7 @@ import { useLocation } from '../../../../../hooks/useLocation';
 import { CameraComponent } from '../../../../../components/Camera/Camera';
 import { CoordinateProps } from '../../../../../types/regenerator';
 import { GeoPosition } from 'react-native-geolocation-service';
+import { useSafeAreaApp } from '../../../../../hooks/useSafeAreaApp';
 
 type RegisterType = 'biodiversity' | 'tree';
 
@@ -31,6 +32,7 @@ export function ModalRegisterItem({
   disabled,
   location,
 }: Props) {
+  const { bottom } = useSafeAreaApp();
   const modalRef = useRef<Modalize>(null);
   const { t } = useTranslation();
   const [showCamera, setShowCamera] = useState<boolean>(false);
@@ -110,7 +112,7 @@ export function ModalRegisterItem({
 
       <Portal>
         <Modalize ref={modalRef} adjustToContentHeight>
-          <View className="p-3">
+          <View className="p-3" style={{ paddingBottom: bottom }}>
             <Text className="text-black text-center">{t('register')}</Text>
 
             <Text className="mt-10 text-gray-500">{t('yourLocation')}</Text>

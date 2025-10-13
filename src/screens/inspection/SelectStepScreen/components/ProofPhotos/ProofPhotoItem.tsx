@@ -6,6 +6,7 @@ import { Modalize } from 'react-native-modalize';
 import { Icon } from '../../../../../components/Icon/Icon';
 import { useTranslation } from 'react-i18next';
 import { useSQLite } from '../../../../../hooks/useSQLite';
+import { useSafeAreaApp } from '../../../../../hooks/useSafeAreaApp';
 
 interface Props {
   photo: ProofPhotosDBProps;
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function ProofPhotoItem({ photo, proofPhotoDeleted }: Props) {
+  const { bottom } = useSafeAreaApp();
   const { t } = useTranslation();
   const { deleteProofPhoto } = useSQLite();
   const modalRef = useRef<Modalize>(null);
@@ -49,7 +51,7 @@ export function ProofPhotoItem({ photo, proofPhotoDeleted }: Props) {
 
       <Portal>
         <Modalize ref={modalRef} adjustToContentHeight>
-          <View className="p-5">
+          <View className="p-5" style={{ paddingBottom: bottom }}>
             <Text className="font-semibold text-lg text-center text-black">
               {t('atention')}
             </Text>

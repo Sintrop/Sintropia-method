@@ -5,20 +5,21 @@ import { useSafeAreaApp } from '../../hooks/useSafeAreaApp';
 
 interface Props extends HeaderProps {
   children: React.ReactNode;
-  scrollable?: boolean
+  scrollable?: boolean;
 }
-export function Screen({ children, scrollable, ...headerProps }: Props): React.JSX.Element {
-  const { top } = useSafeAreaApp();
+export function Screen({
+  children,
+  scrollable,
+  ...headerProps
+}: Props): React.JSX.Element {
+  const { top, bottom } = useSafeAreaApp();
 
   return (
-    <View className="flex-1" style={{ paddingTop: top }}>
+    <View className="flex-1" style={{ paddingTop: top, paddingBottom: bottom }}>
       <Header {...headerProps} />
 
       {scrollable ? (
-        <ScrollView
-          className="px-5"
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView className="px-5" showsVerticalScrollIndicator={false}>
           {children}
         </ScrollView>
       ) : (

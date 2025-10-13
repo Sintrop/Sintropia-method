@@ -5,11 +5,13 @@ import { Portal } from 'react-native-portalize';
 import { Modalize } from 'react-native-modalize';
 import { useInspectionContext } from '../../../../../hooks/useInspectionContext';
 import { Icon } from '../../../../../components/Icon/Icon';
+import { useSafeAreaApp } from '../../../../../hooks/useSafeAreaApp';
 
 interface Props {
   areaId: number;
 }
 export function DeleteInspection({ areaId }: Props) {
+  const { bottom } = useSafeAreaApp();
   const modalRef = useRef<Modalize>(null);
   const { deleteAreaInspection } = useInspectionContext();
   const { t } = useTranslation();
@@ -29,12 +31,14 @@ export function DeleteInspection({ areaId }: Props) {
         onPress={openModalConfirmDelete}
       >
         <Icon name="trash" color="white" size={25} />
-        <Text className="font-semibold text-white ml-2">{t('deleteInspection')}</Text>
+        <Text className="font-semibold text-white ml-2">
+          {t('deleteInspection')}
+        </Text>
       </TouchableOpacity>
 
       <Portal>
         <Modalize ref={modalRef} adjustToContentHeight>
-          <View className="p-5">
+          <View className="p-5" style={{ paddingBottom: bottom }}>
             <Text className="font-semibold text-lg text-center text-black">
               {t('atention')}
             </Text>

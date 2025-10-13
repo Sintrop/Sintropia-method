@@ -9,6 +9,7 @@ import { useSQLite } from '../../../../../hooks/useSQLite';
 import { Portal } from 'react-native-portalize';
 import { Modalize } from 'react-native-modalize';
 import { Icon } from '../../../../../components/Icon/Icon';
+import { useSafeAreaApp } from '../../../../../hooks/useSafeAreaApp';
 
 interface Props {
   sampling: SamplingDBProps;
@@ -18,6 +19,7 @@ interface Props {
 
 type NavigationProps = NativeStackNavigationProp<InspectionStackParamsList>;
 export function SamplingListItem({ sampling, updateList, index }: Props) {
+  const { bottom } = useSafeAreaApp();
   const modalDeleteRef = useRef<Modalize>(null);
   const { t } = useTranslation();
   const { db, fetchTreesSampling, deleteSampling } = useSQLite();
@@ -41,7 +43,7 @@ export function SamplingListItem({ sampling, updateList, index }: Props) {
       collectionMethod: 'sampling',
       sampling: {
         ...sampling,
-        number: index + 1
+        number: index + 1,
       },
     });
   }
@@ -92,7 +94,7 @@ export function SamplingListItem({ sampling, updateList, index }: Props) {
       </TouchableOpacity>
       <Portal>
         <Modalize ref={modalDeleteRef} adjustToContentHeight>
-          <View className="p-5">
+          <View className="p-5" style={{ paddingBottom: bottom }}>
             <Text className="font-semibold text-lg text-center text-black">
               {t('atention')}
             </Text>
