@@ -41,7 +41,7 @@ export function InspectorReportScreen() {
         onChangeText={setInput}
         placeholderTextColor="#aaa"
         placeholder={t('common.typeHere')}
-        className="w-full min-h-12 rounded-2xl bg-gray-200 px-3 text-black mt-1 max-h-[200]"
+        className="w-full min-h-12 rounded-2xl bg-gray-200 px-3 py-2 text-black mt-1 max-h-[200]"
         multiline={true}
       />
     </Screen>
