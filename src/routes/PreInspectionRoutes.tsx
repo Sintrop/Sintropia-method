@@ -3,7 +3,6 @@ import { HomeScreen } from '../screens/preInspection/HomeScreen/HomeScreen';
 import { RegeneratorsListScreen } from '../screens/preInspection/RegeneratorsListScreen/RegeneratorsListScreen';
 import { AreaPreviewScreen } from '../screens/preInspection/AreaPreviewScreen/AreaPreviewScreen';
 import { CoordinateProps, RegeneratorProps } from '../types/regenerator';
-import { InspectedAreasScreen } from '../screens/preInspection/InspectedAreasScreen/InspectedAreasScreen';
 import { AreaDBProps } from '../types/database';
 import { ReportScreen } from '../screens/inspection/ReportScreen/ReportScreen';
 
@@ -14,7 +13,6 @@ export type PreInspectionStackParamsList = {
     regenerator: RegeneratorProps;
     coords: CoordinateProps[];
   };
-  InspectedAreasScreen: undefined;
   ReportScreen: {
     collectionMethod: string;
     area: AreaDBProps;
@@ -32,10 +30,6 @@ export function PreInspectionRoutes() {
         component={RegeneratorsListScreen}
       />
       <Stack.Screen name="AreaPreviewScreen" component={AreaPreviewScreen} />
-      <Stack.Screen
-        name="InspectedAreasScreen"
-        component={InspectedAreasScreen}
-      />
       <Stack.Screen name="ReportScreen" component={ReportScreen} />
     </Stack.Navigator>
   );

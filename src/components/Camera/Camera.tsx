@@ -9,16 +9,17 @@ import {
   Modal,
   Image,
   Alert,
-  Platform,
 } from 'react-native';
 import {
   Camera,
   useCameraDevices,
   PhotoFile,
 } from 'react-native-vision-camera';
-import type { CameraDevice } from 'react-native-vision-camera';
+import { launchImageLibrary } from 'react-native-image-picker';
 import { Icon } from '../Icon/Icon';
 import { usePermissions } from '../../hooks/usePermissions';
+import { useSafeAreaApp } from '../../hooks/useSafeAreaApp';
+import colors from '../../theme/colors';
 
 interface Props {
   close: () => void;
@@ -29,34 +30,45 @@ export function CameraComponent({ close, photo }: Props) {
   const { t } = useTranslation();
   const camera = useRef<Camera>(null);
   const devices = useCameraDevices();
-  const backCamera: CameraDevice | undefined = devices.find(
-    d => d.position === 'back',
-  );
-  const frontCamera: CameraDevice | undefined = devices.find(
-    d => d.position === 'front',
-  );
+  const backCamera = devices.find(d => d.position === 'back');
+  const frontCamera = devices.find(d => d.position === 'front');
   const [imagePreview, setImagePreview] = useState<string>();
   const [loadingTake, setLoadingTake] = useState<boolean>(false);
   const [camToUse, setCamToUse] = useState<'front' | 'back'>('back');
+  const [noCamera, setNoCamera] = useState(false);
   const { requestCameraPermission } = usePermissions();
+  const { top, bottom } = useSafeAreaApp();
 
   useEffect(() => {
     requestCameraPermission();
   }, []);
 
+  useEffect(() => {
+    if (backCamera) return;
+    const timeout = setTimeout(() => setNoCamera(true), 2000);
+    return () => clearTimeout(timeout);
+  }, [backCamera]);
+
   async function handleTakePhoto() {
     try {
       setLoadingTake(true);
-      const photo: PhotoFile | undefined = await camera.current?.takePhoto();
-      if (photo?.path) {
-        setImagePreview('file://' + photo.path);
+      const result: PhotoFile | undefined = await camera.current?.takePhoto();
+      if (result?.path) {
+        setImagePreview('file://' + result.path);
       }
     } catch (e) {
       console.log(e);
-      Alert.alert('Error', 'Erro ao tentar tirar a foto');
+      Alert.alert(t('atention'), t('camera.error'));
     } finally {
       setLoadingTake(false);
     }
+  }
+
+  // Only reachable in development builds (the simulator has no camera).
+  async function handlePickFromLibrary() {
+    const result = await launchImageLibrary({ mediaType: 'photo' });
+    const uri = result.assets?.[0]?.uri;
+    if (uri) setImagePreview(uri);
   }
 
   function handleConfirmPhoto() {
@@ -65,176 +77,135 @@ export function CameraComponent({ close, photo }: Props) {
     close();
   }
 
-  function handleSwitchCam() {
-    if (camToUse === 'back') setCamToUse('front');
-    if (camToUse === 'front') setCamToUse('back');
-  }
+  const closeButton = (
+    <TouchableOpacity
+      onPress={close}
+      className="absolute right-5 z-20 w-11 h-11 rounded-full bg-black/40 items-center justify-center"
+      style={{ top: top + 8 }}
+    >
+      <Icon name="close" size={24} color="white" />
+    </TouchableOpacity>
+  );
 
-  // if (cameraStatus !== 'granted') {
-  //   return (
-  //     <ModalContainer close={close} closeIconBlack>
-  //       <View className="items-center justify-center h-screen p-5">
-  //         <Text className="text-black text-center mt-10 font-semibold">
-  //           {t('weNeedYourCameraPermission')}
-  //         </Text>
-  //         <Text className="text-black text-center mt-1">
-  //           {t('descWeNeedYourCameraPermission')}
-  //         </Text>
-
-  //         <TouchableOpacity
-  //           className="mt-10 w-fit px-10 h-10 rounded-2xl bg-blue-500 items-center justify-center"
-  //           onPress={requestCameraPermission}
-  //         >
-  //           <Text className="text-white font-semibold">{t('continue')}</Text>
-  //         </TouchableOpacity>
-
-  //         <Text className="text-gray-500 text-xs text-center mt-5">
-  //           {t('helpGiveCameraPermission')}
-  //         </Text>
-  //       </View>
-  //     </ModalContainer>
-  //   );
-  // }
-
-  if (!backCamera) {
+  if (imagePreview) {
     return (
-      <ModalContainer close={close}>
-        <View className="w-screen h-screen items-center justify-center">
-          <ActivityIndicator size={40} />
+      <ModalContainer onClose={close}>
+        <Image
+          source={{ uri: imagePreview }}
+          style={StyleSheet.absoluteFill}
+          resizeMode="cover"
+        />
+        {closeButton}
+        <View
+          className="absolute left-0 right-0 flex-row px-5"
+          style={{ bottom: bottom + 16 }}
+        >
+          <TouchableOpacity
+            className="flex-1 h-14 rounded-2xl bg-white/90 items-center justify-center mr-3"
+            onPress={() => setImagePreview(undefined)}
+          >
+            <Text className="text-ink font-semibold">{t('takeAnother')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="flex-1 h-14 rounded-2xl bg-brand flex-row items-center justify-center"
+            onPress={handleConfirmPhoto}
+          >
+            <Icon name="check" size={20} color="white" />
+            <Text className="text-white font-semibold ml-2">
+              {t('confirm')}
+            </Text>
+          </TouchableOpacity>
         </View>
       </ModalContainer>
     );
   }
 
-  if (imagePreview) {
+  if (!backCamera) {
     return (
-      <ModalContainer close={close}>
-        <Image
-          source={{ uri: imagePreview }}
-          style={{ width: '100%', height: '100%' }}
-          resizeMode="cover"
-        />
-
-        <View className="flex-row items-center justify-center absolute bottom-5 w-full h-20">
-          <TouchableOpacity
-            className="bg-gray-300 rounded-2xl w-32 h-12 items-center justify-center"
-            onPress={() => setImagePreview(undefined)}
-          >
-            <Text className="text-black">{t('takeAnother')}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            className="bg-green-600 rounded-2xl w-32 h-12 items-center justify-center ml-5"
-            onPress={handleConfirmPhoto}
-          >
-            <Text className="text-white font-semibold">{t('confirm')}</Text>
-          </TouchableOpacity>
+      <ModalContainer onClose={close}>
+        {closeButton}
+        <View className="flex-1 items-center justify-center px-10">
+          {noCamera ? (
+            <>
+              <Icon name="camera" size={40} color="white" />
+              <Text className="text-white text-center mt-4">
+                {t('camera.unavailable')}
+              </Text>
+              {__DEV__ && (
+                <TouchableOpacity
+                  className="mt-6 px-6 h-12 rounded-2xl bg-white items-center justify-center"
+                  onPress={handlePickFromLibrary}
+                >
+                  <Text className="text-ink font-semibold">
+                    {t('selectStepScreen.gallery')} (dev)
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </>
+          ) : (
+            <ActivityIndicator size="large" color="white" />
+          )}
         </View>
       </ModalContainer>
     );
   }
 
   return (
-    <ModalContainer close={close}>
+    <ModalContainer onClose={close}>
       <Camera
-        style={[StyleSheet.absoluteFill, { width: '100%', height: '100%' }]}
-        //@ts-ignore
-        device={camToUse === 'front' ? frontCamera : backCamera}
+        style={StyleSheet.absoluteFill}
+        device={(camToUse === 'front' && frontCamera) || backCamera}
         isActive={true}
         ref={camera}
         photo={true}
         photoQualityBalance="speed"
       />
+      {closeButton}
 
-      <View style={styles.viewBtnsAction}>
-        <View className="w-10 h-10 mr-10" />
+      <View
+        className="absolute left-0 right-0 flex-row items-center justify-center"
+        style={{ bottom: bottom + 24 }}
+      >
+        <View className="w-12 h-12 mr-10" />
 
         <TouchableOpacity
           onPress={handleTakePhoto}
-          style={styles.captureButton}
           disabled={loadingTake}
+          className="w-20 h-20 rounded-full border-4 border-white items-center justify-center"
         >
-          {loadingTake ? (
-            <ActivityIndicator size={30} />
-          ) : (
-            <Text style={styles.buttonText}>📸</Text>
-          )}
+          <View className="w-16 h-16 rounded-full bg-white items-center justify-center">
+            {loadingTake && <ActivityIndicator color={colors.brand} />}
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity
-          className="w-10 h-10 ml-10 bg-white rounded-full items-center justify-center"
-          onPress={handleSwitchCam}
-        ></TouchableOpacity>
+          className="w-12 h-12 ml-10 rounded-full bg-black/40 items-center justify-center"
+          onPress={() =>
+            setCamToUse(value => (value === 'back' ? 'front' : 'back'))
+          }
+        >
+          <Icon name="shuffle" size={22} color="white" />
+        </TouchableOpacity>
       </View>
     </ModalContainer>
   );
 }
 
-interface ModalContainerProps {
-  children: ReactNode;
-  close: () => void;
-  closeIconBlack?: boolean;
-}
 function ModalContainer({
   children,
-  close,
-  closeIconBlack,
-}: ModalContainerProps) {
+  onClose,
+}: {
+  children: ReactNode;
+  onClose: () => void;
+}) {
   return (
     <Modal
-      visible={true}
+      visible
       animationType="slide"
-      transparent
-      onRequestClose={close}
+      transparent={false}
+      onRequestClose={onClose}
     >
-      <View className="flex-1 bg-white relative">
-        <TouchableOpacity
-          onPress={close}
-          className={`absolute right-5 z-20 ${
-            Platform.OS === 'android' ? 'top-5' : 'top-14'
-          }`}
-        >
-          <Icon
-            name="close"
-            size={30}
-            color={closeIconBlack ? 'black' : 'white'}
-          />
-        </TouchableOpacity>
-        {children}
-      </View>
+      <View className="flex-1 bg-black">{children}</View>
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  viewBtnsAction: {
-    position: 'absolute',
-    bottom: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    flexDirection: 'row',
-  },
-  captureButton: {
-    alignSelf: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 40,
-    padding: 20,
-    elevation: 4,
-  },
-  buttonText: {
-    fontSize: 24,
-  },
-});

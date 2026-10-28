@@ -2,6 +2,9 @@ import React from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { RegeneratorProps } from '../../../../types/regenerator';
+import { Badge } from '../../../../components/ui/Badge';
+import { Icon } from '../../../../components/Icon/Icon';
+import colors from '../../../../theme/colors';
 
 interface Props {
   regenerator: RegeneratorProps;
@@ -18,38 +21,37 @@ export function RegeneratorItem({ regenerator, onPress, loading }: Props) {
 
   return (
     <TouchableOpacity
-      className="w-full rounded-2xl bg-gray-200 p-3 mb-3"
+      className="flex-row items-center bg-surface border border-line rounded-2xl px-4 py-3.5 mb-2"
       onPress={onPress}
       disabled={loading}
+      activeOpacity={0.8}
     >
-      <View className="flex-row items-center justify-between">
-        <Text
-          className="font-semibold text-black flex-1 mr-2"
-          numberOfLines={1}
-        >
+      <View className="w-11 h-11 rounded-xl bg-brand-soft items-center justify-center">
+        <Text className="font-bold text-brand-dark">#{regenerator.id}</Text>
+      </View>
+      <View className="flex-1 ml-3">
+        <Text className="font-semibold text-ink text-base" numberOfLines={1}>
           {regenerator.name || shortAddress(regenerator.regeneratorWallet)}
         </Text>
-        {loading ? (
-          <ActivityIndicator color="#229B13" />
-        ) : (
-          <Text className="text-gray-500 text-xs">#{regenerator.id}</Text>
+        <Text className="text-xs text-muted mt-0.5">
+          {Intl.NumberFormat('pt-BR').format(regenerator.totalArea)} m² ·{' '}
+          {t('regeneratorsList.inspections', {
+            count: regenerator.totalInspections,
+          })}
+        </Text>
+        {regenerator.pendingInspection && (
+          <View className="mt-1.5">
+            <Badge
+              label={t('regeneratorsList.pendingInspection')}
+              tone="warning"
+            />
+          </View>
         )}
       </View>
-
-      <Text className="text-gray-500 text-xs mt-1">
-        {shortAddress(regenerator.regeneratorWallet)} ·{' '}
-        {Intl.NumberFormat('pt-BR').format(regenerator.totalArea)} m² ·{' '}
-        {t('regeneratorsList.inspections', {
-          count: regenerator.totalInspections,
-        })}
-      </Text>
-
-      {regenerator.pendingInspection && (
-        <View className="self-start rounded-full bg-yellow-200 px-2 py-0.5 mt-2">
-          <Text className="text-xs text-black">
-            {t('regeneratorsList.pendingInspection')}
-          </Text>
-        </View>
+      {loading ? (
+        <ActivityIndicator color={colors.brand} />
+      ) : (
+        <Icon name="chevronRight" size={20} color={colors.muted} />
       )}
     </TouchableOpacity>
   );

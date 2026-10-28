@@ -58,7 +58,7 @@ export function InspectionContextProvider({
   }
 
   async function startInspection(props: StartInspectionProps) {
-    const { regenerator, coordinates, areaSize } = props;
+    const { regenerator, coordinates, areaSize, collectionMethod } = props;
 
     // Collections belong to the regenerator's area, not to an on-chain
     // inspection, so they can be done before or independently of a request.
@@ -71,7 +71,7 @@ export function InspectionContextProvider({
       inspectionId: '',
       regeneratorAddress: regenerator.address,
       status: 0,
-      collectionMethod: '',
+      collectionMethod,
       inspectorReport: '',
     });
 

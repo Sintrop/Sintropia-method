@@ -6,7 +6,6 @@ import {
   ListRenderItemInfo,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +16,9 @@ import { RegeneratorProps } from '../../../types/regenerator';
 import { getRegenerators } from '../../../services/regenerator/getRegenerators';
 import { getCoordinates } from '../../../services/regenerator/getCoordinates';
 import { RegeneratorItem } from './components/RegeneratorItem';
+import { Icon } from '../../../components/Icon/Icon';
+import { AppButton } from '../../../components/ui/AppButton';
+import colors from '../../../theme/colors';
 
 function normalize(value: string) {
   return value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -94,36 +96,37 @@ export function RegeneratorsListScreen({ navigation }: ScreenProps) {
 
   return (
     <Screen screenTitle={t('regeneratorsList.title')} showBackButton>
-      <TextInput
-        value={search}
-        onChangeText={setSearch}
-        placeholder={t('regeneratorsList.searchPlaceholder')}
-        placeholderTextColor="#aaa"
-        className="h-[48] rounded-2xl border px-5 text-black"
-        autoCorrect={false}
-        autoCapitalize="none"
-      />
+      <View className="flex-row items-center h-12 rounded-2xl bg-surface border border-line px-4 mt-1">
+        <Icon name="search" size={18} color={colors.muted} />
+        <TextInput
+          value={search}
+          onChangeText={setSearch}
+          placeholder={t('regeneratorsList.searchPlaceholder')}
+          placeholderTextColor="#9CA3AF"
+          className="flex-1 ml-2 text-ink text-base"
+          autoCorrect={false}
+          autoCapitalize="none"
+        />
+      </View>
 
       {loading ? (
         <View className="mt-20 items-center">
-          <ActivityIndicator size={40} color="#229B13" />
-          <Text className="text-gray-500 mt-3">
+          <ActivityIndicator size="large" color={colors.brand} />
+          <Text className="text-muted mt-3">
             {t('regeneratorsList.loading')}
           </Text>
         </View>
       ) : error ? (
         <View className="mt-20 items-center">
-          <Text className="text-black text-center">
+          <Text className="text-ink text-center">
             {t('regeneratorsList.errorLoading')}
           </Text>
-          <TouchableOpacity
-            className="px-10 h-[48] mt-5 border border-[#229B13] items-center justify-center rounded-2xl"
+          <AppButton
+            title={t('regeneratorsList.tryAgain')}
+            variant="secondary"
             onPress={loadRegenerators}
-          >
-            <Text className="font-semibold text-[#229B13]">
-              {t('regeneratorsList.tryAgain')}
-            </Text>
-          </TouchableOpacity>
+            className="mt-5"
+          />
         </View>
       ) : (
         <FlatList
@@ -133,7 +136,7 @@ export function RegeneratorsListScreen({ navigation }: ScreenProps) {
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ paddingTop: 12, paddingBottom: 160 }}
           ListEmptyComponent={
-            <Text className="text-gray-500 text-center mt-10">
+            <Text className="text-muted text-center mt-10">
               {t('regeneratorsList.empty')}
             </Text>
           }

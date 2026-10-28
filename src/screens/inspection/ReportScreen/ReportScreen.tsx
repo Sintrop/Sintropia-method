@@ -5,7 +5,6 @@ import {
   Image,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import Share from 'react-native-share';
@@ -25,8 +24,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { InspectionStackParamsList } from '../../../routes/InspectionRoutes';
 import { generateReportPDF } from '../../../services/inspection/generateReportPDF';
 import { convertImageToBase64 } from '../../../services/inspection/convertImageToBase64';
-import { BiodiversityList } from './components/BiodiversityList/BiodiversityList';
-import { SamplingList } from './components/SamplingList/SamplingList';
 import {
   generateReportPDFSamplingMode,
   SamplingPDFProps,
@@ -37,14 +34,16 @@ import { calculateAreaCircle } from '../../../services/inspection/calculateAreaC
 import { LoadingGeneratingPdf } from './components/LoadingGeneratingPdf/LoadingGeneratingPdf';
 import { generateReportProofPhotos } from '../../../services/inspection/generateReportProofPhotos';
 
-//@ts-ignore
-import SintropiaLogo from '../../../assets/images/syntropy-method-en.png';
 import { format } from 'date-fns';
 import { APP_VERSION } from '../../../constants/app';
 import { TreesAndBiodiversityMarkers } from '../../../components/Map/RegisterMarkers';
 import { SamplingCircles } from '../../../components/Map/SamplingCircles';
 import { useFitBounds } from '../../../hooks/useFitBounds';
 import { boundsOf } from '../../../utils/geo';
+import { AppButton } from '../../../components/ui/AppButton';
+import { Card } from '../../../components/ui/Card';
+import { Icon } from '../../../components/Icon/Icon';
+import colors from '../../../theme/colors';
 
 export interface TreesPerSamplingProps {
   samplingNumber: number;
@@ -101,7 +100,8 @@ export function ReportScreen({ route }: ScreenProps) {
 
   useEffect(() => {
     handleFetchTrees();
-  }, [samplings]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [samplings, loadingSamplings]);
 
   async function setAreaData() {
     setLoadingAreaData(true);
@@ -136,7 +136,11 @@ export function ReportScreen({ route }: ScreenProps) {
   }
 
   async function handleFetchTrees() {
-    if (samplings.length === 0) return;
+    if (loadingSamplings) return;
+    if (samplings.length === 0) {
+      setLoadingTrees(false);
+      return;
+    }
 
     setLoadingTrees(true);
     setAreaTrees(await fetchTreesByAreaId(area.id));
@@ -417,127 +421,136 @@ export function ReportScreen({ route }: ScreenProps) {
 
   if (loadingAreaData || loadingBio || loadingSamplings || loadingTrees) {
     return (
-      <Screen screenTitle={t('report')} showBackButton>
-        <View className="absolute w-screen h-screen items-center justify-center">
-          <ActivityIndicator size={50} />
+      <Screen screenTitle={t('report')} subtitle={area?.name} showBackButton>
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color={colors.brand} />
         </View>
       </Screen>
     );
   }
 
+  const isSampling = collectionMethod === 'sampling';
+
   return (
-    <Screen screenTitle={t('report')} showBackButton scrollable>
-      <View className="items-center mt-5">
-        <Image
-          source={SintropiaLogo}
-          className="w-36 h-[80]"
-          resizeMode="contain"
-        />
-      </View>
-      <Text className="font-bold text-black text-lg mt-5">
-        {t('reportScreen.justificationReport')}
-      </Text>
-      <Text className="text-gray-500">{area?.name}</Text>
-
-      <View className="w-full flex-row items-center justify-between py-1 px-2 rounded-2xl border border-gray-500 mt-2">
-        <Text className="text-gray-500">
-          {t('reportScreen.inspectionReport')}
-        </Text>
-        <TouchableOpacity
-          onPress={handleSharePDF}
-          className="h-10 w-28 rounded-2xl bg-green-600 flex-row items-center justify-center"
-          disabled={loadingShare}
-          style={{ opacity: loadingShare ? 0.5 : 1 }}
+    <Screen
+      screenTitle={t('report')}
+      subtitle={area?.name}
+      showBackButton
+      scrollable
+      footer={
+        <View className="flex-row">
+          <AppButton
+            title={t('reportScreen.sharePhotos')}
+            icon="image"
+            variant="secondary"
+            compact
+            onPress={handleShareProofPhotosPDF}
+            disabled={loadingShare}
+            style={{ flex: 1, marginRight: 8 }}
+          />
+          <AppButton
+            title={t('reportScreen.shareReport')}
+            icon="share"
+            compact
+            onPress={handleSharePDF}
+            disabled={loadingShare}
+            style={{ flex: 1 }}
+          />
+        </View>
+      }
+    >
+      <View className="rounded-3xl overflow-hidden mt-2 border border-line">
+        <MapView
+          ref={mapRef}
+          style={styles.mapContainer}
+          styleURL={StyleURL.SatelliteStreet}
+          onDidFinishLoadingMap={onMapLoaded}
+          scaleBarEnabled={false}
         >
-          <Text className="font-semibold text-white">
-            {t('reportScreen.share')}
-          </Text>
-        </TouchableOpacity>
+          <Camera ref={cameraRef} defaultSettings={defaultSettings} />
+          <Polyline
+            id="area"
+            lineColor="red"
+            lineWidth={3}
+            coordinates={pathPolyline}
+          />
+          {isSampling && <SamplingCircles samplings={samplings} />}
+          <TreesAndBiodiversityMarkers
+            trees={areaTrees}
+            biodiversity={biodiversity}
+          />
+        </MapView>
       </View>
-
-      <View className="w-full flex-row items-center justify-between py-1 px-2 rounded-2xl border border-gray-500 mt-2">
-        <Text className="text-gray-500">
-          {t('reportScreen.proofPhotosReport')}
-        </Text>
-        <TouchableOpacity
-          onPress={handleShareProofPhotosPDF}
-          className="h-10 w-28 rounded-2xl bg-green-600 flex-row items-center justify-center"
-          disabled={loadingShare}
-          style={{ opacity: loadingShare ? 0.5 : 1 }}
-        >
-          <Text className="font-semibold text-white">
-            {t('reportScreen.share')}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <MapView
-        ref={mapRef}
-        style={styles.mapContainer}
-        styleURL={StyleURL.SatelliteStreet}
-        onDidFinishLoadingMap={onMapLoaded}
-      >
-        <Camera ref={cameraRef} defaultSettings={defaultSettings} />
-
-        <Polyline
-          id="area"
-          lineColor="red"
-          lineWidth={4}
-          coordinates={pathPolyline}
-        />
-
-        {collectionMethod === 'sampling' && (
-          <SamplingCircles samplings={samplings} />
-        )}
-
-        <TreesAndBiodiversityMarkers
-          trees={areaTrees}
-          biodiversity={biodiversity}
-        />
-      </MapView>
-
-      <Text className="mt-3 text-gray-500">
+      <Text className="text-xs text-muted mt-2">
         {t('areaSize')}: {Intl.NumberFormat('pt-BR').format(area.size)} m²
       </Text>
 
-      {collectionMethod === 'sampling' && (
-        <>
-          <Text className="text-gray-500">
-            {t('samplingRadius')}: {samplingSize} m
-          </Text>
-          <Text className="text-gray-500">
-            {t('samplingArea')}: {calculateAreaCircle(samplingSize)} m²
-          </Text>
-          {treesPerSampling.map((item, index) => (
-            <Text key={index} className="text-gray-500">
-              {t('numberOfTreesInTheSampling')} {item.samplingNumber}:{' '}
-              {item.treesCount}
-            </Text>
-          ))}
-        </>
-      )}
-
-      <View className="flex-row items-center justify-center mt-5">
-        <View className="w-[48%] h-20 rounded-2xl items-center justify-center bg-gray-200">
-          <Text className="font-bold text-black text-4xl">{totalTrees}</Text>
-          <Text className="text-gray-500">{t('trees')}</Text>
-        </View>
-
-        <View className="w-[48%] h-20 rounded-2xl items-center justify-center bg-gray-200 ml-3">
-          <Text className="font-bold text-black text-4xl">
-            {totalBiodiversity}
-          </Text>
-          <Text className="text-gray-500">{t('biodiversity')}</Text>
-        </View>
+      <View className="flex-row mt-5" style={{ gap: 12 }}>
+        <ResultTile
+          color={colors.tree}
+          icon="tree"
+          value={Intl.NumberFormat('pt-BR').format(totalTrees)}
+          label={
+            isSampling ? t('collection.summary.estimatedTrees') : t('trees')
+          }
+        />
+        <ResultTile
+          color={colors.bio}
+          icon="leaf"
+          value={String(totalBiodiversity)}
+          label={t('collection.summary.species')}
+        />
       </View>
 
-      {collectionMethod === 'sampling' && <Calculation />}
+      {isSampling && (
+        <Card style={{ marginTop: 16 }}>
+          <Text className="font-bold text-ink text-base">
+            {t('reportScreen.calculation')}
+          </Text>
+          <Text className="text-sm text-muted mt-1">
+            {t('samplingRadius')}: {samplingSize} m · {t('samplingArea')}:{' '}
+            {calculateAreaCircle(samplingSize)} m²
+          </Text>
+          {treesPerSampling.map(item => (
+            <View
+              key={item.samplingNumber}
+              className="flex-row justify-between py-2 border-t border-line mt-2"
+            >
+              <Text className="text-ink">
+                {t('collection.samplingNumber', {
+                  number: item.samplingNumber,
+                })}
+              </Text>
+              <Text className="text-ink font-semibold">
+                {t('collection.treesCount', { count: item.treesCount })}
+              </Text>
+            </View>
+          ))}
+          <Calculation />
+        </Card>
+      )}
 
-      <BiodiversityList list={biodiversity} />
+      {area?.inspectorReport ? (
+        <Card style={{ marginTop: 16 }}>
+          <Text className="font-bold text-ink text-base">
+            {t('inspectorReport.title')}
+          </Text>
+          <Text className="text-ink mt-2">{area.inspectorReport}</Text>
+        </Card>
+      ) : null}
 
-      <SamplingList samplings={samplings} collectionMethod={collectionMethod} />
-
-      <View className="mb-20" />
+      <PhotoGrid
+        title={t('collection.species')}
+        color={colors.bio}
+        photos={biodiversity.map(item => item.photo)}
+        emptyLabel={t('anyBiodiversityRegistered')}
+      />
+      <PhotoGrid
+        title={t('collection.trees')}
+        color={colors.tree}
+        photos={areaTrees.map(item => item.photo)}
+        emptyLabel={t('anyTreeRegistered')}
+      />
 
       {loadingShare && (
         <LoadingGeneratingPdf
@@ -549,10 +562,73 @@ export function ReportScreen({ route }: ScreenProps) {
   );
 }
 
+function ResultTile({
+  color,
+  icon,
+  value,
+  label,
+}: {
+  color: string;
+  icon: 'tree' | 'leaf';
+  value: string;
+  label: string;
+}) {
+  return (
+    <View className="flex-1 bg-surface rounded-3xl border border-line p-4">
+      <View
+        className="w-9 h-9 rounded-full items-center justify-center"
+        style={{ backgroundColor: color }}
+      >
+        <Icon name={icon} size={18} color="#FFFFFF" />
+      </View>
+      <Text className="text-3xl font-bold text-ink mt-3">{value}</Text>
+      <Text className="text-xs text-muted">{label}</Text>
+    </View>
+  );
+}
+
+function PhotoGrid({
+  title,
+  color,
+  photos,
+  emptyLabel,
+}: {
+  title: string;
+  color: string;
+  photos: string[];
+  emptyLabel: string;
+}) {
+  return (
+    <View className="mt-7">
+      <View className="flex-row items-center mb-3">
+        <View
+          className="w-3 h-3 rounded-full mr-2"
+          style={{ backgroundColor: color }}
+        />
+        <Text className="font-bold text-ink text-base">{title}</Text>
+        <Text className="text-muted ml-2">{photos.length}</Text>
+      </View>
+      {photos.length === 0 ? (
+        <Text className="text-muted">{emptyLabel}</Text>
+      ) : (
+        <View className="flex-row flex-wrap" style={{ gap: 8 }}>
+          {photos.map((photo, index) => (
+            <Image
+              key={index}
+              source={{ uri: photo }}
+              className="rounded-2xl bg-line"
+              style={{ width: 76, height: 76 }}
+            />
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   mapContainer: {
     width: '100%',
-    height: 300,
-    marginTop: 20,
+    height: 280,
   },
 });

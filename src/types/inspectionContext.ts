@@ -7,4 +7,5 @@ export interface StartInspectionProps {
   };
   coordinates: CoordinateProps[];
   areaSize: number;
+  collectionMethod: 'manual' | 'sampling';
 }
