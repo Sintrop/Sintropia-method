@@ -15,10 +15,11 @@ interface GenerateReportPDFProps {
   coordinates: CoordinateProps[];
   regenerator: {
     address?: string;
-  }
+  };
   date: string;
   version: string;
   mapImage?: string;
+  fileName: string;
   inspectorReport: string;
 }
 
@@ -57,10 +58,12 @@ const styleHTML = `
     .div-flex-wrap { display: flex; gap: 15px; flex-wrap: wrap; }
     .p-coordinate { font-size: 10px; }
   </style>
-`
+`;
 
 function listBiodiversity(biodiversity: BiodiversityDBProps[]) {
-  const bioHTML = biodiversity.map(item => `
+  const bioHTML = biodiversity
+    .map(
+      item => `
     <div class="register-item">
       <img
         src="${item.photo}"
@@ -77,7 +80,9 @@ function listBiodiversity(biodiversity: BiodiversityDBProps[]) {
         </p>
       </div>
     </div> 
-  `).join('');
+  `,
+    )
+    .join('');
 
   return `
       ${bioHTML}
@@ -85,7 +90,9 @@ function listBiodiversity(biodiversity: BiodiversityDBProps[]) {
 }
 
 function listTrees(trees: TreeDBProps[]) {
-  const bioHTML = trees.map(item => `
+  const bioHTML = trees
+    .map(
+      item => `
     <div class="register-item">
       <img
         src="${item.photo}"
@@ -102,7 +109,9 @@ function listTrees(trees: TreeDBProps[]) {
         </p>
       </div>
     </div> 
-  `).join('');
+  `,
+    )
+    .join('');
 
   return `
       ${bioHTML}
@@ -110,11 +119,15 @@ function listTrees(trees: TreeDBProps[]) {
 }
 
 function listCoordinates(coords: CoordinateProps[]) {
-  const coordsHTML = coords.map(item => `<p>Lat: ${item?.latitude}, Lng: ${item?.longitude}</p>`).join('');
+  const coordsHTML = coords
+    .map(item => `<p>Lat: ${item?.latitude}, Lng: ${item?.longitude}</p>`)
+    .join('');
   return `${coordsHTML}`;
 }
 
-export async function generateReportPDF(props: GenerateReportPDFProps): Promise<string> {
+export async function generateReportPDF(
+  props: GenerateReportPDFProps,
+): Promise<string> {
   const {
     areaName,
     biodiversityCount,
@@ -127,7 +140,8 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
     date,
     version,
     mapImage,
-    inspectorReport
+    fileName,
+    inspectorReport,
   } = props;
 
   const htmlContent = `
@@ -316,11 +330,11 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
 
   const options = {
     html: htmlContent,
-    fileName: `inspection-area`,
+    fileName,
     directory: 'Documents',
   };
 
   const file = await RNHTMLtoPDF.convert(options);
 
-  return `file://${file.filePath}`
+  return `file://${file.filePath}`;
 }

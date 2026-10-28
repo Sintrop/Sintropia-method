@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -19,7 +25,11 @@ import { samplingShapes } from '../../../components/Map/SamplingCircles';
 import { extrapolateTreesToArea } from '../../../services/inspection/extrapolateTreesToArea';
 import { FieldMap } from './components/FieldMap';
 import { PhotosPane, MIN_AREA_PHOTOS } from './components/PhotosPane';
-import { SummaryPane } from './components/SummaryPane';
+import { Requirement, SummaryPane } from './components/SummaryPane';
+import { CollectionMap } from '../../../components/Map/CollectionMap';
+import { LoadingGeneratingPdf } from '../ReportScreen/components/LoadingGeneratingPdf/LoadingGeneratingPdf';
+import { useReportExport } from '../../../hooks/useReportExport';
+import { MapView } from '@rnmapbox/maps';
 import { CollectionTab, TabBar } from './components/TabBar';
 import {
   RegisterFlow,
@@ -60,6 +70,8 @@ export function CollectionScreen({ navigation }: ScreenProps) {
     useState<RegisterRequest | null>(null);
 
   const method = area?.collectionMethod === 'manual' ? 'manual' : 'sampling';
+  const summaryMapRef = useRef<MapView>(null);
+  const exporter = useReportExport(area, method, summaryMapRef);
 
   useEffect(() => {
     requestLocationPermission();
@@ -104,11 +116,11 @@ export function CollectionScreen({ navigation }: ScreenProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [area?.id, method, data.loaded, data.samplings.length]);
 
-  const ring = useMemo(
-    () =>
-      area ? areaRing(JSON.parse(area.coordinates) as CoordinateProps[]) : [],
+  const coordinates = useMemo(
+    () => (area ? (JSON.parse(area.coordinates) as CoordinateProps[]) : []),
     [area?.coordinates],
   );
+  const ring = useMemo(() => areaRing(coordinates), [coordinates]);
   const shapes = useMemo(
     () => (method === 'sampling' ? samplingShapes(data.samplings) : []),
     [data.samplings, method],
@@ -133,16 +145,37 @@ export function CollectionScreen({ navigation }: ScreenProps) {
     });
   }, [area, method, data.samplings, data.trees.length, treesBySampling]);
 
-  const requirements = [
+  const requirements: Requirement[] = [
+    method === 'sampling'
+      ? {
+          label: t('collection.requirements.sampling'),
+          done: data.samplings.length > 0,
+          tab: 'map',
+        }
+      : {
+          label: t('collection.requirements.tree'),
+          done: data.trees.length > 0,
+          tab: 'map',
+        },
+    {
+      label: t('collection.requirements.species'),
+      done: data.biodiversity.length > 0,
+      tab: 'map',
+    },
     {
       label: t('collection.requirements.regeneratorPhoto'),
       done: !!area?.proofPhoto,
+      tab: 'photos',
     },
     {
       label: t('collection.requirements.areaPhotos', { min: MIN_AREA_PHOTOS }),
       done: data.areaPhotos.length >= MIN_AREA_PHOTOS,
+      tab: 'photos',
     },
   ];
+  const photosPending = requirements.some(
+    item => item.tab === 'photos' && !item.done,
+  );
 
   async function handleSaveRegister(result: RegisterResult) {
     if (!area) return;
@@ -264,6 +297,21 @@ export function CollectionScreen({ navigation }: ScreenProps) {
                 await data.updateInspectorReport(notes, area.id);
                 fetchOpenedAreas();
               }}
+              onShareReport={exporter.shareInspectionReport}
+              onSharePhotos={exporter.shareProofPhotos}
+              exporting={!!exporter.progress}
+              onGoToTab={setTab}
+              map={
+                <CollectionMap
+                  ref={summaryMapRef}
+                  coordinates={coordinates}
+                  samplings={data.samplings}
+                  trees={data.trees}
+                  biodiversity={data.biodiversity}
+                  showSamplings={method === 'sampling'}
+                  height={200}
+                />
+              }
               onOpenReport={() =>
                 navigation.navigate('ReportScreen', {
                   collectionMethod: method,
@@ -281,8 +329,15 @@ export function CollectionScreen({ navigation }: ScreenProps) {
         current={tab}
         onChange={setTab}
         bottomInset={bottom}
-        pendingPhotos={!requirements.every(item => item.done)}
+        pendingPhotos={photosPending}
       />
+
+      {exporter.progress && (
+        <LoadingGeneratingPdf
+          percentage={exporter.progress.percent}
+          message={exporter.progress.message}
+        />
+      )}
 
       <RegisterFlow
         request={registerRequest}

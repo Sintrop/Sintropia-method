@@ -13,10 +13,11 @@ interface GenerateReportProofPhotosProps {
   coordinates: CoordinateProps[];
   regenerator: {
     address?: string;
-  }
+  };
   date: string;
   version: string;
   mapImage?: string;
+  fileName: string;
 }
 
 const styleHTML = `
@@ -50,15 +51,19 @@ const styleHTML = `
     .div-flex-wrap { display: flex; gap: 15px; flex-wrap: wrap; }
     .p-coordinate { font-size: 10px; }
   </style>
-`
+`;
 
 function listProofPhotos(photos: ProofPhotosDBProps[]) {
-  const photosHTML = photos.map(item => `
+  const photosHTML = photos
+    .map(
+      item => `
     <img
       src="${item.photo}"
       class="register-item_img"
     />
-  `).join('');
+  `,
+    )
+    .join('');
 
   return `
       ${photosHTML}
@@ -66,11 +71,15 @@ function listProofPhotos(photos: ProofPhotosDBProps[]) {
 }
 
 function listCoordinates(coords: CoordinateProps[]) {
-  const coordsHTML = coords.map(item => `<p>Lat: ${item?.latitude}, Lng: ${item?.longitude}</p>`).join('');
+  const coordsHTML = coords
+    .map(item => `<p>Lat: ${item?.latitude}, Lng: ${item?.longitude}</p>`)
+    .join('');
   return `${coordsHTML}`;
 }
 
-export async function generateReportProofPhotos(props: GenerateReportProofPhotosProps): Promise<string> {
+export async function generateReportProofPhotos(
+  props: GenerateReportProofPhotosProps,
+): Promise<string> {
   const {
     areaName,
     areaSize,
@@ -80,7 +89,8 @@ export async function generateReportProofPhotos(props: GenerateReportProofPhotos
     regenerator,
     version,
     mapImage,
-    date
+    fileName,
+    date,
   } = props;
 
   const htmlContent = `
@@ -145,11 +155,11 @@ export async function generateReportProofPhotos(props: GenerateReportProofPhotos
 
   const options = {
     html: htmlContent,
-    fileName: `proof-photo-report`,
+    fileName,
     directory: 'Documents',
   };
 
   const file = await RNHTMLtoPDF.convert(options);
 
-  return `file://${file.filePath}`
+  return `file://${file.filePath}`;
 }

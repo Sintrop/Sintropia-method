@@ -139,7 +139,8 @@
       "justificationReport": "Justification report",
       "calculation": "How the total was estimated",
       "sharePhotos": "Photos PDF",
-      "shareReport": "Report PDF"
+      "shareReport": "Report PDF",
+      "exportError": "Could not generate the PDF. Try again."
     },
     "inspectorReport": {
       "title": "Inspector report",
@@ -236,7 +237,10 @@
       },
       "requirements": {
         "regeneratorPhoto": "Photo with the regenerator",
-        "areaPhotos": "At least {{min}} photos of the area"
+        "areaPhotos": "At least {{min}} photos of the area",
+        "sampling": "At least 1 sampling",
+        "tree": "At least 1 tree registered",
+        "species": "At least 1 species registered"
       },
       "summary": {
         "estimatedTrees": "Estimated trees",
@@ -246,7 +250,8 @@
         "completeChecklist": "Complete the checklist above to finish.",
         "saved": "Saved",
         "saving": "Saving…",
-        "openReport": "View report and share PDF"
+        "openReport": "View full report",
+        "reports": "Reports"
       },
       "treesCount_one": "{{count}} tree",
       "treesCount_other": "{{count}} trees"

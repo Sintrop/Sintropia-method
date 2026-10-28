@@ -6,6 +6,7 @@ import {
   ScrollView,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +21,8 @@ import colors from '../../../../theme/colors';
 export interface Requirement {
   label: string;
   done: boolean;
+  /** Tab where the inspector resolves this item. */
+  tab: 'map' | 'photos';
 }
 
 interface Props {
@@ -34,6 +37,11 @@ interface Props {
   topInset: number;
   onSaveNotes: (notes: string) => Promise<void>;
   onOpenReport: () => void;
+  onShareReport: () => void;
+  onSharePhotos: () => void;
+  exporting: boolean;
+  onGoToTab: (tab: Requirement['tab']) => void;
+  map: React.ReactNode;
   onFinish: () => Promise<void>;
   onDelete: () => Promise<void>;
 }
@@ -50,6 +58,11 @@ export function SummaryPane({
   topInset,
   onSaveNotes,
   onOpenReport,
+  onShareReport,
+  onSharePhotos,
+  exporting,
+  onGoToTab,
+  map,
   onFinish,
   onDelete,
 }: Props) {
@@ -108,7 +121,9 @@ export function SummaryPane({
           {method === 'sampling' ? t('sampling') : t('manual')}
         </Text>
 
-        <View className="flex-row mt-5" style={{ gap: 12 }}>
+        <View className="mt-5">{map}</View>
+
+        <View className="flex-row mt-3" style={{ gap: 12 }}>
           <ResultCard
             color={colors.tree}
             icon="tree"
@@ -143,9 +158,11 @@ export function SummaryPane({
         />
         <Card>
           {requirements.map((item, index) => (
-            <View
+            <TouchableOpacity
               key={item.label}
-              className={`flex-row items-center py-2 ${
+              disabled={item.done}
+              onPress={() => onGoToTab(item.tab)}
+              className={`flex-row items-center py-2.5 ${
                 index > 0 ? 'border-t border-line' : ''
               }`}
             >
@@ -161,7 +178,10 @@ export function SummaryPane({
                 />
               </View>
               <Text className="ml-3 text-ink flex-1">{item.label}</Text>
-            </View>
+              {!item.done && (
+                <Icon name="chevronRight" size={18} color={colors.muted} />
+              )}
+            </TouchableOpacity>
           ))}
         </Card>
 
@@ -187,19 +207,44 @@ export function SummaryPane({
           style={{ minHeight: 120 }}
         />
 
+        <SectionTitle
+          title={t('collection.summary.reports')}
+          style={{ marginTop: 28, marginBottom: 8 }}
+        />
+        <View className="flex-row">
+          <AppButton
+            title={t('reportScreen.sharePhotos')}
+            icon="image"
+            variant="secondary"
+            compact
+            onPress={onSharePhotos}
+            disabled={exporting}
+            style={{ flex: 1, marginRight: 8 }}
+          />
+          <AppButton
+            title={t('reportScreen.shareReport')}
+            icon="share"
+            variant="secondary"
+            compact
+            onPress={onShareReport}
+            disabled={exporting}
+            style={{ flex: 1 }}
+          />
+        </View>
         <AppButton
           title={t('collection.summary.openReport')}
           icon="report"
-          variant="secondary"
+          variant="ghost"
+          compact
           onPress={onOpenReport}
-          className="mt-7"
+          className="mt-1"
         />
         <AppButton
           title={t('markAsRealized')}
           icon="check"
           onPress={confirmFinish}
           disabled={!canFinish}
-          className="mt-3"
+          className="mt-6"
         />
         {!canFinish && (
           <Text className="text-xs text-warning text-center mt-2">

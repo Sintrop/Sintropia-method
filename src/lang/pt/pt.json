@@ -140,7 +140,8 @@
       "justificationReport": "Relatório de justificativa",
       "calculation": "Como o total foi estimado",
       "sharePhotos": "PDF das fotos",
-      "shareReport": "PDF do relatório"
+      "shareReport": "PDF do relatório",
+      "exportError": "Não foi possível gerar o PDF. Tente novamente."
     },
     "inspectorReport": {
       "title": "Relatório do inspetor",
@@ -237,7 +238,10 @@
       },
       "requirements": {
         "regeneratorPhoto": "Foto com o regenerador",
-        "areaPhotos": "Pelo menos {{min}} fotos da área"
+        "areaPhotos": "Pelo menos {{min}} fotos da área",
+        "sampling": "Pelo menos 1 amostra",
+        "tree": "Pelo menos 1 árvore registrada",
+        "species": "Pelo menos 1 espécie registrada"
       },
       "summary": {
         "estimatedTrees": "Árvores (estimativa)",
@@ -247,7 +251,8 @@
         "completeChecklist": "Complete a lista acima para finalizar.",
         "saved": "Salvo",
         "saving": "Salvando…",
-        "openReport": "Ver relatório e compartilhar PDF"
+        "openReport": "Ver relatório completo",
+        "reports": "Relatórios"
       },
       "treesCount_one": "{{count}} árvore",
       "treesCount_other": "{{count}} árvores"

@@ -1,427 +1,66 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import Share from 'react-native-share';
-import { Screen } from '../../../components/Screen/Screen';
+import React, { useMemo, useRef } from 'react';
+import { ActivityIndicator, Image, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Camera, MapView, StyleURL } from '@rnmapbox/maps';
-import { Polyline } from '../../../components/Map/Polyline';
-import {
-  BiodiversityDBProps,
-  ProofPhotosDBProps,
-  SamplingDBProps,
-  TreeDBProps,
-} from '../../../types/database';
-import { useSQLite } from '../../../hooks/useSQLite';
-import { CoordinateProps } from '../../../types/regenerator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { MapView } from '@rnmapbox/maps';
+import { Screen } from '../../../components/Screen/Screen';
 import { InspectionStackParamsList } from '../../../routes/InspectionRoutes';
-import { generateReportPDF } from '../../../services/inspection/generateReportPDF';
-import { convertImageToBase64 } from '../../../services/inspection/convertImageToBase64';
-import {
-  generateReportPDFSamplingMode,
-  SamplingPDFProps,
-} from '../../../services/inspection/generateReportPDFSamplingMode';
+import { CoordinateProps } from '../../../types/regenerator';
+import { useCollectionData } from '../../../hooks/useCollectionData';
+import { useReportExport } from '../../../hooks/useReportExport';
 import { extrapolateTreesToArea } from '../../../services/inspection/extrapolateTreesToArea';
-import { Calculation } from './components/Calculation/Calculation';
 import { calculateAreaCircle } from '../../../services/inspection/calculateAreaCircle';
-import { LoadingGeneratingPdf } from './components/LoadingGeneratingPdf/LoadingGeneratingPdf';
-import { generateReportProofPhotos } from '../../../services/inspection/generateReportProofPhotos';
-
-import { format } from 'date-fns';
-import { APP_VERSION } from '../../../constants/app';
-import { TreesAndBiodiversityMarkers } from '../../../components/Map/RegisterMarkers';
-import { SamplingCircles } from '../../../components/Map/SamplingCircles';
-import { useFitBounds } from '../../../hooks/useFitBounds';
-import { boundsOf } from '../../../utils/geo';
+import { countTreesBySampling } from '../../../utils/fieldPosition';
+import { CollectionMap } from '../../../components/Map/CollectionMap';
 import { AppButton } from '../../../components/ui/AppButton';
 import { Card } from '../../../components/ui/Card';
 import { Icon } from '../../../components/Icon/Icon';
 import colors from '../../../theme/colors';
+import { Calculation } from './components/Calculation/Calculation';
+import { LoadingGeneratingPdf } from './components/LoadingGeneratingPdf/LoadingGeneratingPdf';
 
-export interface TreesPerSamplingProps {
-  samplingNumber: number;
-  treesCount: number;
-}
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
   'ReportScreen'
 >;
 export function ReportScreen({ route }: ScreenProps) {
   const { collectionMethod, area } = route.params;
-  const {
-    fetchBiodiversityByAreaId,
-    db,
-    fetchSampligsArea,
-    fetchTreesSampling,
-    fetchTreesByAreaId,
-    fetchProofPhotosArea,
-  } = useSQLite();
   const { t } = useTranslation();
-  const [coordinatesArea, setCoordinatesArea] = useState<CoordinateProps[]>([]);
-  const [areaSize, setAreaSize] = useState<number>(0);
-  const [pathPolyline, setPathPolyline] = useState<[number, number][]>([]);
-  const [biodiversity, setBiodiversity] = useState<BiodiversityDBProps[]>([]);
-  const [samplings, setSamplings] = useState<SamplingDBProps[]>([]);
-  const [samplingSize, setSamplingSize] = useState<number>(0);
-  const [trees, setTrees] = useState<TreeDBProps[]>([]);
-  const [treesPerSampling, setTreesPerSampling] = useState<
-    TreesPerSamplingProps[]
-  >([]);
-  const [totalTrees, setTotalTrees] = useState<number>(0);
-  const [totalBiodiversity, setTotalBiodiversity] = useState<number>(0);
-  const [areaTrees, setAreaTrees] = useState<TreeDBProps[]>([]);
-  const areaBounds = useMemo(() => boundsOf(pathPolyline), [pathPolyline]);
-  const { cameraRef, onMapLoaded, defaultSettings } = useFitBounds(areaBounds);
   const mapRef = useRef<MapView>(null);
-  const [loadingShare, setLoadingShare] = useState(false);
-  const [loadingAreaData, setLoadingAreaData] = useState(true);
-  const [loadingBio, setLoadingBio] = useState(true);
-  const [loadingTrees, setLoadingTrees] = useState(true);
-  const [loadingSamplings, setLoadingSamplings] = useState(true);
+  const { samplings, trees, biodiversity, loaded } = useCollectionData(area.id);
+  const { progress, shareInspectionReport, shareProofPhotos } = useReportExport(
+    area,
+    collectionMethod,
+    mapRef,
+  );
 
-  const [totalPicturesToPdf, setTotalPicturesToPdf] = useState<number>(1);
-  const [percentGeneratingPdf, setPercentGeneratingPdf] = useState<number>(0);
-  const [messageGeneratingPdf, setMessageGeneratingPdf] = useState<string>('');
-
-  useEffect(() => {
-    if (db) {
-      setAreaData();
-      handleFetchBiodiversity();
-      handleFetchSamplings();
-    }
-  }, [db]);
-
-  useEffect(() => {
-    handleFetchTrees();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [samplings, loadingSamplings]);
-
-  async function setAreaData() {
-    setLoadingAreaData(true);
-    setAreaSize(area?.size);
-
-    const coords = JSON.parse(area.coordinates) as CoordinateProps[];
-    setCoordinatesArea(coords);
-    setPathPolyline(
-      coords.map(coord => [
-        parseFloat(coord.longitude),
-        parseFloat(coord.latitude),
-      ]),
-    );
-    setPathPolyline(value => [...value, value[0]]);
-    setLoadingAreaData(false);
-  }
-
-  async function handleFetchBiodiversity() {
-    setLoadingBio(true);
-    const bios = await fetchBiodiversityByAreaId(area?.id);
-    setTotalBiodiversity(bios.length);
-    setTotalPicturesToPdf(value => value + bios.length);
-    setBiodiversity(bios);
-    setLoadingBio(false);
-  }
-
-  async function handleFetchSamplings() {
-    setLoadingSamplings(true);
-    const responseSamplings = await fetchSampligsArea(area?.id);
-    setSamplings(responseSamplings);
-    setLoadingSamplings(false);
-  }
-
-  async function handleFetchTrees() {
-    if (loadingSamplings) return;
-    if (samplings.length === 0) {
-      setLoadingTrees(false);
-      return;
-    }
-
-    setLoadingTrees(true);
-    setAreaTrees(await fetchTreesByAreaId(area.id));
-
-    if (collectionMethod === 'manual') {
-      const responseTrees = await fetchTreesSampling(samplings[0].id);
-      setTrees(responseTrees);
-      setTotalTrees(responseTrees.length);
-      setTotalPicturesToPdf(value => value + responseTrees.length);
-    }
-
-    if (collectionMethod === 'sampling') {
-      setTreesPerSampling([]);
-      setSamplingSize(samplings[0].size);
-      let treesCountPerSampling: number[] = [];
-      for (let s = 0; s < samplings.length; s++) {
-        const sampling = samplings[s];
-        const responseTrees = await fetchTreesSampling(sampling.id);
-        treesCountPerSampling.push(responseTrees.length);
-
-        setTreesPerSampling(value => [
-          ...value,
-          { samplingNumber: s + 1, treesCount: responseTrees.length },
-        ]);
-        setTotalPicturesToPdf(value => value + responseTrees.length);
-      }
-
-      const treesTotalEstimated = extrapolateTreesToArea({
-        samplingSize: samplings[0].size,
-        samplingTrees: treesCountPerSampling,
-        totalArea: area.size,
-      });
-
-      setTotalTrees(treesTotalEstimated);
-    }
-    setLoadingTrees(false);
-  }
-
-  async function captureMap(): Promise<string> {
-    try {
-      return (await mapRef.current?.takeSnap(false)) ?? '';
-    } catch (e) {
-      console.warn('Map snapshot failed', e);
-      return '';
-    }
-  }
-
-  async function generatePDFManualMode(): Promise<string> {
-    const newListBio: BiodiversityDBProps[] = [];
-    const newListTrees: TreeDBProps[] = [];
-
-    let totalConverted = 0;
-
-    for (let b = 0; b < biodiversity.length; b++) {
-      const bio = biodiversity[b];
-      const photo = bio.photo;
-      const base64 = await convertImageToBase64({ uri: photo });
-      newListBio.push({
-        ...bio,
-        photo: base64,
-      });
-      totalConverted += 1;
-      setPercentGeneratingPdf(
-        Math.ceil((totalConverted / totalPicturesToPdf) * 100),
-      );
-    }
-
-    for (let t = 0; t < trees.length; t++) {
-      const tree = trees[t];
-      const photo = tree.photo;
-      const base64 = await convertImageToBase64({ uri: photo });
-      newListTrees.push({
-        ...tree,
-        photo: base64,
-      });
-      totalConverted += 1;
-      setPercentGeneratingPdf(
-        Math.ceil((totalConverted / totalPicturesToPdf) * 100),
-      );
-    }
-
-    setMessageGeneratingPdf('creatingPDF');
-    const mapImage = await captureMap();
-
-    const pdfUri = await generateReportPDF({
-      mapImage,
-      areaName: area?.name,
-      biodiversityCount: totalBiodiversity,
-      treesCount: totalTrees,
-      biodiversity: newListBio,
-      trees: newListTrees,
-      coordinates: coordinatesArea,
-      areaSize: `${Intl.NumberFormat('pt-BR').format(areaSize)} m²`,
-      regenerator: {
-        address: area.regeneratorAddress,
-      },
-      date: format(new Date(), 'dd/MM/yyyy'),
-      version: APP_VERSION,
-      inspectorReport: area?.inspectorReport,
+  const isSampling = collectionMethod === 'sampling';
+  const coordinates = useMemo(
+    () => JSON.parse(area.coordinates) as CoordinateProps[],
+    [area.coordinates],
+  );
+  const treesBySampling = useMemo(() => countTreesBySampling(trees), [trees]);
+  const samplingSize = samplings[0]?.size ?? 0;
+  const totalTrees = useMemo(() => {
+    if (!isSampling) return trees.length;
+    if (samplings.length === 0) return 0;
+    return extrapolateTreesToArea({
+      samplingSize,
+      samplingTrees: samplings.map(s => treesBySampling[s.id] ?? 0),
+      totalArea: area.size,
     });
+  }, [
+    isSampling,
+    trees.length,
+    samplings,
+    samplingSize,
+    treesBySampling,
+    area.size,
+  ]);
 
-    return pdfUri;
-  }
-
-  async function generatePDFSamplingMode(): Promise<string> {
-    const newListBio: BiodiversityDBProps[] = [];
-    const newListSamplings: SamplingPDFProps[] = [];
-
-    let totalConverted = 0;
-
-    for (let b = 0; b < biodiversity.length; b++) {
-      const bio = biodiversity[b];
-      const photo = bio.photo;
-      const base64 = await convertImageToBase64({ uri: photo });
-      newListBio.push({
-        ...bio,
-        photo: base64,
-      });
-      totalConverted += 1;
-      setPercentGeneratingPdf(
-        Math.ceil((totalConverted / totalPicturesToPdf) * 100),
-      );
-    }
-
-    for (let s = 0; s < samplings.length; s++) {
-      const sampling = samplings[s];
-      const trees = await fetchTreesSampling(sampling.id);
-
-      let newTreesList: TreeDBProps[] = [];
-
-      for (let t = 0; t < trees.length; t++) {
-        const tree = trees[t];
-        const photoBase64 = await convertImageToBase64({ uri: tree.photo });
-        const newDataTree: TreeDBProps = {
-          ...tree,
-          photo: photoBase64,
-        };
-        newTreesList.push(newDataTree);
-        totalConverted += 1;
-        setPercentGeneratingPdf(
-          Math.ceil((totalConverted / totalPicturesToPdf) * 100),
-        );
-      }
-
-      const newDataSampling: SamplingPDFProps = {
-        samplingNumber: sampling.number,
-        size: sampling.size,
-        trees: newTreesList,
-      };
-
-      newListSamplings.push(newDataSampling);
-    }
-
-    setMessageGeneratingPdf('creatingPDF');
-    const mapImage = await captureMap();
-
-    const pdfUri = await generateReportPDFSamplingMode({
-      mapImage,
-      areaName: area?.name,
-      biodiversityCount: totalBiodiversity,
-      treesCount: totalTrees,
-      biodiversity: newListBio,
-      samplings: newListSamplings,
-      coordinates: coordinatesArea,
-      areaSize: `${Intl.NumberFormat('pt-BR').format(areaSize)} m²`,
-      regenerator: {
-        address: area.regeneratorAddress,
-      },
-      date: format(new Date(), 'dd/MM/yyyy'),
-      version: APP_VERSION,
-      inspectorReport: area?.inspectorReport,
-    });
-
-    return pdfUri;
-  }
-
-  async function handleSharePDF() {
-    setLoadingShare(true);
-    setMessageGeneratingPdf('optimizingPictures');
-    setPercentGeneratingPdf(0);
-    sharePdf();
-  }
-
-  async function sharePdf(): Promise<void> {
-    setTimeout(async () => {
-      try {
-        if (collectionMethod === 'manual') {
-          const pdf = await generatePDFManualMode();
-          Share.open({
-            url: pdf,
-            title: `Inspection Area: ${area?.name}`,
-            type: 'application/pdf',
-          });
-        }
-
-        if (collectionMethod === 'sampling') {
-          const pdf = await generatePDFSamplingMode();
-          Share.open({
-            url: pdf,
-            title: `Inspection Area: ${area?.name}`,
-            type: 'application/pdf',
-          });
-        }
-      } catch (e) {
-        Alert.alert(e as string);
-        setLoadingShare(false);
-      }
-      setLoadingShare(false);
-    }, 1000);
-  }
-
-  async function handleShareProofPhotosPDF() {
-    setLoadingShare(true);
-    setMessageGeneratingPdf('optimizingPictures');
-    setPercentGeneratingPdf(0);
-    const pdf = await generateProofPhotosPDF();
-    Share.open({
-      url: pdf,
-      title: `Proof Photos Report: ${area?.name}`,
-      type: 'application/pdf',
-    });
-    setLoadingShare(false);
-  }
-
-  async function generateProofPhotosPDF(): Promise<string> {
-    const newListPhotos: ProofPhotosDBProps[] = [];
-
-    const response = await fetchProofPhotosArea(area.id);
-    const totalProofPhotos = response.length + 1;
-
-    let totalConverted = 0;
-
-    for (let b = 0; b < response.length; b++) {
-      const register = response[b];
-      const photo = register.photo;
-      const base64 = await convertImageToBase64({
-        uri: photo,
-        width: 500,
-        height: 500,
-      });
-      newListPhotos.push({
-        ...register,
-        photo: base64,
-      });
-      totalConverted += 1;
-      setPercentGeneratingPdf(
-        Math.ceil((totalConverted / totalProofPhotos) * 100),
-      );
-    }
-    const proofPhoto = await convertImageToBase64({
-      uri: area.proofPhoto,
-      width: 500,
-      height: 500,
-    });
-    totalConverted += 1;
-    setPercentGeneratingPdf(
-      Math.ceil((totalConverted / totalProofPhotos) * 100),
-    );
-    setMessageGeneratingPdf('creatingPDF');
-    const mapImage = await captureMap();
-
-    const pdfUri = await generateReportProofPhotos({
-      mapImage,
-      areaName: area?.name,
-      coordinates: coordinatesArea,
-      areaSize: `${Intl.NumberFormat('pt-BR').format(areaSize)} m²`,
-      proofPhotos: newListPhotos,
-      proofPhoto,
-      regenerator: {
-        address: area.regeneratorAddress,
-      },
-      date: format(new Date(), 'dd/MM/yyyy'),
-      version: APP_VERSION,
-    });
-
-    return pdfUri;
-  }
-
-  if (loadingAreaData || loadingBio || loadingSamplings || loadingTrees) {
+  if (!loaded) {
     return (
-      <Screen screenTitle={t('report')} subtitle={area?.name} showBackButton>
+      <Screen screenTitle={t('report')} subtitle={area.name} showBackButton>
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.brand} />
         </View>
@@ -429,12 +68,10 @@ export function ReportScreen({ route }: ScreenProps) {
     );
   }
 
-  const isSampling = collectionMethod === 'sampling';
-
   return (
     <Screen
       screenTitle={t('report')}
-      subtitle={area?.name}
+      subtitle={area.name}
       showBackButton
       scrollable
       footer={
@@ -444,42 +81,31 @@ export function ReportScreen({ route }: ScreenProps) {
             icon="image"
             variant="secondary"
             compact
-            onPress={handleShareProofPhotosPDF}
-            disabled={loadingShare}
+            onPress={shareProofPhotos}
+            disabled={!!progress}
             style={{ flex: 1, marginRight: 8 }}
           />
           <AppButton
             title={t('reportScreen.shareReport')}
             icon="share"
             compact
-            onPress={handleSharePDF}
-            disabled={loadingShare}
+            onPress={shareInspectionReport}
+            disabled={!!progress}
             style={{ flex: 1 }}
           />
         </View>
       }
     >
-      <View className="rounded-3xl overflow-hidden mt-2 border border-line">
-        <MapView
+      <View className="mt-2">
+        <CollectionMap
           ref={mapRef}
-          style={styles.mapContainer}
-          styleURL={StyleURL.SatelliteStreet}
-          onDidFinishLoadingMap={onMapLoaded}
-          scaleBarEnabled={false}
-        >
-          <Camera ref={cameraRef} defaultSettings={defaultSettings} />
-          <Polyline
-            id="area"
-            lineColor="red"
-            lineWidth={3}
-            coordinates={pathPolyline}
-          />
-          {isSampling && <SamplingCircles samplings={samplings} />}
-          <TreesAndBiodiversityMarkers
-            trees={areaTrees}
-            biodiversity={biodiversity}
-          />
-        </MapView>
+          coordinates={coordinates}
+          samplings={samplings}
+          trees={trees}
+          biodiversity={biodiversity}
+          showSamplings={isSampling}
+          height={280}
+        />
       </View>
       <Text className="text-xs text-muted mt-2">
         {t('areaSize')}: {Intl.NumberFormat('pt-BR').format(area.size)} m²
@@ -497,7 +123,7 @@ export function ReportScreen({ route }: ScreenProps) {
         <ResultTile
           color={colors.bio}
           icon="leaf"
-          value={String(totalBiodiversity)}
+          value={String(biodiversity.length)}
           label={t('collection.summary.species')}
         />
       </View>
@@ -511,18 +137,18 @@ export function ReportScreen({ route }: ScreenProps) {
             {t('samplingRadius')}: {samplingSize} m · {t('samplingArea')}:{' '}
             {calculateAreaCircle(samplingSize)} m²
           </Text>
-          {treesPerSampling.map(item => (
+          {samplings.map((sampling, index) => (
             <View
-              key={item.samplingNumber}
+              key={sampling.id}
               className="flex-row justify-between py-2 border-t border-line mt-2"
             >
               <Text className="text-ink">
-                {t('collection.samplingNumber', {
-                  number: item.samplingNumber,
-                })}
+                {t('collection.samplingNumber', { number: index + 1 })}
               </Text>
               <Text className="text-ink font-semibold">
-                {t('collection.treesCount', { count: item.treesCount })}
+                {t('collection.treesCount', {
+                  count: treesBySampling[sampling.id] ?? 0,
+                })}
               </Text>
             </View>
           ))}
@@ -530,7 +156,7 @@ export function ReportScreen({ route }: ScreenProps) {
         </Card>
       )}
 
-      {area?.inspectorReport ? (
+      {area.inspectorReport ? (
         <Card style={{ marginTop: 16 }}>
           <Text className="font-bold text-ink text-base">
             {t('inspectorReport.title')}
@@ -548,14 +174,14 @@ export function ReportScreen({ route }: ScreenProps) {
       <PhotoGrid
         title={t('collection.trees')}
         color={colors.tree}
-        photos={areaTrees.map(item => item.photo)}
+        photos={trees.map(item => item.photo)}
         emptyLabel={t('anyTreeRegistered')}
       />
 
-      {loadingShare && (
+      {progress && (
         <LoadingGeneratingPdf
-          percentage={percentGeneratingPdf}
-          message={messageGeneratingPdf}
+          percentage={progress.percent}
+          message={progress.message}
         />
       )}
     </Screen>
@@ -625,10 +251,3 @@ function PhotoGrid({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  mapContainer: {
-    width: '100%',
-    height: 280,
-  },
-});
