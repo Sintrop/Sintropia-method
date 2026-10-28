@@ -4,6 +4,7 @@ import { CoordinateProps } from '../../types/regenerator';
 import { calculateAreaCircle } from './calculateAreaCircle';
 import { LogoBase64 } from '../../data/base64/images';
 import { RCLogoBase64 } from '../../data/base64/images';
+import { reportMapSection } from './reportMapSection';
 
 export interface SamplingPDFProps {
   samplingNumber: number;
@@ -24,6 +25,7 @@ interface GenerateReportPDFProps {
   },
   date: string;
   version: string;
+  mapImage?: string;
   inspectorReport: string;
 }
 
@@ -172,6 +174,7 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
     regenerator,
     date,
     version,
+    mapImage,
     inspectorReport
   } = props;
 
@@ -228,6 +231,8 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
             ${listCoordinates(coordinates)}
           </div>
         </div>
+
+        ${reportMapSection(mapImage, true)}
 
         <h2 class="text-center mt-20">Justification Report</h2>
 

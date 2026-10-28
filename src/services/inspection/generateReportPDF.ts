@@ -3,6 +3,7 @@ import { BiodiversityDBProps, TreeDBProps } from '../../types/database';
 import { CoordinateProps } from '../../types/regenerator';
 import { LogoBase64 } from '../../data/base64/images';
 import { RCLogoBase64 } from '../../data/base64/images';
+import { reportMapSection } from './reportMapSection';
 
 interface GenerateReportPDFProps {
   areaName: string;
@@ -17,6 +18,7 @@ interface GenerateReportPDFProps {
   }
   date: string;
   version: string;
+  mapImage?: string;
   inspectorReport: string;
 }
 
@@ -124,6 +126,7 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
     regenerator,
     date,
     version,
+    mapImage,
     inspectorReport
   } = props;
 
@@ -180,6 +183,8 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
             ${listCoordinates(coordinates)}
           </div>
         </div>
+
+        ${reportMapSection(mapImage, true)}
         
         <h2 class="text-center mt-20">Justification Report</h2>
         <h4>Inspector report:</h4>

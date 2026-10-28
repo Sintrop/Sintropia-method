@@ -3,6 +3,7 @@ import { ProofPhotosDBProps } from '../../types/database';
 import { CoordinateProps } from '../../types/regenerator';
 import { LogoBase64 } from '../../data/base64/images';
 import { RCLogoBase64 } from '../../data/base64/images';
+import { reportMapSection } from './reportMapSection';
 
 interface GenerateReportProofPhotosProps {
   areaName: string;
@@ -15,6 +16,7 @@ interface GenerateReportProofPhotosProps {
   }
   date: string;
   version: string;
+  mapImage?: string;
 }
 
 const styleHTML = `
@@ -77,6 +79,7 @@ export async function generateReportProofPhotos(props: GenerateReportProofPhotos
     proofPhotos,
     regenerator,
     version,
+    mapImage,
     date
   } = props;
 
@@ -123,6 +126,8 @@ export async function generateReportProofPhotos(props: GenerateReportProofPhotos
             ${listCoordinates(coordinates)}
           </div>
         </div>
+
+        ${reportMapSection(mapImage, false)}
         
         <h3>Proof photo with regenerator</h3>
         <img

@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import ViewShot from 'react-native-view-shot';
 import Share from 'react-native-share';
 import { Screen } from '../../../components/Screen/Screen';
 import { useTranslation } from 'react-i18next';
@@ -80,7 +79,7 @@ export function ReportScreen({ route }: ScreenProps) {
   const [areaTrees, setAreaTrees] = useState<TreeDBProps[]>([]);
   const areaBounds = useMemo(() => boundsOf(pathPolyline), [pathPolyline]);
   const { cameraRef, onMapLoaded, defaultSettings } = useFitBounds(areaBounds);
-  const viewMapRef = useRef<ViewShot>(null);
+  const mapRef = useRef<MapView>(null);
   const [loadingShare, setLoadingShare] = useState(false);
   const [loadingAreaData, setLoadingAreaData] = useState(true);
   const [loadingBio, setLoadingBio] = useState(true);
@@ -175,6 +174,15 @@ export function ReportScreen({ route }: ScreenProps) {
     setLoadingTrees(false);
   }
 
+  async function captureMap(): Promise<string> {
+    try {
+      return (await mapRef.current?.takeSnap(false)) ?? '';
+    } catch (e) {
+      console.warn('Map snapshot failed', e);
+      return '';
+    }
+  }
+
   async function generatePDFManualMode(): Promise<string> {
     const newListBio: BiodiversityDBProps[] = [];
     const newListTrees: TreeDBProps[] = [];
@@ -210,8 +218,10 @@ export function ReportScreen({ route }: ScreenProps) {
     }
 
     setMessageGeneratingPdf('creatingPDF');
+    const mapImage = await captureMap();
 
     const pdfUri = await generateReportPDF({
+      mapImage,
       areaName: area?.name,
       biodiversityCount: totalBiodiversity,
       treesCount: totalTrees,
@@ -280,8 +290,10 @@ export function ReportScreen({ route }: ScreenProps) {
     }
 
     setMessageGeneratingPdf('creatingPDF');
+    const mapImage = await captureMap();
 
     const pdfUri = await generateReportPDFSamplingMode({
+      mapImage,
       areaName: area?.name,
       biodiversityCount: totalBiodiversity,
       treesCount: totalTrees,
@@ -383,8 +395,10 @@ export function ReportScreen({ route }: ScreenProps) {
       Math.ceil((totalConverted / totalProofPhotos) * 100),
     );
     setMessageGeneratingPdf('creatingPDF');
+    const mapImage = await captureMap();
 
     const pdfUri = await generateReportProofPhotos({
+      mapImage,
       areaName: area?.name,
       coordinates: coordinatesArea,
       areaSize: `${Intl.NumberFormat('pt-BR').format(areaSize)} m²`,
@@ -456,38 +470,30 @@ export function ReportScreen({ route }: ScreenProps) {
         </TouchableOpacity>
       </View>
 
-      <ViewShot
-        ref={viewMapRef}
-        options={{
-          fileName: `mapshot-${area?.name}`,
-          format: 'png',
-          quality: 0.8,
-        }}
+      <MapView
+        ref={mapRef}
+        style={styles.mapContainer}
+        styleURL={StyleURL.SatelliteStreet}
+        onDidFinishLoadingMap={onMapLoaded}
       >
-        <MapView
-          style={styles.mapContainer}
-          styleURL={StyleURL.SatelliteStreet}
-          onDidFinishLoadingMap={onMapLoaded}
-        >
-          <Camera ref={cameraRef} defaultSettings={defaultSettings} />
+        <Camera ref={cameraRef} defaultSettings={defaultSettings} />
 
-          <Polyline
-            id="area"
-            lineColor="red"
-            lineWidth={4}
-            coordinates={pathPolyline}
-          />
+        <Polyline
+          id="area"
+          lineColor="red"
+          lineWidth={4}
+          coordinates={pathPolyline}
+        />
 
-          {collectionMethod === 'sampling' && (
-            <SamplingCircles samplings={samplings} />
-          )}
+        {collectionMethod === 'sampling' && (
+          <SamplingCircles samplings={samplings} />
+        )}
 
-          <TreesAndBiodiversityMarkers
-            trees={areaTrees}
-            biodiversity={biodiversity}
-          />
-        </MapView>
-      </ViewShot>
+        <TreesAndBiodiversityMarkers
+          trees={areaTrees}
+          biodiversity={biodiversity}
+        />
+      </MapView>
 
       <Text className="mt-3 text-gray-500">
         {t('areaSize')}: {Intl.NumberFormat('pt-BR').format(area.size)} m²
