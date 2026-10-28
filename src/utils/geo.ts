@@ -108,13 +108,17 @@ export function samplingCirclesCollection(
 
 export function samplingCentersCollection(
   samplings: SamplingShape[],
+  highlightedId?: number,
 ): FeatureCollection<Point> {
   return {
     type: 'FeatureCollection',
     features: samplings.map(sampling => ({
       type: 'Feature',
       id: sampling.id,
-      properties: { number: String(sampling.number) },
+      properties: {
+        number: String(sampling.number),
+        highlighted: sampling.id === highlightedId,
+      },
       geometry: { type: 'Point', coordinates: sampling.center },
     })),
   };

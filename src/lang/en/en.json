@@ -144,6 +144,10 @@
     "map": {
       "myLocation": "My location",
       "wholeArea": "Whole area"
+    },
+    "radius": "Radius",
+    "samplingsScreen": {
+      "touchCircleToEnter": "Touch a circle on the map to enter that sampling"
     }
   }
 }

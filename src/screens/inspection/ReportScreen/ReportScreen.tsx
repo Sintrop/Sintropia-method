@@ -79,7 +79,7 @@ export function ReportScreen({ route }: ScreenProps) {
   const [totalBiodiversity, setTotalBiodiversity] = useState<number>(0);
   const [areaTrees, setAreaTrees] = useState<TreeDBProps[]>([]);
   const areaBounds = useMemo(() => boundsOf(pathPolyline), [pathPolyline]);
-  const { cameraRef, onMapLoaded } = useFitBounds(areaBounds);
+  const { cameraRef, onMapLoaded, defaultSettings } = useFitBounds(areaBounds);
   const viewMapRef = useRef<ViewShot>(null);
   const [loadingShare, setLoadingShare] = useState(false);
   const [loadingAreaData, setLoadingAreaData] = useState(true);
@@ -469,7 +469,7 @@ export function ReportScreen({ route }: ScreenProps) {
           styleURL={StyleURL.SatelliteStreet}
           onDidFinishLoadingMap={onMapLoaded}
         >
-          <Camera ref={cameraRef} />
+          <Camera ref={cameraRef} defaultSettings={defaultSettings} />
 
           <Polyline
             id="area"

@@ -1,5 +1,11 @@
 import React, { useMemo } from 'react';
-import { FillLayer, LineLayer, ShapeSource, SymbolLayer } from '@rnmapbox/maps';
+import {
+  CircleLayer,
+  FillLayer,
+  LineLayer,
+  ShapeSource,
+  SymbolLayer,
+} from '@rnmapbox/maps';
 import { SamplingDBProps } from '../../types/database';
 import {
   parseStoredCoordinate,
@@ -39,7 +45,10 @@ export function SamplingCircles({
     () => samplingCirclesCollection(shapes, highlightedId),
     [shapes, highlightedId],
   );
-  const centers = useMemo(() => samplingCentersCollection(shapes), [shapes]);
+  const centers = useMemo(
+    () => samplingCentersCollection(shapes, highlightedId),
+    [shapes, highlightedId],
+  );
 
   return (
     <>
@@ -71,14 +80,26 @@ export function SamplingCircles({
 
       {showNumbers && (
         <ShapeSource id="samplings-labels-source" shape={centers}>
+          <CircleLayer
+            id="samplings-labels-background"
+            style={{
+              circleRadius: 11,
+              circleColor: [
+                'case',
+                ['get', 'highlighted'],
+                'rgb(0, 150, 255)',
+                'rgba(0, 0, 0, 0.6)',
+              ],
+              circleStrokeColor: '#ffffff',
+              circleStrokeWidth: 2,
+            }}
+          />
           <SymbolLayer
             id="samplings-labels"
             style={{
               textField: ['get', 'number'],
-              textSize: 14,
+              textSize: 13,
               textColor: '#ffffff',
-              textHaloColor: '#000000',
-              textHaloWidth: 1.5,
               textAllowOverlap: true,
               textIgnorePlacement: true,
             }}

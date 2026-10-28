@@ -145,6 +145,10 @@
     "map": {
       "myLocation": "Minha posição",
       "wholeArea": "Área toda"
+    },
+    "radius": "Raio",
+    "samplingsScreen": {
+      "touchCircleToEnter": "Toque em um círculo no mapa para entrar na amostra"
     }
   }
 }

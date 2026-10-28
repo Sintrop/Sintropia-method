@@ -1,43 +1,70 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '../../../components/Screen/Screen';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { InspectionStackParamsList } from '../../../routes/InspectionRoutes';
-import { SamplingDBProps } from '../../../types/database';
+import {
+  BiodiversityDBProps,
+  SamplingDBProps,
+  TreeDBProps,
+} from '../../../types/database';
 import { useSQLite } from '../../../hooks/useSQLite';
 import { ModalCreateSampling } from './components/ModalCreateSampling/ModalCreateSampling';
 import { SamplingListItem } from './components/SamplingListItem/SamplingListItem';
 import { RadiusSamplingSelector } from './components/RadiusSamplingSelector/RadiusSamplingSelector';
+import { SamplingsMap } from './components/SamplingsMap/SamplingsMap';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
   'SamplingsScreen'
 >;
-export function SamplingsScreen({ route }: ScreenProps) {
+export function SamplingsScreen({ route, navigation }: ScreenProps) {
   const { areaId, areaCoordinates } = route.params;
   const { t } = useTranslation();
-  const { db, fetchSampligsArea } = useSQLite();
+  const {
+    db,
+    fetchSampligsArea,
+    fetchTreesByAreaId,
+    fetchBiodiversityByAreaId,
+  } = useSQLite();
   const [samplings, setSamplings] = useState<SamplingDBProps[]>([]);
+  const [trees, setTrees] = useState<TreeDBProps[]>([]);
+  const [biodiversity, setBiodiversity] = useState<BiodiversityDBProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateSampling, setShowCreateSampling] = useState(false);
   const [radiusSampling, setRadiusSampling] = useState(5);
 
-  useEffect(() => {
-    if (db) {
-      handleGetSamplings();
-    }
-  }, [db]);
+  useFocusEffect(
+    useCallback(() => {
+      if (db) {
+        handleGetSamplings();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [db]),
+  );
 
   async function handleGetSamplings() {
-    setLoading(true);
     const response = await fetchSampligsArea(areaId);
     setSamplings(response);
+    setTrees(await fetchTreesByAreaId(areaId));
+    setBiodiversity(await fetchBiodiversityByAreaId(areaId));
 
     if (response.length > 0) {
-      setRadiusSampling(response[0].size)
+      setRadiusSampling(response[0].size);
     }
     setLoading(false);
+  }
+
+  function handleEnterSampling(samplingId: number) {
+    const index = samplings.findIndex(item => item.id === samplingId);
+    if (index === -1) return;
+
+    navigation.navigate('RealizeInspectionScreen', {
+      collectionMethod: 'sampling',
+      sampling: { ...samplings[index], number: index + 1 },
+    });
   }
 
   function handleShowCreateSampling() {
@@ -55,11 +82,15 @@ export function SamplingsScreen({ route }: ScreenProps) {
   }
 
   return (
-    <Screen
-      screenTitle={t('samplings')}
-      showBackButton
-      scrollable
-    >
+    <Screen screenTitle={t('samplings')} showBackButton scrollable>
+      <SamplingsMap
+        areaCoordinates={areaCoordinates}
+        samplings={samplings}
+        trees={trees}
+        biodiversity={biodiversity}
+        onPressSampling={handleEnterSampling}
+      />
+
       {samplings.length === 0 ? (
         <View className="mt-10">
           <RadiusSamplingSelector
@@ -77,15 +108,18 @@ export function SamplingsScreen({ route }: ScreenProps) {
         <View className="pt-5">
           {samplings.map((sampling, index) => (
             <SamplingListItem
-              key={index.toString()}
+              key={sampling.id}
               sampling={sampling}
+              treesCount={
+                trees.filter(tree => tree.samplingId === sampling.id).length
+              }
               updateList={handleGetSamplings}
               index={index}
             />
           ))}
-          
+
           <ButtonCreateSampling onPress={handleShowCreateSampling} />
-        </View> 
+        </View>
       )}
 
       {showCreateSampling && (
@@ -95,6 +129,7 @@ export function SamplingsScreen({ route }: ScreenProps) {
           areaCoordinates={areaCoordinates}
           samplingsCount={samplings.length}
           samplingCreated={handleGetSamplings}
+          existingSamplings={samplings}
           samplingSize={radiusSampling}
         />
       )}
@@ -115,5 +150,5 @@ function ButtonCreateSampling({ onPress }: ButtonCreateSamplingProps) {
     >
       <Text className="font-semibold text-white">{t('createNewSampling')}</Text>
     </TouchableOpacity>
-  )
+  );
 }

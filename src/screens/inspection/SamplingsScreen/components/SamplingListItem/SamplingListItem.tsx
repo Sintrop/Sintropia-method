@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { SamplingDBProps } from '../../../../../types/database';
 import { useTranslation } from 'react-i18next';
@@ -13,30 +13,24 @@ import { useSafeAreaApp } from '../../../../../hooks/useSafeAreaApp';
 
 interface Props {
   sampling: SamplingDBProps;
+  treesCount: number;
   updateList: () => void;
   index: number;
 }
 
 type NavigationProps = NativeStackNavigationProp<InspectionStackParamsList>;
-export function SamplingListItem({ sampling, updateList, index }: Props) {
+export function SamplingListItem({
+  sampling,
+  treesCount,
+  updateList,
+  index,
+}: Props) {
   const { bottom } = useSafeAreaApp();
   const modalDeleteRef = useRef<Modalize>(null);
   const { t } = useTranslation();
-  const { db, fetchTreesSampling, deleteSampling } = useSQLite();
+  const { deleteSampling } = useSQLite();
   const navigation = useNavigation<NavigationProps>();
-  const [treesCount, setTreesCount] = useState<number>(0);
   const [loadingDelete, setLoadingDelete] = useState(false);
-
-  useEffect(() => {
-    if (db) {
-      getTrees();
-    }
-  }, [db]);
-
-  async function getTrees() {
-    const response = await fetchTreesSampling(sampling.id);
-    setTreesCount(response.length);
-  }
 
   function handleGoToInspection() {
     navigation.navigate('RealizeInspectionScreen', {
@@ -74,7 +68,12 @@ export function SamplingListItem({ sampling, updateList, index }: Props) {
       </Text>
 
       <View className="flex-row mt-3">
-        <View className="w-20 h-20 rounded-2xl bg-gray-300"></View>
+        <View className="w-20 h-20 rounded-2xl bg-gray-300 items-center justify-center">
+          <Text className="font-bold text-2xl text-black">
+            {sampling.size} m
+          </Text>
+          <Text className="text-sm text-gray-500">{t('radius')}</Text>
+        </View>
 
         <View className="w-20 h-20 rounded-2xl bg-gray-300 ml-5 items-center justify-center">
           <Text className="font-bold text-2xl text-black">{treesCount}</Text>
