@@ -17,6 +17,7 @@ export function FinishInspection({ areaId, disabled }: Props) {
   const { t } = useTranslation();
 
   function openModalConfirmDelete() {
+    if (disabled) return;
     modalRef.current?.open();
   }
 
@@ -48,7 +49,7 @@ export function FinishInspection({ areaId, disabled }: Props) {
 
             <View className="mt-10">
               <TouchableOpacity
-                onPress={() => finishInspection(areaId)}
+                onPress={() => !disabled && finishInspection(areaId)}
                 className="w-full h-10 items-center justify-center rounded-2xl bg-green-500"
               >
                 <Text className="text-white font-semibold">

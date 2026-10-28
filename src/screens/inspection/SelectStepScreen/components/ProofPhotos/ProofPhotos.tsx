@@ -11,7 +11,19 @@ import { ProofPhotosDBProps } from '../../../../../types/database';
 import { ProofPhotoItem } from './ProofPhotoItem';
 import { useSafeAreaApp } from '../../../../../hooks/useSafeAreaApp';
 
-export function ProofPhotos() {
+export const MIN_AREA_PHOTOS = 3;
+export const MAX_AREA_PHOTOS = 10;
+
+export interface ProofPhotosStatus {
+  hasRegeneratorPhoto: boolean;
+  areaPhotosCount: number;
+}
+
+interface Props {
+  onChange?: (status: ProofPhotosStatus) => void;
+}
+
+export function ProofPhotos({ onChange }: Props) {
   const { bottom } = useSafeAreaApp();
   const modalChoosePhoto = useRef<Modalize>(null);
   const { t } = useTranslation();
@@ -26,6 +38,14 @@ export function ProofPhotos() {
   >('proof-photo');
 
   useEffect(() => {
+    onChange?.({
+      hasRegeneratorPhoto: proofPhoto !== '' && proofPhoto !== null,
+      areaPhotosCount: proofPhotos.length,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [proofPhoto, proofPhotos]);
+
+  useEffect(() => {
     getProofPhoto();
     if (db) {
       getProofPhotos();
@@ -36,7 +56,7 @@ export function ProofPhotos() {
 
   function getProofPhoto() {
     if (!areaOpened) return;
-    setProofPhoto(areaOpened?.proofPhoto);
+    setProofPhoto(areaOpened?.proofPhoto ?? '');
   }
 
   async function getProofPhotos() {
@@ -93,7 +113,7 @@ export function ProofPhotos() {
           {t('selectStepScreen.registerPhotoWithRegenerator')}
         </Text>
         <TouchableOpacity onPress={handleTakeProofPhoto} className="w-20 h-20">
-          {proofPhoto === '' ? (
+          {!proofPhoto ? (
             <View className="w-20 h-20 rounded-2xl items-center justify-center bg-gray-300">
               <Text className="text-black text-center text-xs">
                 {t('selectStepScreen.touchToRegister')}
@@ -114,7 +134,11 @@ export function ProofPhotos() {
           </Text>
 
           <Text className="text-gray-500 text-xs mt-2">
-            {proofPhotos.length}/10
+            {t('selectStepScreen.areaPhotosCount', {
+              count: proofPhotos.length,
+              min: MIN_AREA_PHOTOS,
+              max: MAX_AREA_PHOTOS,
+            })}
           </Text>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -126,7 +150,7 @@ export function ProofPhotos() {
             />
           ))}
 
-          {proofPhotos.length < 10 && (
+          {proofPhotos.length < MAX_AREA_PHOTOS && (
             <TouchableOpacity
               onPress={handleTakeProofPhotos}
               className="w-20 h-20 rounded-2xl items-center justify-center bg-gray-300"

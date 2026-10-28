@@ -115,7 +115,7 @@
     "selectStepScreen": {
       "proofPhotos": "Fotos de prova",
       "registerPhotoWithRegenerator": "Registre uma foto com o regenerador",
-      "registerMorePhotosOfArea": "Registre mais fotos da área",
+      "registerMorePhotosOfArea": "Registre pelo menos 3 fotos da área",
       "touchToRegister": "Toque para registrar",
       "textConfirmDeletePhoto": "Você quer excluir essa foto?",
       "deletePhoto": "Excluir foto",
@@ -123,7 +123,11 @@
       "textConfirmSelectPhotoSource": "Escolha se você quer tirar uma foto ou selecionar da galeria do seu dispositivo",
       "gallery": "Galeria",
       "camera": "Câmera",
-      "createOneSamplingFirst": "Crie primeiro uma amostragem"
+      "createOneSamplingFirst": "Crie primeiro uma amostragem",
+      "areaPhotosCount": "{{count}}/{{max}} (mín. {{min}})",
+      "beforeFinishing": "Para marcar como realizada, ainda falta:",
+      "missingRegeneratorPhoto": "Foto com o regenerador",
+      "missingAreaPhotos": "Fotos da área: mais {{count}}"
     },
     "reportScreen": {
       "inspectionReport": "Relatório da inspeção",

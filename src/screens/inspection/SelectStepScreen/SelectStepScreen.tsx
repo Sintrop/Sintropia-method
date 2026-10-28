@@ -10,7 +10,11 @@ import { HeaderInspectionMode } from '../components/HeaderInspectionMode';
 import { FinishInspection } from './components/FinishInspection/FinishInspection';
 import { DeleteInspection } from './components/DeleteInspection/DeleteInspection';
 import { usePermissions } from '../../../hooks/usePermissions';
-import { ProofPhotos } from './components/ProofPhotos/ProofPhotos';
+import {
+  MIN_AREA_PHOTOS,
+  ProofPhotos,
+  ProofPhotosStatus,
+} from './components/ProofPhotos/ProofPhotos';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -22,6 +26,23 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
   const { areaOpened } = useInspectionContext();
   const { fetchSampligsArea } = useSQLite();
   const { requestLocationPermission } = usePermissions();
+  const [photosStatus, setPhotosStatus] = useState<ProofPhotosStatus>({
+    hasRegeneratorPhoto: false,
+    areaPhotosCount: 0,
+  });
+
+  const missingRequirements: string[] = [];
+  if (!photosStatus.hasRegeneratorPhoto) {
+    missingRequirements.push(t('selectStepScreen.missingRegeneratorPhoto'));
+  }
+  if (photosStatus.areaPhotosCount < MIN_AREA_PHOTOS) {
+    missingRequirements.push(
+      t('selectStepScreen.missingAreaPhotos', {
+        count: MIN_AREA_PHOTOS - photosStatus.areaPhotosCount,
+      }),
+    );
+  }
+  const canFinish = missingRequirements.length === 0;
 
   useEffect(() => {
     requestLocationPermission();
@@ -45,7 +66,7 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
 
     const response = await fetchSampligsArea(areaOpened.id);
     if (response.length === 0) {
-      Alert.alert(t('atention'), t('createOneSamplingFirst'));
+      Alert.alert(t('atention'), t('selectStepScreen.createOneSamplingFirst'));
       return;
     }
 
@@ -83,7 +104,7 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
 
       <HeaderInspectionMode />
 
-      <ProofPhotos />
+      <ProofPhotos onChange={setPhotosStatus} />
 
       {collectionMethod === 'manual' && (
         <TouchableOpacity
@@ -132,7 +153,23 @@ export function SelectStepScreen({ route, navigation }: ScreenProps) {
         <Text className="font-semibold text-black">{t('report')}</Text>
       </TouchableOpacity>
 
-      <FinishInspection areaId={areaOpened?.id as number} disabled={false} />
+      {!canFinish && (
+        <View className="w-full rounded-2xl bg-yellow-100 border border-yellow-500 p-3 mt-10">
+          <Text className="font-semibold text-black">
+            {t('selectStepScreen.beforeFinishing')}
+          </Text>
+          {missingRequirements.map(item => (
+            <Text key={item} className="text-black mt-1">
+              • {item}
+            </Text>
+          ))}
+        </View>
+      )}
+
+      <FinishInspection
+        areaId={areaOpened?.id as number}
+        disabled={!canFinish}
+      />
 
       <DeleteInspection areaId={areaOpened?.id as number} />
     </Screen>
