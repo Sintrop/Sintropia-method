@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -12,7 +12,7 @@ import ViewShot from 'react-native-view-shot';
 import Share from 'react-native-share';
 import { Screen } from '../../../components/Screen/Screen';
 import { useTranslation } from 'react-i18next';
-import { Camera, MapView, PointAnnotation, StyleURL } from '@rnmapbox/maps';
+import { Camera, MapView, StyleURL } from '@rnmapbox/maps';
 import { Polyline } from '../../../components/Map/Polyline';
 import {
   BiodiversityDBProps,
@@ -24,7 +24,6 @@ import { useSQLite } from '../../../hooks/useSQLite';
 import { CoordinateProps } from '../../../types/regenerator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { InspectionStackParamsList } from '../../../routes/InspectionRoutes';
-import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
 import { generateReportPDF } from '../../../services/inspection/generateReportPDF';
 import { convertImageToBase64 } from '../../../services/inspection/convertImageToBase64';
 import { BiodiversityList } from './components/BiodiversityList/BiodiversityList';
@@ -42,6 +41,10 @@ import { generateReportProofPhotos } from '../../../services/inspection/generate
 //@ts-ignore
 import SintropiaLogo from '../../../assets/images/syntropy-method-en.png';
 import { format } from 'date-fns';
+import { TreesAndBiodiversityMarkers } from '../../../components/Map/RegisterMarkers';
+import { SamplingCircles } from '../../../components/Map/SamplingCircles';
+import { useFitBounds } from '../../../hooks/useFitBounds';
+import { boundsOf } from '../../../utils/geo';
 
 export interface TreesPerSamplingProps {
   samplingNumber: number;
@@ -58,6 +61,7 @@ export function ReportScreen({ route }: ScreenProps) {
     db,
     fetchSampligsArea,
     fetchTreesSampling,
+    fetchTreesByAreaId,
     fetchProofPhotosArea,
   } = useSQLite();
   const { t } = useTranslation();
@@ -73,9 +77,9 @@ export function ReportScreen({ route }: ScreenProps) {
   >([]);
   const [totalTrees, setTotalTrees] = useState<number>(0);
   const [totalBiodiversity, setTotalBiodiversity] = useState<number>(0);
-  const [coordinateMapCenter, setCoordinateMapCenter] = useState<Position>([
-    -46.62714425279819, -23.576845138073693,
-  ]);
+  const [areaTrees, setAreaTrees] = useState<TreeDBProps[]>([]);
+  const areaBounds = useMemo(() => boundsOf(pathPolyline), [pathPolyline]);
+  const { cameraRef, onMapLoaded } = useFitBounds(areaBounds);
   const viewMapRef = useRef<ViewShot>(null);
   const [loadingShare, setLoadingShare] = useState(false);
   const [loadingAreaData, setLoadingAreaData] = useState(true);
@@ -105,10 +109,6 @@ export function ReportScreen({ route }: ScreenProps) {
 
     const coords = JSON.parse(area.coordinates) as CoordinateProps[];
     setCoordinatesArea(coords);
-    setCoordinateMapCenter([
-      parseFloat(coords[0].longitude),
-      parseFloat(coords[0].latitude),
-    ]);
     setPathPolyline(
       coords.map(coord => [
         parseFloat(coord.longitude),
@@ -139,6 +139,8 @@ export function ReportScreen({ route }: ScreenProps) {
     if (samplings.length === 0) return;
 
     setLoadingTrees(true);
+    setAreaTrees(await fetchTreesByAreaId(area.id));
+
     if (collectionMethod === 'manual') {
       const responseTrees = await fetchTreesSampling(samplings[0].id);
       setTrees(responseTrees);
@@ -465,38 +467,25 @@ export function ReportScreen({ route }: ScreenProps) {
         <MapView
           style={styles.mapContainer}
           styleURL={StyleURL.SatelliteStreet}
+          onDidFinishLoadingMap={onMapLoaded}
         >
-          <Camera centerCoordinate={coordinateMapCenter} zoomLevel={16} />
+          <Camera ref={cameraRef} />
 
-          <Polyline lineColor="red" lineWidth={4} coordinates={pathPolyline} />
+          <Polyline
+            id="area"
+            lineColor="red"
+            lineWidth={4}
+            coordinates={pathPolyline}
+          />
 
-          {biodiversity.map((item, index) => (
-            <PointAnnotation
-              id="bio-marker"
-              key={index.toString()}
-              coordinate={[
-                JSON.parse(item.coordinate).longitude,
-                JSON.parse(item.coordinate).latitude,
-              ]}
-              children={
-                <View className="w-3 h-3 bg-yellow-500 rounded-full border border-black" />
-              }
-            />
-          ))}
+          {collectionMethod === 'sampling' && (
+            <SamplingCircles samplings={samplings} />
+          )}
 
-          {trees.map((item, index) => (
-            <PointAnnotation
-              id="tree-marker"
-              key={index.toString()}
-              coordinate={[
-                JSON.parse(item.coordinate).longitude,
-                JSON.parse(item.coordinate).latitude,
-              ]}
-              children={
-                <View className="w-5 h-5 bg-green-500 rounded-full border border-black" />
-              }
-            />
-          ))}
+          <TreesAndBiodiversityMarkers
+            trees={areaTrees}
+            biodiversity={biodiversity}
+          />
         </MapView>
       </ViewShot>
 

@@ -137,6 +137,10 @@
     },
     "common": {
       "typeHere": "Digite aqui"
+    },
+    "map": {
+      "myLocation": "Minha posição",
+      "wholeArea": "Área toda"
     }
   }
 }

@@ -136,6 +136,10 @@
     },
     "common": {
       "typeHere": "Type here"
+    },
+    "map": {
+      "myLocation": "My location",
+      "wholeArea": "Whole area"
     }
   }
 }

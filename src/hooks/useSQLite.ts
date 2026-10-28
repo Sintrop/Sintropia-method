@@ -471,6 +471,32 @@ export function useSQLite() {
     });
   };
 
+  async function fetchTreesByAreaId(areaId: number): Promise<TreeDBProps[]> {
+    if (!db) return [];
+
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        tx.executeSql(
+          'SELECT * FROM tree WHERE areaId = ?;',
+          [areaId],
+          (_, results) => {
+            const rows = results.rows;
+            const list: TreeDBProps[] = [];
+            for (let i = 0; i < rows.length; i++) {
+              list.push(rows.item(i));
+            }
+            resolve(list);
+          },
+          (_, error) => {
+            console.error('Erro ao buscar arvores da area:', error);
+            reject(error);
+            return true;
+          }
+        );
+      })
+    });
+  };
+
   async function addTree(data: Omit<TreeDBProps, 'id'>) {
     if (!db) return;
 
@@ -583,6 +609,7 @@ export function useSQLite() {
     fetchSampligsArea,
     addSampling,
     fetchTreesSampling,
+    fetchTreesByAreaId,
     addTree,
     updateCollectionMethod,
     updateProofPhoto,

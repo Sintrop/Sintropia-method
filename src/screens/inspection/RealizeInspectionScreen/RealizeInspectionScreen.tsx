@@ -1,4 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   Alert,
   StyleSheet,
@@ -12,19 +18,21 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { InspectionStackParamsList } from '../../../routes/InspectionRoutes';
 import {
   Camera,
-  FillLayer,
   MapView,
-  PointAnnotation,
-  ShapeSource,
   StyleURL,
   UserLocation,
   UserTrackingMode,
 } from '@rnmapbox/maps';
+import { useFocusEffect } from '@react-navigation/native';
 import { useInspectionContext } from '../../../hooks/useInspectionContext';
 import { CoordinateProps } from '../../../types/regenerator';
 import { Polyline } from '../../../components/Map/Polyline';
 import { useSQLite } from '../../../hooks/useSQLite';
-import { BiodiversityDBProps, TreeDBProps } from '../../../types/database';
+import {
+  BiodiversityDBProps,
+  SamplingDBProps,
+  TreeDBProps,
+} from '../../../types/database';
 import {
   ModalRegisterItem,
   RegisterItemProps,
@@ -32,7 +40,6 @@ import {
 import { BiodiversityList } from './components/BiodiversityList/BiodiversityList';
 import { Header } from '../../../components/Header/Header';
 import { TreesList } from './components/TreesList/TreesList';
-import { circle } from '@turf/turf';
 import { useLocation } from '../../../hooks/useLocation';
 import { isPointInPolygon } from '../../../services/inspection/isPointInPolygon';
 import { isPointInCircle } from '../../../services/inspection/isPointInCircle';
@@ -40,6 +47,9 @@ import { SamplingIndicator } from './components/SamplingIndicator/SamplingIndica
 import { OutsideTheCollectionArea } from './components/OutsideTheCollectionArea';
 import { Subtitle } from './components/Subtitle';
 import { useSafeAreaApp } from '../../../hooks/useSafeAreaApp';
+import { TreesAndBiodiversityMarkers } from '../../../components/Map/RegisterMarkers';
+import { SamplingCircles } from '../../../components/Map/SamplingCircles';
+import { boundsOf, parseStoredCoordinate } from '../../../utils/geo';
 
 type ScreenProps = NativeStackScreenProps<
   InspectionStackParamsList,
@@ -53,6 +63,8 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
     addBiodiversity,
     db,
     fetchTreesSampling,
+    fetchTreesByAreaId,
+    fetchSampligsArea,
     addTree,
   } = useSQLite();
   const { location } = useLocation();
@@ -62,29 +74,56 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
   const [pathPolyline, setPathPolyline] = useState<[number, number][]>([]);
   const [biodiversity, setBiodiversity] = useState<BiodiversityDBProps[]>([]);
   const [trees, setTrees] = useState<TreeDBProps[]>([]);
+  const [areaTrees, setAreaTrees] = useState<TreeDBProps[]>([]);
+  const [samplings, setSamplings] = useState<SamplingDBProps[]>([]);
   const [disableRegisterBio, setDisableRegisterBio] = useState(false);
   const [disableRegisterTree, setDisableRegisterTree] = useState(false);
+  const [followUser, setFollowUser] = useState(true);
 
-  const centerSampling =
-    sampling.coordinate !== ''
-      ? [
-          JSON.parse(sampling.coordinate).longitude,
-          JSON.parse(sampling.coordinate).latitude,
-        ]
-      : [0, 0];
+  const centerSampling = parseStoredCoordinate(sampling.coordinate) ?? [0, 0];
+  const highlightedSamplingId =
+    collectionMethod === 'sampling' && !collectOnlyBio
+      ? sampling.id
+      : undefined;
 
-  const circleGeoJSON = circle(centerSampling, sampling.size, {
-    steps: 64,
-    units: 'meters',
-  });
+  const cameraRef = useRef<Camera>(null);
+  const areaBounds = useMemo(() => boundsOf(pathPolyline), [pathPolyline]);
+
+  const [wholeAreaRequest, setWholeAreaRequest] = useState(0);
+
+  function showWholeArea() {
+    setFollowUser(false);
+    setWholeAreaRequest(value => value + 1);
+  }
+
+  useEffect(() => {
+    if (wholeAreaRequest === 0 || followUser || !areaBounds) return;
+    // The map is as tall as the window but starts below the header, and the
+    // overlays cover its top and bottom, so the padding keeps the area visible.
+    cameraRef.current?.fitBounds(
+      areaBounds.ne,
+      areaBounds.sw,
+      [190, 30, 300 + top + bottom, 30],
+      600,
+    );
+  }, [wholeAreaRequest, followUser, areaBounds, top, bottom]);
 
   useEffect(() => {
     if (db) {
       fetchAreaData();
-      handleFetchBiodiversity();
-      handleFetchTrees();
     }
   }, [areaOpened, db]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (db) {
+        handleFetchBiodiversity();
+        handleFetchTrees();
+        handleFetchSamplings();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [areaOpened, db]),
+  );
 
   useEffect(() => {
     handleCheckAvailableCollect();
@@ -144,6 +183,15 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
   async function handleFetchTrees() {
     const responseTrees = await fetchTreesSampling(sampling.id);
     setTrees(responseTrees);
+
+    if (areaOpened) {
+      setAreaTrees(await fetchTreesByAreaId(areaOpened.id));
+    }
+  }
+
+  async function handleFetchSamplings() {
+    if (!areaOpened || collectionMethod !== 'sampling') return;
+    setSamplings(await fetchSampligsArea(areaOpened.id));
   }
 
   async function handleRegisterItem(data: RegisterItemProps): Promise<void> {
@@ -198,7 +246,22 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
             <SamplingIndicator samplingNumber={sampling.number} />
           )}
 
-          <Subtitle />
+          <View className="flex-row items-start justify-between">
+            <Subtitle />
+
+            <View className="mt-3">
+              <MapModeButton
+                label={t('map.myLocation')}
+                active={followUser}
+                onPress={() => setFollowUser(true)}
+              />
+              <MapModeButton
+                label={t('map.wholeArea')}
+                active={!followUser}
+                onPress={showWholeArea}
+              />
+            </View>
+          </View>
 
           {collectOnlyBio ? (
             <OutsideTheCollectionArea outside={disableRegisterBio} />
@@ -210,60 +273,35 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
         <MapView
           style={[styles.mapContainer, { width, height }]}
           styleURL={StyleURL.SatelliteStreet}
+          onTouchStart={() => setFollowUser(false)}
         >
           <Camera
-            followUserLocation={true}
+            ref={cameraRef}
+            followUserLocation={followUser}
             followUserMode={UserTrackingMode.Follow}
             followZoomLevel={18}
           />
 
           <UserLocation showsUserHeadingIndicator minDisplacement={1} />
 
-          <Polyline lineColor="red" lineWidth={4} coordinates={pathPolyline} />
+          <Polyline
+            id="area"
+            lineColor="red"
+            lineWidth={4}
+            coordinates={pathPolyline}
+          />
 
-          {!collectOnlyBio && (
-            <>
-              {trees.map((item, index) => (
-                <PointAnnotation
-                  id="tree-marker"
-                  key={index.toString()}
-                  coordinate={[
-                    JSON.parse(item.coordinate).longitude,
-                    JSON.parse(item.coordinate).latitude,
-                  ]}
-                  children={
-                    <View className="w-5 h-5 bg-green-500 rounded-full border border-black" />
-                  }
-                />
-              ))}
-
-              {collectionMethod === 'sampling' && (
-                <ShapeSource id="circlesource" shape={circleGeoJSON}>
-                  <FillLayer
-                    id="circlelayer"
-                    style={{
-                      fillColor: 'rgba(0, 150, 255, 0.3)',
-                      fillOutlineColor: 'rgba(0, 150, 255, 1)',
-                    }}
-                  />
-                </ShapeSource>
-              )}
-            </>
+          {collectionMethod === 'sampling' && (
+            <SamplingCircles
+              samplings={samplings}
+              highlightedId={highlightedSamplingId}
+            />
           )}
 
-          {biodiversity.map((item, index) => (
-            <PointAnnotation
-              id="bio-marker"
-              key={index.toString()}
-              coordinate={[
-                JSON.parse(item.coordinate).longitude,
-                JSON.parse(item.coordinate).latitude,
-              ]}
-              children={
-                <View className="w-3 h-3 bg-yellow-500 rounded-full border border-black" />
-              }
-            />
-          ))}
+          <TreesAndBiodiversityMarkers
+            trees={collectOnlyBio ? [] : areaTrees}
+            biodiversity={biodiversity}
+          />
         </MapView>
 
         <View
@@ -302,6 +340,30 @@ export function RealizeInspectionScreen({ route }: ScreenProps) {
         </View>
       </View>
     </View>
+  );
+}
+
+interface MapModeButtonProps {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}
+function MapModeButton({ label, active, onPress }: MapModeButtonProps) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      className={`rounded-2xl px-3 py-2 mb-2 ${
+        active ? 'bg-green-600' : 'bg-white'
+      }`}
+    >
+      <Text
+        className={`text-xs font-semibold ${
+          active ? 'text-white' : 'text-black'
+        }`}
+      >
+        {label}
+      </Text>
+    </TouchableOpacity>
   );
 }
 
