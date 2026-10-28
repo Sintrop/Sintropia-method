@@ -4,6 +4,7 @@ import { CoordinateProps } from '../../types/regenerator';
 import { calculateAreaCircle } from './calculateAreaCircle';
 import { LogoBase64 } from '../../data/base64/images';
 import { RCLogoBase64 } from '../../data/base64/images';
+import { reportMapSection } from './reportMapSection';
 
 export interface SamplingPDFProps {
   samplingNumber: number;
@@ -21,9 +22,11 @@ interface GenerateReportPDFProps {
   coordinates: CoordinateProps[];
   regenerator: {
     address?: string;
-  },
+  };
   date: string;
   version: string;
+  mapImage?: string;
+  fileName: string;
   inspectorReport: string;
 }
 
@@ -73,10 +76,12 @@ const styleHTML = `
     .box-trees-result_p { color: black; text-align: center }
     .box-trees-result_result { color: black; text-align: center; font-weight: bold; margin-top: 20px; }
   </style>
-`
+`;
 
 function listBiodiversity(biodiversity: BiodiversityDBProps[]) {
-  const bioHTML = biodiversity.map(item => `
+  const bioHTML = biodiversity
+    .map(
+      item => `
     <div class="register-item">
       <img
         src="${item.photo}"
@@ -93,7 +98,9 @@ function listBiodiversity(biodiversity: BiodiversityDBProps[]) {
         </p>
       </div>
     </div> 
-  `).join('');
+  `,
+    )
+    .join('');
 
   return `
       ${bioHTML}
@@ -101,7 +108,9 @@ function listBiodiversity(biodiversity: BiodiversityDBProps[]) {
 }
 
 function listTrees(samplings: SamplingPDFProps[]) {
-  const samplingsHTML = samplings.map(item => `
+  const samplingsHTML = samplings
+    .map(
+      item => `
     <div class="sampling-item">
       <p class="sampling-item_title">
         Sampling #${item.samplingNumber}
@@ -116,7 +125,9 @@ function listTrees(samplings: SamplingPDFProps[]) {
           <p>Radius</p>
         </div>
         <div class="sampling-item_box-count">
-          <p class="sampling-item_count">${calculateAreaCircle(item.size)} m²</p>
+          <p class="sampling-item_count">${calculateAreaCircle(
+            item.size,
+          )} m²</p>
           <p>Area</p>
         </div>
       </div>
@@ -124,10 +135,14 @@ function listTrees(samplings: SamplingPDFProps[]) {
         ${trees(item.trees)}
       </div>
     </div> 
-  `).join('');
+  `,
+    )
+    .join('');
 
   function trees(trees: TreeDBProps[]) {
-    const treesHTML = trees.map(item => `
+    const treesHTML = trees
+      .map(
+        item => `
       <div class="register-item">
         <img
           src="${item.photo}"
@@ -144,9 +159,11 @@ function listTrees(samplings: SamplingPDFProps[]) {
           </p>
         </div>
       </div> 
-    `).join('');
+    `,
+      )
+      .join('');
 
-    return treesHTML
+    return treesHTML;
   }
 
   return `
@@ -156,11 +173,15 @@ function listTrees(samplings: SamplingPDFProps[]) {
 }
 
 function listCoordinates(coords: CoordinateProps[]) {
-  const coordsHTML = coords.map(item => `<p>Lat: ${item?.latitude}, Lng: ${item?.longitude}</p>`).join('');
+  const coordsHTML = coords
+    .map(item => `<p>Lat: ${item?.latitude}, Lng: ${item?.longitude}</p>`)
+    .join('');
   return `${coordsHTML}`;
 }
 
-export async function generateReportPDFSamplingMode(props: GenerateReportPDFProps): Promise<string> {
+export async function generateReportPDFSamplingMode(
+  props: GenerateReportPDFProps,
+): Promise<string> {
   const {
     areaName,
     biodiversityCount,
@@ -172,7 +193,9 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
     regenerator,
     date,
     version,
-    inspectorReport
+    mapImage,
+    fileName,
+    inspectorReport,
   } = props;
 
   const htmlContent = `
@@ -229,6 +252,8 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
           </div>
         </div>
 
+        ${reportMapSection(mapImage, true)}
+
         <h2 class="text-center mt-20">Justification Report</h2>
 
         <div class="header-file">
@@ -249,7 +274,7 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
         </div>
 
         <h4>Inspector report:</h4>
-        <p>${inspectorReport}</p>
+        <p>${inspectorReport || '-'}</p>
         
         <h3>Biodiversity</h3>
         <div class="div-flex-wrap">
@@ -375,11 +400,11 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
 
   const options = {
     html: htmlContent,
-    fileName: `inspection-area`,
+    fileName,
     directory: 'Documents',
   };
 
   const file = await RNHTMLtoPDF.convert(options);
 
-  return `file://${file.filePath}`
+  return `file://${file.filePath}`;
 }

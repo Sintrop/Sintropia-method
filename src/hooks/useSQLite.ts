@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import SQLite, { SQLiteDatabase } from 'react-native-sqlite-storage';
-import { AreaDBProps, BiodiversityDBProps, InspectionDBProps, ProofPhotosDBProps, SamplingDBProps, TreeDBProps } from '../types/database';
+import { AreaDBProps, BiodiversityDBProps, ProofPhotosDBProps, SamplingDBProps, TreeDBProps } from '../types/database';
 
 export function useSQLite() {
   const [db, setDb] = useState<SQLiteDatabase | null>(null);
@@ -301,18 +301,6 @@ export function useSQLite() {
     });
   };
 
-  async function addInspection(data: Omit<InspectionDBProps, 'id'>) {
-    if (!db) return;
-
-    await db.transaction(tx => {
-      tx.executeSql(
-        'INSERT INTO inspection (inspectionId, regeneratorAddress) VALUES (?, ?);',
-        [data?.inspectionId, data?.regeneratorAddress],
-        () => { }
-      );
-    });
-  };
-
   async function fetchBiodiversityByAreaId(id: number): Promise<BiodiversityDBProps[]> {
     if (!db) return [];
 
@@ -471,6 +459,32 @@ export function useSQLite() {
     });
   };
 
+  async function fetchTreesByAreaId(areaId: number): Promise<TreeDBProps[]> {
+    if (!db) return [];
+
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        tx.executeSql(
+          'SELECT * FROM tree WHERE areaId = ?;',
+          [areaId],
+          (_, results) => {
+            const rows = results.rows;
+            const list: TreeDBProps[] = [];
+            for (let i = 0; i < rows.length; i++) {
+              list.push(rows.item(i));
+            }
+            resolve(list);
+          },
+          (_, error) => {
+            console.error('Erro ao buscar arvores da area:', error);
+            reject(error);
+            return true;
+          }
+        );
+      })
+    });
+  };
+
   async function addTree(data: Omit<TreeDBProps, 'id'>) {
     if (!db) return;
 
@@ -575,7 +589,6 @@ export function useSQLite() {
     fetchAreas,
     fetchOpenedAreas,
     addArea,
-    addInspection,
     areas,
     areasOpened,
     fetchBiodiversityByAreaId,
@@ -583,6 +596,7 @@ export function useSQLite() {
     fetchSampligsArea,
     addSampling,
     fetchTreesSampling,
+    fetchTreesByAreaId,
     addTree,
     updateCollectionMethod,
     updateProofPhoto,

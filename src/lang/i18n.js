@@ -10,7 +10,9 @@ const resources = {
 
 i18n.use(initReactI18next).init({
   resources,
-  lng: 'en',
+  lng: 'pt',
+  fallbackLng: 'pt',
+  interpolation: { escapeValue: false },
 });
 
 export default { i18n };

@@ -15,15 +15,16 @@ export const MainContext = createContext({} as MainContextProps);
 export function MainContextProvider({
   children,
 }: MainContextProviderProps): React.JSX.Element {
-  const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState(i18next.language);
 
   useEffect(() => {
     getStoragedLanguage();
-  }, []);
 
-  useEffect(() => {
-    setLanguage(i18next.language);
-  }, [i18next.language]);
+    // Portuguese is the default; a language picked in the selector wins.
+    const onChange = (next: string) => setLanguage(next);
+    i18next.on('languageChanged', onChange);
+    return () => i18next.off('languageChanged', onChange);
+  }, []);
 
   async function getStoragedLanguage(): Promise<void> {
     //This function tries to find if there is any record of a language previously chosen by the user

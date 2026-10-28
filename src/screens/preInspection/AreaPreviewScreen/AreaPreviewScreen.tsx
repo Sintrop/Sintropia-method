@@ -1,31 +1,34 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { useState } from 'react';
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Screen } from '../../../components/Screen/Screen';
 import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { PreInspectionStackParamsList } from '../../../routes/PreInspectionRoutes';
 import Mapbox, {
   Camera,
+  FillLayer,
   MapView,
-  PointAnnotation,
+  ShapeSource,
   StyleURL,
-  offlineManager,
 } from '@rnmapbox/maps';
 import { Polyline } from '../../../components/Map/Polyline';
 import { useInspectionContext } from '../../../hooks/useInspectionContext';
+import { useFitBounds } from '../../../hooks/useFitBounds';
+import { areaRing, boundsOf } from '../../../utils/geo';
+import { shortAddress } from '../RegeneratorsListScreen/components/RegeneratorItem';
+import { AppButton } from '../../../components/ui/AppButton';
+import { Badge } from '../../../components/ui/Badge';
+import { SectionTitle } from '../../../components/ui/SectionTitle';
+import { Icon, IconName } from '../../../components/Icon/Icon';
+import colors from '../../../theme/colors';
 import Config from 'react-native-config';
 
-const MAPBOX_ACCESS_TOKEN = Config.MAPBOX_ACCESS_TOKEN
-  ? Config.MAPBOX_ACCESS_TOKEN
-  : '';
-Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
+Mapbox.setAccessToken(Config.MAPBOX_ACCESS_TOKEN ?? '');
+
+/** Below this size counting every tree is feasible; above it, sample. */
+const MANUAL_MAX_AREA = 5000;
+
+type Method = 'manual' | 'sampling';
 
 type ScreenProps = NativeStackScreenProps<
   PreInspectionStackParamsList,
@@ -33,120 +36,185 @@ type ScreenProps = NativeStackScreenProps<
 >;
 export function AreaPreviewScreen({ route }: ScreenProps) {
   const { startInspection } = useInspectionContext();
-  const { coords, inspection, regenerator, areaSize } = route.params;
-
+  const { coords, regenerator } = route.params;
   const { t } = useTranslation();
-  const pathPolyline: [number, number][] = coords.map(coord => [
-    parseFloat(coord.longitude),
-    parseFloat(coord.latitude),
-  ]);
-  pathPolyline.push([...pathPolyline[0]]);
-
   const [loading, setLoading] = useState(false);
+  const [method, setMethod] = useState<Method>(
+    regenerator.totalArea <= MANUAL_MAX_AREA ? 'manual' : 'sampling',
+  );
+
+  const ring = useMemo(() => areaRing(coords), [coords]);
+  const bounds = useMemo(() => boundsOf(ring), [ring]);
+  const { cameraRef, onMapLoaded, defaultSettings } = useFitBounds(bounds, 30);
 
   async function handleStartInspection() {
     setLoading(true);
-    downloadAreaMap();
     await startInspection({
-      areaSize,
-      coordinates: coords,
-      inspection: {
-        inspectionId: inspection.id.toString(),
-        regeneratorAddress: inspection?.regenerator,
+      regenerator: {
+        address: regenerator.regeneratorWallet,
+        name: regenerator.name,
       },
+      coordinates: coords,
+      areaSize: regenerator.totalArea,
+      collectionMethod: method,
     });
     setLoading(false);
   }
 
-  function downloadAreaMap() {
-    offlineManager.createPack(
-      {
-        name: coords[0].latitude,
-        styleURL: StyleURL.SatelliteStreet,
-        minZoom: 15,
-        maxZoom: 19,
-        bounds: [
-          [parseFloat(coords[0]?.longitude), parseFloat(coords[0]?.latitude)], // Coordenadas sudoeste
-          [parseFloat(coords[2]?.longitude), parseFloat(coords[2]?.latitude)], // Coordenadas nordeste
-        ],
-      },
-      offlinePack => {
-        offlinePack.resume();
-        offlinePack
-          .status()
-          .then(res => {
-            console.log('map downloaded: ' + res);
-          })
-          .catch(err => {
-            console.log('error dowload map: ' + err);
-          });
-      },
-      error => {
-        console.error('Error creating pack', error);
-      },
-    );
-  }
-
   return (
-    <Screen screenTitle={t('areaPreview')} showBackButton scrollable>
-      <MapView style={styles.mapContainer} styleURL={StyleURL.SatelliteStreet}>
-        <Camera
-          centerCoordinate={[
-            parseFloat(coords[0].longitude),
-            parseFloat(coords[0].latitude),
-          ]}
-          zoomLevel={15}
+    <Screen
+      screenTitle={t('areaPreview')}
+      showBackButton
+      scrollable
+      footer={
+        <AppButton
+          title={t('startInspection')}
+          icon="map"
+          loading={loading}
+          onPress={handleStartInspection}
         />
-
-        {coords.map((coord, index) => (
-          <PointAnnotation
-            key={index.toString()}
-            coordinate={[
-              parseFloat(coord?.longitude),
-              parseFloat(coord.latitude),
-            ]}
-            id="marker"
-          >
-            <View />
-          </PointAnnotation>
-        ))}
-
-        <Polyline lineColor="red" lineWidth={4} coordinates={pathPolyline} />
-      </MapView>
-
-      <Text className="text-gray-500">
-        {t('areaSize')}: {Intl.NumberFormat('pt-BR').format(areaSize)} m²
+      }
+    >
+      <Text className="text-2xl font-bold text-ink mt-2">
+        {regenerator.name}
       </Text>
-
-      <View className="p-3 rounded-2xl border mt-5">
-        <Text className="text-gray-500">{t('coordinates')}</Text>
-        {coords.map((item, index) => (
-          <Text key={index} className="mb-1 text-black">
-            Lat: {item.latitude}, Lng: {item.longitude}
-          </Text>
-        ))}
+      <View className="flex-row items-center mt-1">
+        <Text className="text-sm text-muted mr-2">
+          #{regenerator.id} · {shortAddress(regenerator.regeneratorWallet)}
+        </Text>
+        {regenerator.pendingInspection && (
+          <Badge
+            label={t('regeneratorsList.pendingInspection')}
+            tone="warning"
+          />
+        )}
       </View>
 
-      <TouchableOpacity
-        className="w-full h-[48] bg-[#229B13] flex items-center justify-center rounded-2xl my-10"
-        onPress={handleStartInspection}
-      >
-        {loading ? (
-          <ActivityIndicator color="white" size={30} />
-        ) : (
-          <Text className="font-semibold text-white">
-            {t('startInspection')}
-          </Text>
-        )}
-      </TouchableOpacity>
+      <View className="rounded-3xl overflow-hidden mt-4 border border-line">
+        <MapView
+          style={styles.mapContainer}
+          styleURL={StyleURL.SatelliteStreet}
+          onDidFinishLoadingMap={onMapLoaded}
+          scaleBarEnabled={false}
+        >
+          <Camera ref={cameraRef} defaultSettings={defaultSettings} />
+          <ShapeSource
+            id="area-fill-source"
+            shape={{
+              type: 'Feature',
+              properties: {},
+              geometry: { type: 'Polygon', coordinates: [ring] },
+            }}
+          >
+            <FillLayer
+              id="area-fill"
+              style={{ fillColor: 'rgba(255, 0, 0, 0.15)' }}
+            />
+          </ShapeSource>
+          <Polyline
+            id="area"
+            lineColor="red"
+            lineWidth={3}
+            coordinates={ring}
+          />
+        </MapView>
+      </View>
+
+      <View className="flex-row mt-3" style={{ gap: 8 }}>
+        <Fact
+          label={t('areaSize')}
+          value={`${Intl.NumberFormat('pt-BR').format(
+            regenerator.totalArea,
+          )} m²`}
+        />
+        <Fact
+          label={t('regeneratorsList.inspectionsLabel')}
+          value={String(regenerator.totalInspections)}
+        />
+      </View>
+
+      <SectionTitle
+        title={t('collectionMethod')}
+        subtitle={t('areaPreviewScreen.methodHint')}
+        style={{ marginTop: 28, marginBottom: 12 }}
+      />
+      <MethodOption
+        icon="target"
+        title={t('sampling')}
+        description={t('areaPreviewScreen.samplingDescription')}
+        selected={method === 'sampling'}
+        onPress={() => setMethod('sampling')}
+      />
+      <MethodOption
+        icon="tree"
+        title={t('manual')}
+        description={t('areaPreviewScreen.manualDescription')}
+        selected={method === 'manual'}
+        onPress={() => setMethod('manual')}
+      />
     </Screen>
+  );
+}
+
+function Fact({ label, value }: { label: string; value: string }) {
+  return (
+    <View className="flex-1 bg-surface border border-line rounded-2xl px-4 py-3">
+      <Text className="text-xs text-muted">{label}</Text>
+      <Text className="text-base font-bold text-ink mt-0.5">{value}</Text>
+    </View>
+  );
+}
+
+function MethodOption({
+  icon,
+  title,
+  description,
+  selected,
+  onPress,
+}: {
+  icon: IconName;
+  title: string;
+  description: string;
+  selected: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.85}
+      className={`flex-row items-center rounded-3xl p-4 mb-3 border-2 ${
+        selected ? 'border-brand bg-brand-soft' : 'border-line bg-surface'
+      }`}
+    >
+      <View
+        className={`w-11 h-11 rounded-2xl items-center justify-center ${
+          selected ? 'bg-brand' : 'bg-canvas'
+        }`}
+      >
+        <Icon
+          name={icon}
+          size={22}
+          color={selected ? '#FFFFFF' : colors.muted}
+        />
+      </View>
+      <View className="flex-1 ml-3">
+        <Text className="font-bold text-ink text-base">{title}</Text>
+        <Text className="text-sm text-muted mt-0.5">{description}</Text>
+      </View>
+      <View
+        className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
+          selected ? 'border-brand bg-brand' : 'border-line'
+        }`}
+      >
+        {selected && <Icon name="check" size={14} color="#FFFFFF" />}
+      </View>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   mapContainer: {
-    height: 300,
+    height: 260,
     width: '100%',
-    marginTop: 20,
   },
 });

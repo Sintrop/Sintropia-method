@@ -1,8 +1,11 @@
-import {InspectionDBProps} from './database';
-import {CoordinateProps} from './regenerator';
+import { CoordinateProps } from './regenerator';
 
 export interface StartInspectionProps {
-  inspection?: Omit<InspectionDBProps, 'id'>;
+  regenerator: {
+    address: string;
+    name: string;
+  };
   coordinates: CoordinateProps[];
-  areaSize: number
+  areaSize: number;
+  collectionMethod: 'manual' | 'sampling';
 }

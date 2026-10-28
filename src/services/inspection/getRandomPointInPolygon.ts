@@ -3,11 +3,13 @@ import { point } from '@turf/helpers';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import bbox from '@turf/bbox';
 import { AllGeoJSON } from '@turf/turf';
+import type { Polygon } from 'geojson';
 
-export function getRandomPointInPolygon(
-  polygonCoords: [number, number][]
-) : {latitude: number, longitude: number} {
-  const polygon = {
+export function getRandomPointInPolygon(polygonCoords: [number, number][]): {
+  latitude: number;
+  longitude: number;
+} {
+  const polygon: Polygon = {
     type: 'Polygon',
     coordinates: [polygonCoords],
   };
@@ -30,5 +32,7 @@ export function getRandomPointInPolygon(
     attempts++;
   }
 
-  throw new Error("Não foi possível encontrar um ponto dentro do polígono após várias tentativas.");
+  throw new Error(
+    'Não foi possível encontrar um ponto dentro do polígono após várias tentativas.',
+  );
 }

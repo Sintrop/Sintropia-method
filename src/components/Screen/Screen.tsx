@@ -6,24 +6,40 @@ import { useSafeAreaApp } from '../../hooks/useSafeAreaApp';
 interface Props extends HeaderProps {
   children: React.ReactNode;
   scrollable?: boolean;
+  footer?: React.ReactNode;
 }
 export function Screen({
   children,
   scrollable,
+  footer,
   ...headerProps
 }: Props): React.JSX.Element {
   const { top, bottom } = useSafeAreaApp();
 
   return (
-    <View className="flex-1" style={{ paddingTop: top, paddingBottom: bottom }}>
+    <View className="flex-1 bg-canvas" style={{ paddingTop: top }}>
       <Header {...headerProps} />
 
       {scrollable ? (
-        <ScrollView className="px-5" showsVerticalScrollIndicator={false}>
+        <ScrollView
+          className="px-5"
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ paddingBottom: footer ? 24 : bottom + 24 }}
+        >
           {children}
         </ScrollView>
       ) : (
-        <View className="p-5">{children}</View>
+        <View className="flex-1 px-5">{children}</View>
+      )}
+
+      {footer && (
+        <View
+          className="px-5 pt-3 bg-canvas border-t border-line"
+          style={{ paddingBottom: bottom }}
+        >
+          {footer}
+        </View>
       )}
     </View>
   );

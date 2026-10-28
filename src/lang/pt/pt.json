@@ -1,7 +1,15 @@
 {
   "translation": {
     "homeScreen": {
-      "privacyPolicy": "Política de privacidade"
+      "privacyPolicy": "Política de privacidade",
+      "title": "Conte árvores e espécies no campo",
+      "subtitle": "Método de avaliação do Crédito de Regeneração para inspetores.",
+      "inProgress": "Coleta em andamento",
+      "continueCollection": "Continuar coleta",
+      "newCollection": "Nova coleta",
+      "newCollectionHint": "Escolha o regenerador, confira a área e comece a contagem.",
+      "finished": "Coletas finalizadas",
+      "version": "Versão {{version}}"
     },
     "helloWorld": "Olá Mundo!!!",
     "whichAreaDoYouWantToInspect": "Qual área você quer inspecionar?",
@@ -40,10 +48,10 @@
     "continue": "Continuar",
     "youCanOnlyInspectInspectionOpenedAndAccepted": "Você só pode inspecionar inspeções abertas ou aceitas",
     "atention": "Atenção",
-    "areaPreview": "Visão geral da área",
+    "areaPreview": "Área",
     "areaSize": "Tamanho da área",
     "coordinates": "Coordenadas",
-    "startInspection": "Começar inspeção",
+    "startInspection": "Começar coleta",
     "youAreInInspectionMode": "Você está no modo inspeção",
     "touchHereToExit": "Toque aqui para sair",
     "previous": "Anterior",
@@ -52,8 +60,8 @@
     "manual": "Manual",
     "sampling": "Amostragem",
     "proofPhoto": "Foto de prova",
-    "markAsRealized": "Marcar como concluída",
-    "deleteInspection": "Apagar inspeção",
+    "markAsRealized": "Finalizar coleta",
+    "deleteInspection": "Apagar coleta",
     "realizeInspection": "Realizar inspeção",
     "registerNewTree": "Registrar nova planta",
     "trees": "Plantas",
@@ -66,14 +74,14 @@
     "takePhoto": "Tirar foto",
     "takeAnother": "Tirar outra",
     "confirm": "Confirmar",
-    "textConfirmFinishInspection": "Você quer finalizar a inspeção? Ao finalizar, não será possível editar os dados.",
-    "finishInspection": "Finalizar inspeção",
+    "textConfirmFinishInspection": "Finalizar esta coleta? Depois disso os dados não poderão mais ser editados.",
+    "finishInspection": "Finalizar coleta",
     "cancel": "Cancelar",
-    "textConfirmDeleteInspection": "Você quer apagar essa inspeção? Todos os dados registrados nela serão perdidos.",
+    "textConfirmDeleteInspection": "Apagar esta coleta? Tudo o que foi registrado nela será perdido.",
     "coordinate": "Coordenada",
-    "textConfirmDeleteTree": "Você quer apagar essa planta?",
+    "textConfirmDeleteTree": "Excluir esta árvore?",
     "deleteTree": "Apagar planta",
-    "textConfirmDeleteBio": "Você quer apagar essa biodiversidade?",
+    "textConfirmDeleteBio": "Excluir esta espécie?",
     "deleteBio": "Apagar biodiversidade",
     "noBiodiversityRegistered": "Nenhum registro de biodiversidade",
     "noTreeRegistered": "Nenhum registro de plantas",
@@ -88,7 +96,7 @@
     "createSampling": "Criar amostragem",
     "generatePoint": "Gerar ponto",
     "touchToEnterThisSampling": "Toque para entrar nessa amostragem",
-    "textConfirmDeleteSampling": "Você quer apagar essa amostragem? Todos os dados registrados nela serão perdidos.",
+    "textConfirmDeleteSampling": "Excluir esta amostra e as árvores dela?",
     "deleteSampling": "Apagar amostragem",
     "tutorial": "Tutorial",
     "samplingRadius": "Raio da amostragem",
@@ -115,7 +123,7 @@
     "selectStepScreen": {
       "proofPhotos": "Fotos de prova",
       "registerPhotoWithRegenerator": "Registre uma foto com o regenerador",
-      "registerMorePhotosOfArea": "Registre mais fotos da área",
+      "registerMorePhotosOfArea": "Registre pelo menos 3 fotos da área",
       "touchToRegister": "Toque para registrar",
       "textConfirmDeletePhoto": "Você quer excluir essa foto?",
       "deletePhoto": "Excluir foto",
@@ -129,7 +137,11 @@
       "inspectionReport": "Relatório da inspeção",
       "proofPhotosReport": "Relatório das fotos de prova",
       "share": "Compartilhar",
-      "justificationReport": "Relatório de justificativa"
+      "justificationReport": "Relatório de justificativa",
+      "calculation": "Como o total foi estimado",
+      "sharePhotos": "PDF das fotos",
+      "shareReport": "PDF do relatório",
+      "exportError": "Não foi possível gerar o PDF. Tente novamente."
     },
     "inspectorReport": {
       "title": "Relatório do inspetor",
@@ -137,6 +149,113 @@
     },
     "common": {
       "typeHere": "Digite aqui"
+    },
+    "radius": "Raio",
+    "samplingsScreen": {
+      "touchCircleToEnter": "Toque em um círculo no mapa para entrar na amostra"
+    },
+    "selectRegenerator": "Selecionar regenerador",
+    "regeneratorsList": {
+      "title": "Regeneradores",
+      "searchPlaceholder": "Buscar por nome, carteira ou ID",
+      "loading": "Carregando regeneradores da blockchain...",
+      "errorLoading": "Não foi possível carregar os regeneradores. Verifique sua conexão.",
+      "errorLoadingArea": "Não foi possível carregar a área deste regenerador. Tente novamente.",
+      "tryAgain": "Tentar novamente",
+      "empty": "Nenhum regenerador encontrado",
+      "pendingInspection": "Inspeção pendente",
+      "inspections": "Inspeções: {{count}}",
+      "inspectionsLabel": "Inspeções"
+    },
+    "anyBiodiversityRegistered": "Nenhuma espécie registrada",
+    "anyTreeRegistered": "Nenhuma árvore registrada",
+    "noAreasInspected": "Nenhuma coleta finalizada ainda",
+    "result": "Resultado",
+    "camera": {
+      "error": "Não foi possível tirar a foto",
+      "unavailable": "Câmera indisponível neste aparelho"
+    },
+    "areaPreviewScreen": {
+      "methodHint": "Como as árvores desta área serão contadas",
+      "samplingDescription": "Conte as árvores em círculos sorteados e estime o total. Ideal para áreas grandes.",
+      "manualDescription": "Registre todas as árvores da área, uma a uma. Ideal para áreas pequenas."
+    },
+    "tutorialScreen": {
+      "skip": "Pular",
+      "trees": "Conte árvores, palmeiras e outras plantas com mais de 1 m de altura e 3 cm de diâmetro. No modo amostragem, entre em um círculo de amostra e toque em “+ Árvore” para cada uma.",
+      "species": "Toque em “+ Espécie” para cada espécie diferente plantada ou manejada pelo regenerador, em qualquer ponto da área.",
+      "photos": "Tire uma foto com o regenerador e pelo menos 3 fotos da área. A coleta só pode ser finalizada com elas."
+    },
+    "collection": {
+      "tabs": {
+        "map": "Mapa",
+        "photos": "Fotos",
+        "summary": "Resumo"
+      },
+      "addTree": "Árvore",
+      "addSpecies": "Espécie",
+      "tree": "Árvore",
+      "trees": "Árvores",
+      "species": "Espécies",
+      "sampling": "Amostra",
+      "samplings": "Amostras",
+      "samplingNumber": "Amostra {{number}}",
+      "delete": "Excluir",
+      "done": "Feito",
+      "required": "Obrigatório",
+      "goInsideSampling": "Entre em uma amostra",
+      "goInsideArea": "Entre na área",
+      "goToSampling": "Mostrar no mapa",
+      "newSampling": "Nova amostra #{{number}}",
+      "newSamplingHint": "O ponto foi sorteado dentro da área. Confirme ou sorteie outro.",
+      "drawAgain": "Sortear outro",
+      "samplingPointError": "Não foi possível sortear um ponto dentro da área.",
+      "status": {
+        "waiting": "Aguardando GPS…",
+        "outside": "Você está fora da área",
+        "inArea": "Dentro da área",
+        "inAreaSampling": "Dentro da área, fora das amostras",
+        "inSampling": "Dentro da amostra {{number}}"
+      },
+      "register": {
+        "newTree": "Nova árvore",
+        "newSpecies": "Nova espécie",
+        "inSampling": "Amostra {{number}}",
+        "inArea": "Área de regeneração",
+        "position": "Posição",
+        "retake": "Tirar outra foto",
+        "alsoNewSpecies": "Também é uma espécie nova",
+        "alsoNewSpeciesHint": "Registra esta árvore também na contagem de espécies",
+        "save": "Salvar"
+      },
+      "photos": {
+        "title": "Fotos de prova",
+        "subtitle": "Obrigatórias para finalizar a coleta.",
+        "withRegenerator": "Foto com o regenerador",
+        "withRegeneratorHint": "Comprova que a inspeção foi presencial.",
+        "ofArea": "Fotos da área",
+        "ofAreaHint": "No mínimo {{min}}, até {{max}}. Toque numa foto para excluir."
+      },
+      "requirements": {
+        "regeneratorPhoto": "Foto com o regenerador",
+        "areaPhotos": "Pelo menos {{min}} fotos da área",
+        "sampling": "Pelo menos 1 amostra",
+        "tree": "Pelo menos 1 árvore registrada",
+        "species": "Pelo menos 1 espécie registrada"
+      },
+      "summary": {
+        "estimatedTrees": "Árvores (estimativa)",
+        "species": "Espécies",
+        "samplingBasis": "Árvores contadas: {{trees}} · Amostras: {{samplings}} de {{area}} m² cada · Extrapolado para a área toda.",
+        "checklist": "Para finalizar",
+        "completeChecklist": "Complete a lista acima para finalizar.",
+        "saved": "Salvo",
+        "saving": "Salvando…",
+        "openReport": "Ver relatório completo",
+        "reports": "Relatórios"
+      },
+      "treesCount_one": "{{count}} árvore",
+      "treesCount_other": "{{count}} árvores"
     }
   }
 }

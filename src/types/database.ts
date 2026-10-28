@@ -12,12 +12,6 @@ export interface AreaDBProps {
   inspectorReport: string;
 }
 
-export interface InspectionDBProps {
-  id: number;
-  inspectionId: string;
-  regeneratorAddress: string;
-}
-
 export interface SamplingDBProps {
   id: number;
   areaId: number;

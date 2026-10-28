@@ -1,4 +1,4 @@
-import { calculateAreaCircle } from "./calculateAreaCircle";
+import { calculateAreaCircle } from './calculateAreaCircle';
 
 interface Props {
   totalArea: number;
@@ -9,8 +9,8 @@ interface Props {
 export function extrapolateTreesToArea({
   samplingSize,
   samplingTrees,
-  totalArea
-} : Props): number {
+  totalArea,
+}: Props): number {
   if (samplingTrees.length === 0) return 0;
 
   const samplingArea = calculateAreaCircle(samplingSize);
@@ -19,5 +19,5 @@ export function extrapolateTreesToArea({
   const densityPerM2 = treesAverage / samplingArea;
   const totalEstimated = densityPerM2 * totalArea;
 
-  return Math.round(totalEstimated)
+  return Math.round(totalEstimated);
 }

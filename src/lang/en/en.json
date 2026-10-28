@@ -1,7 +1,15 @@
 {
   "translation": {
     "homeScreen": {
-      "privacyPolicy": "Privacy policy"
+      "privacyPolicy": "Privacy policy",
+      "title": "Count trees and species in the field",
+      "subtitle": "Evaluation method of the Regeneration Credit for inspectors.",
+      "inProgress": "Collection in progress",
+      "continueCollection": "Continue collection",
+      "newCollection": "New collection",
+      "newCollectionHint": "Choose the regenerator, check the area and start counting.",
+      "finished": "Finished collections",
+      "version": "Version {{version}}"
     },
     "whichAreaDoYouWantToInspect": "Which Area Do You Want To Inspect?",
     "selectInspection": "Select inspection",
@@ -29,10 +37,10 @@
     "continue": "Continue",
     "youCanOnlyInspectInspectionOpenedAndAccepted": "You can only inspect inspections opened and accepted",
     "atention": "Atention",
-    "areaPreview": "Area preview",
+    "areaPreview": "Area",
     "areaSize": "Area size",
     "coordinates": "Coordinates",
-    "startInspection": "Start inspection",
+    "startInspection": "Start collection",
     "youAreInInspectionMode": "You are in inspection mode",
     "touchHereToExit": "Touch here to exit",
     "previous": "Previous",
@@ -41,8 +49,8 @@
     "manual": "Manual",
     "sampling": "Sampling",
     "proofPhoto": "Proof photo",
-    "markAsRealized": "Mark as realized",
-    "deleteInspection": "Delete inspection",
+    "markAsRealized": "Finish collection",
+    "deleteInspection": "Delete collection",
     "realizeInspection": "Realize inspection",
     "registerNewTree": "Register new tree",
     "trees": "Trees",
@@ -55,14 +63,14 @@
     "takePhoto": "Take photo",
     "takeAnother": "Take another",
     "confirm": "Confirm",
-    "textConfirmFinishInspection": "Do you want to finish the inspection? Once finished, you will not be able to edit the data in it.",
-    "finishInspection": "Finish inspection",
+    "textConfirmFinishInspection": "Finish this collection? After that its data can no longer be edited.",
+    "finishInspection": "Finish collection",
     "cancel": "Cancel",
-    "textConfirmDeleteInspection": "Do you want to delete this inspection? All data recorded in it will be deleted.",
+    "textConfirmDeleteInspection": "Delete this collection? Everything registered in it will be lost.",
     "coordinate": "Coordinate",
-    "textConfirmDeleteTree": "Do you want to delete this tree?",
+    "textConfirmDeleteTree": "Delete this tree?",
     "deleteTree": "Delete tree",
-    "textConfirmDeleteBio": "Do you want to delete this biodiversity?",
+    "textConfirmDeleteBio": "Delete this species?",
     "deleteBio": "Delete biodiversity",
     "noBiodiversityRegistered": "No biodiversity registered",
     "noTreeRegistered": "No tree registered",
@@ -77,7 +85,7 @@
     "createSampling": "Create sampling",
     "generatePoint": "Generate point",
     "touchToEnterThisSampling": "Touch to enter this sampling",
-    "textConfirmDeleteSampling": "Do you want to delete this sampling? All data recorded in it will be deleted.",
+    "textConfirmDeleteSampling": "Delete this sampling and its trees?",
     "deleteSampling": "Delete sampling",
     "tutorial": "Tutorial",
     "overview": "Overview",
@@ -114,7 +122,7 @@
     "selectStepScreen": {
       "proofPhotos": "Proof photos",
       "registerPhotoWithRegenerator": "Register photo with regenerator",
-      "registerMorePhotosOfArea": "Register more photos of area",
+      "registerMorePhotosOfArea": "Register at least 3 photos of the area",
       "touchToRegister": "Touch to register",
       "textConfirmDeletePhoto": "Do you want to delete this photo?",
       "deletePhoto": "Delete photo",
@@ -128,7 +136,11 @@
       "inspectionReport": "Inspection report",
       "proofPhotosReport": "Proof photos report",
       "share": "Share",
-      "justificationReport": "Justification report"
+      "justificationReport": "Justification report",
+      "calculation": "How the total was estimated",
+      "sharePhotos": "Photos PDF",
+      "shareReport": "Report PDF",
+      "exportError": "Could not generate the PDF. Try again."
     },
     "inspectorReport": {
       "title": "Inspector report",
@@ -136,6 +148,113 @@
     },
     "common": {
       "typeHere": "Type here"
+    },
+    "radius": "Radius",
+    "samplingsScreen": {
+      "touchCircleToEnter": "Touch a circle on the map to enter that sampling"
+    },
+    "selectRegenerator": "Select regenerator",
+    "regeneratorsList": {
+      "title": "Regenerators",
+      "searchPlaceholder": "Search by name, wallet or ID",
+      "loading": "Loading regenerators from the blockchain...",
+      "errorLoading": "Could not load the regenerators. Check your connection.",
+      "errorLoadingArea": "Could not load this regenerator area. Try again.",
+      "tryAgain": "Try again",
+      "empty": "No regenerator found",
+      "pendingInspection": "Pending inspection",
+      "inspections": "Inspections: {{count}}",
+      "inspectionsLabel": "Inspections"
+    },
+    "anyBiodiversityRegistered": "No species registered",
+    "anyTreeRegistered": "No tree registered",
+    "noAreasInspected": "No collection finished yet",
+    "result": "Result",
+    "camera": {
+      "error": "Could not take the photo",
+      "unavailable": "Camera unavailable on this device"
+    },
+    "areaPreviewScreen": {
+      "methodHint": "How the trees will be counted in this area",
+      "samplingDescription": "Count trees in random circles and estimate the total. Best for large areas.",
+      "manualDescription": "Register every tree of the area one by one. Best for small areas."
+    },
+    "tutorialScreen": {
+      "skip": "Skip",
+      "trees": "Count trees, palm trees and other plants over 1 m high and 3 cm in diameter. In sampling mode, walk into a sampling circle and tap “+ Tree” for each one.",
+      "species": "Tap “+ Species” for each different species planted or managed by the regenerator, anywhere in the area.",
+      "photos": "Take a photo with the regenerator and at least 3 photos of the area. The collection can only be finished with them."
+    },
+    "collection": {
+      "tabs": {
+        "map": "Map",
+        "photos": "Photos",
+        "summary": "Summary"
+      },
+      "addTree": "Tree",
+      "addSpecies": "Species",
+      "tree": "Tree",
+      "trees": "Trees",
+      "species": "Species",
+      "sampling": "Sampling",
+      "samplings": "Samplings",
+      "samplingNumber": "Sampling {{number}}",
+      "delete": "Delete",
+      "done": "Done",
+      "required": "Required",
+      "goInsideSampling": "Walk into a sampling",
+      "goInsideArea": "Walk into the area",
+      "goToSampling": "Show on the map",
+      "newSampling": "New sampling #{{number}}",
+      "newSamplingHint": "The point was drawn at random inside the area. Confirm it or draw again.",
+      "drawAgain": "Draw again",
+      "samplingPointError": "Could not draw a point inside the area.",
+      "status": {
+        "waiting": "Waiting for GPS…",
+        "outside": "You are outside the area",
+        "inArea": "Inside the area",
+        "inAreaSampling": "Inside the area, outside the samplings",
+        "inSampling": "Inside sampling {{number}}"
+      },
+      "register": {
+        "newTree": "New tree",
+        "newSpecies": "New species",
+        "inSampling": "Sampling {{number}}",
+        "inArea": "Regeneration area",
+        "position": "Position",
+        "retake": "Retake photo",
+        "alsoNewSpecies": "It is also a new species",
+        "alsoNewSpeciesHint": "Registers this tree in the species count too",
+        "save": "Save"
+      },
+      "photos": {
+        "title": "Proof photos",
+        "subtitle": "Required to finish the collection.",
+        "withRegenerator": "Photo with the regenerator",
+        "withRegeneratorHint": "Proves that the inspection happened in person.",
+        "ofArea": "Photos of the area",
+        "ofAreaHint": "At least {{min}}, up to {{max}}. Touch a photo to delete it."
+      },
+      "requirements": {
+        "regeneratorPhoto": "Photo with the regenerator",
+        "areaPhotos": "At least {{min}} photos of the area",
+        "sampling": "At least 1 sampling",
+        "tree": "At least 1 tree registered",
+        "species": "At least 1 species registered"
+      },
+      "summary": {
+        "estimatedTrees": "Estimated trees",
+        "species": "Species",
+        "samplingBasis": "Counted trees: {{trees}} · Samplings: {{samplings}} of {{area}} m² each · Extrapolated to the whole area.",
+        "checklist": "To finish",
+        "completeChecklist": "Complete the checklist above to finish.",
+        "saved": "Saved",
+        "saving": "Saving…",
+        "openReport": "View full report",
+        "reports": "Reports"
+      },
+      "treesCount_one": "{{count}} tree",
+      "treesCount_other": "{{count}} trees"
     }
   }
 }
