@@ -20,7 +20,7 @@ export function reportMapSection(mapImage?: string, showLegend = true) {
     <style>
       .area-map { width: 100%; max-height: 520px; object-fit: contain; border-radius: 12px; margin-top: 20px; }
       .map-legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; margin-top: 8px; }
-      .map-legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 5px; margin-right: 4px; border: 1px solid #000; }
+      .map-legend .dot { -webkit-print-color-adjust: exact; print-color-adjust: exact; display: inline-block; width: 10px; height: 10px; border-radius: 5px; margin-right: 4px; border: 1px solid #000; }
       .dot-area { background: red; }
       .dot-sampling { background: rgb(0, 150, 255); }
       .dot-tree { background: #22c55e; }

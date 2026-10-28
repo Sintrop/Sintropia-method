@@ -188,7 +188,7 @@ export async function generateReportPDF(props: GenerateReportPDFProps): Promise<
         
         <h2 class="text-center mt-20">Justification Report</h2>
         <h4>Inspector report:</h4>
-        <p>${inspectorReport}</p>
+        <p>${inspectorReport || '-'}</p>
 
         <h3 class="mt-20">Biodiversity</h3>
         <div class="div-flex-wrap">

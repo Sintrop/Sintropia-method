@@ -254,7 +254,7 @@ export async function generateReportPDFSamplingMode(props: GenerateReportPDFProp
         </div>
 
         <h4>Inspector report:</h4>
-        <p>${inspectorReport}</p>
+        <p>${inspectorReport || '-'}</p>
         
         <h3>Biodiversity</h3>
         <div class="div-flex-wrap">

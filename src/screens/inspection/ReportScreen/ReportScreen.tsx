@@ -40,6 +40,7 @@ import { generateReportProofPhotos } from '../../../services/inspection/generate
 //@ts-ignore
 import SintropiaLogo from '../../../assets/images/syntropy-method-en.png';
 import { format } from 'date-fns';
+import { APP_VERSION } from '../../../constants/app';
 import { TreesAndBiodiversityMarkers } from '../../../components/Map/RegisterMarkers';
 import { SamplingCircles } from '../../../components/Map/SamplingCircles';
 import { useFitBounds } from '../../../hooks/useFitBounds';
@@ -233,7 +234,7 @@ export function ReportScreen({ route }: ScreenProps) {
         address: area.regeneratorAddress,
       },
       date: format(new Date(), 'dd/MM/yyyy'),
-      version: '1',
+      version: APP_VERSION,
       inspectorReport: area?.inspectorReport,
     });
 
@@ -305,7 +306,7 @@ export function ReportScreen({ route }: ScreenProps) {
         address: area.regeneratorAddress,
       },
       date: format(new Date(), 'dd/MM/yyyy'),
-      version: '1',
+      version: APP_VERSION,
       inspectorReport: area?.inspectorReport,
     });
 
@@ -408,7 +409,7 @@ export function ReportScreen({ route }: ScreenProps) {
         address: area.regeneratorAddress,
       },
       date: format(new Date(), 'dd/MM/yyyy'),
-      version: '1',
+      version: APP_VERSION,
     });
 
     return pdfUri;
