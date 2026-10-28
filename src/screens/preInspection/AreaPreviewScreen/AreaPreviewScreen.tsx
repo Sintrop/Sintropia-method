@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   StyleSheet,
@@ -13,13 +12,16 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { PreInspectionStackParamsList } from '../../../routes/PreInspectionRoutes';
 import Mapbox, {
   Camera,
+  FillLayer,
   MapView,
-  PointAnnotation,
+  ShapeSource,
   StyleURL,
-  offlineManager,
 } from '@rnmapbox/maps';
 import { Polyline } from '../../../components/Map/Polyline';
 import { useInspectionContext } from '../../../hooks/useInspectionContext';
+import { useFitBounds } from '../../../hooks/useFitBounds';
+import { areaRing, boundsOf } from '../../../utils/geo';
+import { shortAddress } from '../RegeneratorsListScreen/components/RegeneratorItem';
 import Config from 'react-native-config';
 
 const MAPBOX_ACCESS_TOKEN = Config.MAPBOX_ACCESS_TOKEN
@@ -33,89 +35,64 @@ type ScreenProps = NativeStackScreenProps<
 >;
 export function AreaPreviewScreen({ route }: ScreenProps) {
   const { startInspection } = useInspectionContext();
-  const { coords, inspection, regenerator, areaSize } = route.params;
-
+  const { coords, regenerator } = route.params;
   const { t } = useTranslation();
-  const pathPolyline: [number, number][] = coords.map(coord => [
-    parseFloat(coord.longitude),
-    parseFloat(coord.latitude),
-  ]);
-  pathPolyline.push([...pathPolyline[0]]);
-
   const [loading, setLoading] = useState(false);
+
+  const ring = useMemo(() => areaRing(coords), [coords]);
+  const bounds = useMemo(() => boundsOf(ring), [ring]);
+  const { cameraRef, onMapLoaded, defaultSettings } = useFitBounds(bounds, 30);
 
   async function handleStartInspection() {
     setLoading(true);
-    downloadAreaMap();
     await startInspection({
-      areaSize,
-      coordinates: coords,
-      inspection: {
-        inspectionId: inspection.id.toString(),
-        regeneratorAddress: inspection?.regenerator,
+      regenerator: {
+        address: regenerator.regeneratorWallet,
+        name: regenerator.name,
       },
+      coordinates: coords,
+      areaSize: regenerator.totalArea,
     });
     setLoading(false);
   }
 
-  function downloadAreaMap() {
-    offlineManager.createPack(
-      {
-        name: coords[0].latitude,
-        styleURL: StyleURL.SatelliteStreet,
-        minZoom: 15,
-        maxZoom: 19,
-        bounds: [
-          [parseFloat(coords[0]?.longitude), parseFloat(coords[0]?.latitude)], // Coordenadas sudoeste
-          [parseFloat(coords[2]?.longitude), parseFloat(coords[2]?.latitude)], // Coordenadas nordeste
-        ],
-      },
-      offlinePack => {
-        offlinePack.resume();
-        offlinePack
-          .status()
-          .then(res => {
-            console.log('map downloaded: ' + res);
-          })
-          .catch(err => {
-            console.log('error dowload map: ' + err);
-          });
-      },
-      error => {
-        console.error('Error creating pack', error);
-      },
-    );
-  }
-
   return (
     <Screen screenTitle={t('areaPreview')} showBackButton scrollable>
-      <MapView style={styles.mapContainer} styleURL={StyleURL.SatelliteStreet}>
-        <Camera
-          centerCoordinate={[
-            parseFloat(coords[0].longitude),
-            parseFloat(coords[0].latitude),
-          ]}
-          zoomLevel={15}
-        />
+      <Text className="font-bold text-black text-lg mt-5">
+        {regenerator.name}
+      </Text>
+      <Text className="text-gray-500">
+        {t('regenerator')} #{regenerator.id} ·{' '}
+        {shortAddress(regenerator.regeneratorWallet)}
+      </Text>
 
-        {coords.map((coord, index) => (
-          <PointAnnotation
-            key={index.toString()}
-            coordinate={[
-              parseFloat(coord?.longitude),
-              parseFloat(coord.latitude),
-            ]}
-            id="marker"
-          >
-            <View />
-          </PointAnnotation>
-        ))}
+      <MapView
+        style={styles.mapContainer}
+        styleURL={StyleURL.SatelliteStreet}
+        onDidFinishLoadingMap={onMapLoaded}
+      >
+        <Camera ref={cameraRef} defaultSettings={defaultSettings} />
 
-        <Polyline lineColor="red" lineWidth={4} coordinates={pathPolyline} />
+        <ShapeSource
+          id="area-fill-source"
+          shape={{
+            type: 'Feature',
+            properties: {},
+            geometry: { type: 'Polygon', coordinates: [ring] },
+          }}
+        >
+          <FillLayer
+            id="area-fill"
+            style={{ fillColor: 'rgba(255, 0, 0, 0.15)' }}
+          />
+        </ShapeSource>
+
+        <Polyline id="area" lineColor="red" lineWidth={4} coordinates={ring} />
       </MapView>
 
-      <Text className="text-gray-500">
-        {t('areaSize')}: {Intl.NumberFormat('pt-BR').format(areaSize)} m²
+      <Text className="text-gray-500 mt-2">
+        {t('areaSize')}:{' '}
+        {Intl.NumberFormat('pt-BR').format(regenerator.totalArea)} m²
       </Text>
 
       <View className="p-3 rounded-2xl border mt-5">
@@ -130,6 +107,7 @@ export function AreaPreviewScreen({ route }: ScreenProps) {
       <TouchableOpacity
         className="w-full h-[48] bg-[#229B13] flex items-center justify-center rounded-2xl my-10"
         onPress={handleStartInspection}
+        disabled={loading}
       >
         {loading ? (
           <ActivityIndicator color="white" size={30} />
@@ -147,6 +125,8 @@ const styles = StyleSheet.create({
   mapContainer: {
     height: 300,
     width: '100%',
-    marginTop: 20,
+    marginTop: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
   },
 });

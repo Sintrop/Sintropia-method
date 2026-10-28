@@ -149,6 +149,18 @@
     "radius": "Raio",
     "samplingsScreen": {
       "touchCircleToEnter": "Toque em um círculo no mapa para entrar na amostra"
+    },
+    "selectRegenerator": "Selecionar regenerador",
+    "regeneratorsList": {
+      "title": "Regeneradores",
+      "searchPlaceholder": "Buscar por nome, carteira ou ID",
+      "loading": "Carregando regeneradores da blockchain...",
+      "errorLoading": "Não foi possível carregar os regeneradores. Verifique sua conexão.",
+      "errorLoadingArea": "Não foi possível carregar a área deste regenerador. Tente novamente.",
+      "tryAgain": "Tentar novamente",
+      "empty": "Nenhum regenerador encontrado",
+      "pendingInspection": "Inspeção pendente",
+      "inspections": "Inspeções: {{count}}"
     }
   }
 }

@@ -3,6 +3,7 @@ import { StartInspectionProps } from '../types/inspectionContext';
 import { useSQLite } from '../hooks/useSQLite';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AreaDBProps } from '../types/database';
+import { downloadAreaOfflineMap } from '../services/map/downloadAreaOfflineMap';
 
 export interface InspectionContextProps {
   inspectionMode: boolean;
@@ -26,7 +27,6 @@ export function InspectionContextProvider({
 }: InspectionProviderProps) {
   const {
     addArea,
-    addInspection,
     areasOpened,
     fetchOpenedAreas,
     updateAreaStatus,
@@ -58,25 +58,25 @@ export function InspectionContextProvider({
   }
 
   async function startInspection(props: StartInspectionProps) {
-    const { inspection, coordinates, areaSize } = props;
+    const { regenerator, coordinates, areaSize } = props;
 
+    // Collections belong to the regenerator's area, not to an on-chain
+    // inspection, so they can be done before or independently of a request.
     await addArea({
       coordinates: JSON.stringify(coordinates),
-      name: inspection ? `Inspection #${inspection?.inspectionId}` : '',
+      name: regenerator.name,
       description: '',
       proofPhoto: '',
       size: areaSize,
-      inspectionId: inspection ? inspection?.inspectionId : '0',
-      regeneratorAddress: inspection
-        ? inspection?.regeneratorAddress
-        : '0x0000000000000000000000000000000000000',
+      inspectionId: '',
+      regeneratorAddress: regenerator.address,
       status: 0,
       collectionMethod: '',
+      inspectorReport: '',
     });
 
-    if (inspection) {
-      await addInspection(inspection);
-    }
+    downloadAreaOfflineMap(`area-${regenerator.address}`, coordinates);
+
     fetchOpenedAreas();
     setInspectionMode(true);
     await AsyncStorage.setItem('inspection-mode', 'true');

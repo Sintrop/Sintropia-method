@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import SQLite, { SQLiteDatabase } from 'react-native-sqlite-storage';
-import { AreaDBProps, BiodiversityDBProps, InspectionDBProps, ProofPhotosDBProps, SamplingDBProps, TreeDBProps } from '../types/database';
+import { AreaDBProps, BiodiversityDBProps, ProofPhotosDBProps, SamplingDBProps, TreeDBProps } from '../types/database';
 
 export function useSQLite() {
   const [db, setDb] = useState<SQLiteDatabase | null>(null);
@@ -301,18 +301,6 @@ export function useSQLite() {
     });
   };
 
-  async function addInspection(data: Omit<InspectionDBProps, 'id'>) {
-    if (!db) return;
-
-    await db.transaction(tx => {
-      tx.executeSql(
-        'INSERT INTO inspection (inspectionId, regeneratorAddress) VALUES (?, ?);',
-        [data?.inspectionId, data?.regeneratorAddress],
-        () => { }
-      );
-    });
-  };
-
   async function fetchBiodiversityByAreaId(id: number): Promise<BiodiversityDBProps[]> {
     if (!db) return [];
 
@@ -601,7 +589,6 @@ export function useSQLite() {
     fetchAreas,
     fetchOpenedAreas,
     addArea,
-    addInspection,
     areas,
     areasOpened,
     fetchBiodiversityByAreaId,

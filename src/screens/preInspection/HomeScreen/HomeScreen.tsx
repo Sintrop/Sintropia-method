@@ -18,8 +18,8 @@ export function HomeScreen({ navigation }: ScreenProps): React.JSX.Element {
   const { t } = useTranslation();
   const { language } = useMainContext();
 
-  function handleGoToInspectionsScreen() {
-    navigation.navigate('SearchInspectionScreen');
+  function handleGoToRegeneratorsScreen() {
+    navigation.navigate('RegeneratorsListScreen');
   }
 
   function handleGoToInspectedAreasScreen() {
@@ -62,10 +62,10 @@ export function HomeScreen({ navigation }: ScreenProps): React.JSX.Element {
 
             <TouchableOpacity
               className="w-[320] h-[48] rounded-2xl bg-[#229B13] flex items-center justify-center mt-5"
-              onPress={handleGoToInspectionsScreen}
+              onPress={handleGoToRegeneratorsScreen}
             >
               <Text className="font-semibold text-white">
-                {t('selectInspection')}
+                {t('selectRegenerator')}
               </Text>
             </TouchableOpacity>
           </View>

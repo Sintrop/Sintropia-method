@@ -148,6 +148,18 @@
     "radius": "Radius",
     "samplingsScreen": {
       "touchCircleToEnter": "Touch a circle on the map to enter that sampling"
+    },
+    "selectRegenerator": "Select regenerator",
+    "regeneratorsList": {
+      "title": "Regenerators",
+      "searchPlaceholder": "Search by name, wallet or ID",
+      "loading": "Loading regenerators from the blockchain...",
+      "errorLoading": "Could not load the regenerators. Check your connection.",
+      "errorLoadingArea": "Could not load this regenerator area. Try again.",
+      "tryAgain": "Try again",
+      "empty": "No regenerator found",
+      "pendingInspection": "Pending inspection",
+      "inspections": "Inspections: {{count}}"
     }
   }
 }

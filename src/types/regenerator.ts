@@ -16,6 +16,7 @@ export interface RegeneratorProps {
     currentEra: number;
   };
   createdAt: number;
+  isFullyInvalidated: boolean;
 }
 
 export interface CoordinateProps {
